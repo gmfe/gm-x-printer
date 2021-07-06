@@ -133,4 +133,39 @@ export default {
 }
 ```
 
+## addFields
+
+右侧的添加字段数据
+
+```js
+├── commonFields # 块区域的添加字段
+├── summaryFields # 合计汇总字段
+├── tableFields # 表格区域的添加字段
+```
+
+## data数据
+
+1. common：非表格数据
+2. _origin:原始数据
+3. _table：表格数据（根据模板的不同，进行整理数据）
+   1. orders: kOrders, // 普通
+   2. orders_multi: kOrdersMulti, // 双栏
+   3. orders_multi_vertical: kOrdersMultiVertical, // 双栏（纵向）
+   4. orders_category: kCategory, // 分类
+   5. orders_category_multi: kCategoryMulti, // 分类 + 双栏
+   6. orders_category_multi_vertical: kCategoryMultiVertical, // 分类+双栏（纵向）
+   7. .......
+
+## 区域表示
+
+```js
+    // header
+    // header.block.0
+    // contents.panel.0 //区域块
+    // contents.panel.0.block.0 //区域块的每一个块
+    // contents.table.0 //区域表格
+    // contents.table.0.column.0 // 区域表格的每一个表格
+```
+
+
 

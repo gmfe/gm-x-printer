@@ -1,4 +1,4 @@
-declare module 'gm-printer' {
+declare module 'gm-x-printer' {
   import { CSSProperties } from 'react'
   interface EditorProps {
     config: any
