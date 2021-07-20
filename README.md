@@ -1,32 +1,80 @@
-# gm-printer 
+# gm-x-printer
 
 ## 目录简要
+
 ```bash
 ├── src
 │   ├── config.js # 一些printer配置信息
 │   ├── data_to_key # 原始数据转换成打印数据
 │   ├── editor # 右侧打印编辑界面
-│   ├── index.js 
+│   ├── index.js
 │   ├── mock_data # 模拟数据
 │   ├── printer # 打印区域
 │   ├── template_config # 打印模板配置文件
-│   └── util.js 
+│   └── util.js
 ├── locales # 多语言文件
 ```
 
+## 运行gm-x-printer
+
+1. yarn
+2. yarn start
+
+## 与erp进行连接测试
+
+1. 在gm-x-printer中，使用`yarn link`
+2. 在gm-static-x-erp中使用`yarn link 'gm-x-printer'`,这样就连接上了gm-x-printer组件库，改动组件库的时候，就可以在gm-static-x-erp看到效果
+3. 断开连接，先在gm-x-printer中使用`yarn unlink`,在gm-static-x-erp中运行`yarn unlink 'gm-x-printer'`,重新yarn和yarn start一下
+4. 可能断开连接不太好用，不好用的时候，删除node_modeles，关闭gm-x-printer，重新yarn
+5. yarn link不太稳定
+
+## 版本命名规则
+
+1. GNU 风格的版本号命名格式：主版本号 . 子版本号 [. 修正版本号 [. 编译版本号 ]]，示例 : 1.2.1 （正式版本）, 1.2.1-beta.0(测试版本)
+2. 版本号管理策略:
+   1. 项目最初版本为1.0.0（npm上最初的10.11.3-beta0的原因是gm-x-printer是从gm-printer上feature/迁移出来的，没有影响不用在乎）
+   2. 当项目在进行了局部修改或 bug 修正时，主版本号和子版本号都不变，修正版本号加 1；示例：1.0.1
+   3. 当项目在原有的基础上增加了部分功能时，主版本号不变，子版本号加 1，修正版本号复位为 0。示例：1.1.0
+   4. 当项目在进行了重大修改或局部修正累积较多，而导致项目整体发生全局变化时，主版本号加 1.示例：2.1.0
+
+## 版本发布
+
+gm-x-printer是一个单独的组件库，使用npm发布版本
+
+1. 没有登陆过，使用`npm login`登陆，一次登陆永久使用，登陆的时候会输入密码，用户名，邮箱（公司有）
+2. beta版本包的版本发布(用来测试该版本，解决该版本的bug)
+   1. 将`pageage.json`中的`version`修改为`X.X.X-beta.0`，或者运行 `npm version X.X.X-beta.0`来更新`package.json`，同时创建一个git标签 (请参考 https://docs.npmjs.com/cli/version)。
+   
+      在你的版本末尾添加 `beta.0` 非常重要。`.0` 表示它是哪个版本。当我们对 `beta` 版进行修补发布新的 `beta` 版本时，我们会将 `.0` 递增到 `.1`，以此类推。
+   
+   2. ⚠️将该版本的包push到远程仓库
+   
+   3. 使用`npm publish --tag beta`发布测试版本
+   
+   4. 对版本进行修补时，只需要将`beta.0`递增到`beta.1`进行版本发布即可，以此类推
+3. 正式版本的发布
+   1. 遵循上面的版本命名规则，修改`pageage.json`中的`version`版本号，或者运行 `npm version X.X.X`来更新`package.json`，同时创建一个git标签 
+   2. ⚠️将正式版本push到远程仓库
+   3. 使用`npm publish`发布正式版本
+   4. 在自己的分支上进行发布版本即可，发完后，将分支合并到master上！！！
+
 ## 模板文件(template_config)
-config主要是有下面6大部分组成
+
+config 主要是有下面 6 大部分组成
+
 ```js
 export default {
-  'name': '模板名称',   // 模板名称
-  'page': {},         // 模板整体的配置信息
-  'header': {},       // 页眉(每页都会渲染)
-  'contents': {},     // 主要内容(contents只渲染一次!第一页放不下,会顺延到次页继续渲染,直至全部渲染)
-  'sign': {},         // 签名(只在最后一页渲染)
-  'footer': {}        // 页脚(每页都会渲染)
+  name: '模板名称', // 模板名称
+  page: {}, // 模板整体的配置信息
+  header: {}, // 页眉(每页都会渲染)
+  contents: {}, // 主要内容(contents只渲染一次!第一页放不下,会顺延到次页继续渲染,直至全部渲染)
+  sign: {}, // 签名(只在最后一页渲染)
+  footer: {} // 页脚(每页都会渲染)
 }
 ```
+
 一个简单模板配置如下
+
 ```js
 export default {
   name: '模板名称',
@@ -38,18 +86,22 @@ export default {
       height: '297mm' // 纸张高度
     },
     printDirection: 'vertical', // 打印布局方向(两种: vertical, horizontal)
-    gap: {       // 纸张内边距
+    gap: {
+      // 纸张内边距
       paddingRight: '5mm',
       paddingLeft: '5mm',
       paddingBottom: '5mm',
       paddingTop: '5mm'
     }
   },
-  header: {     // 页眉
-    blocks: [   // blocks数组,里面元素
+  header: {
+    // 页眉
+    blocks: [
+      // blocks数组,里面元素
       {
         text: '收货人: {{收货人}}', // 文本块
-        style: {                  // 文本块样式
+        style: {
+          // 文本块样式
           right: '',
           left: '450px',
           position: 'absolute',
@@ -57,15 +109,17 @@ export default {
         }
       }
     ],
-    style: {                      // header 的样式
+    style: {
+      // header 的样式
       height: '97px'
     }
   },
-  contents: [  // contents数组,元素是object. 
+  contents: [
+    // contents数组,元素是object.
     {
       blocks: [
         {
-          text: '收货人: {{收货人}}',  // 模板字符串用{{}}表示
+          text: '收货人: {{收货人}}', // 模板字符串用{{}}表示
           style: {
             right: '',
             left: '450px',
@@ -79,27 +133,43 @@ export default {
       }
     },
     {
-      className: '',   
-      type: 'table',   // type 表明是table 
-      dataKey: 'orders_category',  // table的接受哪些数据. dataKey详细看下文
-      subtotal: {     // 是否显示table每页合计
+      blocks: [
+        {
+          type: 'counter',//  type类型为 'counter'是表格上面的类别和商品数小表格
+          style: {}
+        }
+      ],
+      style: {
+        height: 'auto'
+      }
+    },
+    {
+      className: '',
+      type: 'table', // type 表明是table
+      dataKey: 'orders_category', // table的接受哪些数据. dataKey详细看下文
+      subtotal: {
+        // 是否显示table每页合计
         show: false
       },
-      columns: [      // 表单列配置
+      columns: [
+        // 表单列配置
         {
           head: '序号',
-          headStyle: {    // 表头样式
+          headStyle: {
+            // 表头样式
             textAlign: 'center'
           },
-          style: {       // 表格样式
+          style: {
+            // 表格样式
             textAlign: 'center'
           },
-          text: '{{列.序号}}'  // 表格内容
+          text: '{{列.序号}}' // 表格内容
         }
       ]
     }
   ],
-  sign: {    // 签名(只在最后一页打印)
+  sign: {
+    // 签名(只在最后一页打印)
     blocks: [
       {
         text: '签收人：',
@@ -114,7 +184,8 @@ export default {
       height: '46px'
     }
   },
-  footer: {   // 页脚
+  footer: {
+    // 页脚
     blocks: [
       {
         text: '页码： {{当前页码}} / {{页码总数}}',
@@ -143,11 +214,11 @@ export default {
 ├── tableFields # 表格区域的添加字段
 ```
 
-## data数据
+## data 数据
 
 1. common：非表格数据
-2. _origin:原始数据
-3. _table：表格数据（根据模板的不同，进行整理数据）
+2. \_origin:原始数据
+3. \_table：表格数据（根据模板的不同，进行整理数据）
    1. orders: kOrders, // 普通
    2. orders_multi: kOrdersMulti, // 双栏
    3. orders_multi_vertical: kOrdersMultiVertical, // 双栏（纵向）
@@ -159,13 +230,10 @@ export default {
 ## 区域表示
 
 ```js
-    // header
-    // header.block.0
-    // contents.panel.0 //区域块
-    // contents.panel.0.block.0 //区域块的每一个块
-    // contents.table.0 //区域表格
-    // contents.table.0.column.0 // 区域表格的每一个表格
+// header
+// header.block.0
+// contents.panel.0 //区域块
+// contents.panel.0.block.0 //区域块的每一个块
+// contents.table.0 //区域表格
+// contents.table.0.column.0 // 区域表格的每一个表格
 ```
-
-
-
