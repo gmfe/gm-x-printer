@@ -35,6 +35,7 @@ declare module 'gm-x-printer' {
     T,
     any
   > {}
+  class EditorAccount<T extends EditorProps> extends React.Component<T, any> {}
   class EditorBoxLabel<T extends EditorProps> extends React.Component<T, any> {}
   class Printer<T extends PrinterProps> extends React.Component<T, any> {}
   class BatchPrinter<T extends BatchPrinterProps> extends React.Component<T, any> {}
@@ -55,6 +56,7 @@ declare module 'gm-x-printer' {
     EditorCannibalize,
     EditorStatement,
     EditorAccoutStatement,
+    EditorAccount,
     EditorBoxLabel,
     Printer,
     BatchPrinter,

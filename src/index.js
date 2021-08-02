@@ -7,6 +7,7 @@ import EditorStockOut from './editor_stockout'
 import EditorSettle from './editor_settle'
 import EditorStatement from './editor_statement'
 import EditorAccoutStatement from './editor_account_statement'
+import EditorAccount from './editor_account'
 import EditorBoxLabel from './editor_box_label'
 import EditorSaleMenus from './editor_salemenus'
 import EditorCannibalize from './editor_cannibalize'
@@ -24,6 +25,7 @@ export {
   EditorSettle,
   EditorStatement,
   EditorAccoutStatement,
+  EditorAccount,
   EditorBoxLabel,
   EditorSaleMenus,
   EditorCannibalize,

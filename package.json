@@ -1,6 +1,6 @@
 {
   "name": "gm-x-printer",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "diy printer",
   "main": "src/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gmfe/gm-printer.git"
+    "url": "git+https://github.com/gmfe/gm-x-printer.git"
   },
   "types": "global.d.ts",
   "author": "",
