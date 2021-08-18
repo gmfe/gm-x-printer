@@ -155,7 +155,8 @@ class Table extends React.Component {
                 data-name={getTableColumnName(name, col.index)}
                 draggable
                 style={{
-                  minWidth: thWidths[i],
+                  maxWidth: thWidths[i],
+                  minWidth: '24px', // 最小两个字24px
                   ...col.headStyle
                 }}
                 className={classNames({
