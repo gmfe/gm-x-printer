@@ -96,6 +96,7 @@
     td,
     th {
       border: 1px solid black;
+      padding: 2px 0;
     }
   }
 }
@@ -105,7 +106,7 @@
     td,
     th {
       border: 1px solid #ddd;
-      padding: 2px;
+      padding: 2px 0;
     }
   }
 }
@@ -129,7 +130,7 @@
     td,
     th {
       border: none;
-      padding: 2px;
+      padding: 2px 0;
     }
   }
 }
@@ -140,7 +141,7 @@
 
   .gm-printer-special-container-box {
     flex: 1;
-    padding: 2px;
+    padding: 2px 0;
   }
 
   .gm-printer-special-container-box + .gm-printer-special-container-box {
