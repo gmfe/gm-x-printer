@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import Big from 'big.js'
 
-function getHeight(el) {
+function getPageHeight(el) {
   const styles = window.getComputedStyle(el)
   const height = el.offsetHeight
   const borderTopWidth = parseFloat(styles.borderTopWidth)
@@ -13,6 +13,18 @@ function getHeight(el) {
   )
 }
 
+/**
+ * 获取元素的高度
+ * @param {object} el 元素
+ * @returns 元素高度
+ */
+function getHeight(el) {
+  //   const styles = window.getComputedStyle(el)
+  //   const borderTopWidth = parseFloat(styles.borderTopWidth)
+  // return el.offsetHeight - borderTopWidth
+  return el.offsetHeight
+}
+
 function getWidth(el) {
   const styles = window.getComputedStyle(el)
   const width = el.offsetWidth
@@ -21,6 +33,14 @@ function getWidth(el) {
   const paddingLeft = parseFloat(styles.paddingLeft)
   const paddingRight = parseFloat(styles.paddingRight)
   return width - borderLeftWidth - borderRightWidth - paddingLeft - paddingRight
+}
+/**
+ * 获取元素的宽度
+ * @param {object} el 元素
+ * @returns 元素高度
+ */
+function getHeadThWidth(el) {
+  return el.offsetWidth
 }
 
 function pxAdd(origin = '0px', add) {
@@ -53,6 +73,22 @@ function getBlockName(name, index) {
 
 function getTableColumnName(name, index) {
   return `${name}.column.${index}`
+}
+
+/**
+ * @param {string} index 表格列的下表
+ * @returns {string} 设置第一列表格的类名
+ */
+function getTableRowColumnName(index) {
+  return `rowSpan-column-${index}`
+}
+
+/**
+ * @param {Array} data 表格数据
+ * @returns {boolean} 判断是否是生产打印
+ */
+function isRowSpanTable(data) {
+  return _.some(data, item => item.length)
 }
 
 function insertCSS(cssString, target) {
@@ -178,13 +214,55 @@ const getDataKey = (dataKey, arrange) =>
     ? `${dataKey}_vertical`
     : dataKey
 
+/**
+ * @param {*} indexEnd 当前表格行的索引
+ * @param {*} trs 当前表格的所有tr高度数组
+ * @param {*} heightParams {currentPageHeight:当前计算的高度 calcHeight: pageHeight:页面的总高度currentPageMinimumHeight：当前页面的最小高度（表格的表头+合计+页眉页脚）}
+ * @param {*} pageHeight page的高度
+ * @returns {ranges, trsPageHeight} trsPageHeight 每页高度合集
+ */
+const caclRowSpanTdPageHeight = (indexEnd, trs, heightParams) => {
+  let end = 0
+  let index = 0
+  let splicePoint = 0
+  let currentDetailsMiniHeight = 0
+  let detailsPageHeight = 0
+  const { calcHeight, pageHeight, currentPageHeight } = heightParams
+
+  while (end < trs.length) {
+    currentDetailsMiniHeight += trs[end]
+
+    const _calcHeight = !index && indexEnd === 0 ? calcHeight : pageHeight
+    // 如果当前明细高度综合大于页面高度，到此为止进行分页
+    if (currentDetailsMiniHeight + currentPageHeight > _calcHeight) {
+      splicePoint = end === 0 ? 0 : end - 1
+      detailsPageHeight = currentDetailsMiniHeight - trs[end]
+      index++
+      break
+    } else {
+      end++
+      if (end === trs.length) {
+        splicePoint = end
+        detailsPageHeight = currentDetailsMiniHeight
+      }
+    }
+  }
+
+  return {
+    splicePoint,
+    detailsPageHeight
+  }
+}
+
 export {
-  getHeight,
+  getPageHeight,
   getWidth,
+  getHeadThWidth,
   pxAdd,
   getStyleWithDiff,
   getBlockName,
   getTableColumnName,
+  getTableRowColumnName,
   insertCSS,
   dispatchMsg,
   exchange,
@@ -193,5 +271,8 @@ export {
   coverDigit2Uppercase,
   getDataKey,
   isMultiTable,
-  getMultiNumber
+  getMultiNumber,
+  isRowSpanTable,
+  getHeight,
+  caclRowSpanTdPageHeight
 }

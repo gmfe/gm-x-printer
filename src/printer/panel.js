@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
-import { dispatchMsg, getBlockName, getHeight, pxAdd } from '../util'
+import { dispatchMsg, getBlockName, getPageHeight, pxAdd } from '../util'
 import classnames from 'classnames'
 import Block from './block'
 
@@ -23,7 +23,7 @@ class Panel extends React.Component {
     if (!printerStore.ready) {
       const $dom = this.ref.current
 
-      printerStore.setHeight(name, getHeight($dom))
+      printerStore.setHeight(name, getPageHeight($dom))
     }
   }
 

@@ -21,7 +21,6 @@ const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
 class Editor extends React.Component {
   render() {
     const { onSave, showEditor, addFields } = this.props
-    // console.log('挑拨单数据',this.props)
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>

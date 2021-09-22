@@ -85,7 +85,9 @@ class Printer extends React.Component {
       printerStore.setReady(true)
 
       // 开始计算，获取各种数据
-      printerStore.computedPages()
+      config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
+        ? printerStore.computedRowTablePages()
+        : printerStore.computedPages()
     }
     // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
     this.setState({}, () => {

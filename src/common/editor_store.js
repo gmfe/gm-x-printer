@@ -528,7 +528,8 @@ class EditorStore {
       columns.push({
         head: key,
         headStyle: {
-          textAlign: 'center'
+          textAlign: 'center',
+          width: '85px'
         },
         text: value,
         style: {
@@ -552,8 +553,10 @@ class EditorStore {
     } else if (arr.length === 5 && arr[1] === 'panel') {
       source.splice(arr[4], 1)
     } else if (arr.length === 5 && arr[1] === 'table') {
-      // 表格至少保留一列
-      if (source.length > 1) {
+      // 获取当前选中的列，isRemove有值的时候，不允许删除
+      const noRemove = source[arr[4]]?.noRemove
+      // 大于一列和isRemove没有值的时候允许删除
+      if (source.length > 1 && !noRemove) {
         source.splice(arr[4], 1)
       }
     }
@@ -590,6 +593,19 @@ class EditorStore {
             subtotal: defaultTableSubtotal, // 默认的每页合计配置
             columns: [
               {
+                head: i18next.t('序号'),
+                headStyle: {
+                  textAlign: 'center',
+                  minWidth: '30px'
+                },
+                text: i18next.t('{{列.序号}}'),
+                style: {
+                  textAlign: 'center'
+                },
+                rowSpan: 'rowSpan',
+                noRemove: 'isRemove' // 是否允许删除该列
+              },
+              {
                 head: i18next.t('表头'),
                 headStyle: {
                   textAlign: 'center',
@@ -619,7 +635,10 @@ class EditorStore {
     if (this.selectedRegion) {
       const arr = this.selectedRegion.split('.')
       const table = this.config.contents[arr[2]]
-
+      // 修改要合并的单元格 productionMergeType控制了要合并的单元格是哪个，还控制config的切换
+      if (this.config?.productionMergeType) {
+        this.config.productionMergeType = dataKey
+      }
       this.selected = null // 清空点中项
       table.dataKey = dataKey
       // 改变dataKey后做副作用action

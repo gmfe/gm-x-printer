@@ -7,8 +7,10 @@ import {
   getHeight,
   getMultiNumber,
   getTableColumnName,
-  getWidth,
-  isMultiTable
+  getHeadThWidth,
+  isMultiTable,
+  isRowSpanTable,
+  getTableRowColumnName
 } from '../util'
 import { inject, observer } from 'mobx-react'
 import classNames from 'classnames'
@@ -29,23 +31,41 @@ class Table extends React.Component {
   }
 
   componentDidMount() {
-    const { name, printerStore } = this.props
+    let {
+      name,
+      printerStore,
+      config: { dataKey, arrange }
+    } = this.props
+    // 数据
+    dataKey = getDataKey(dataKey, arrange)
+    const tableData = printerStore.data._table[dataKey] || []
 
     if (!printerStore.ready) {
       const $table = this.ref.current.querySelector('table')
       const tHead = $table.querySelector('thead')
       const ths = tHead.querySelectorAll('th') || []
-      const trs = $table.querySelectorAll('tbody tr') || []
+      const trs =
+        $table.querySelectorAll(
+          `${
+            isRowSpanTable(tableData)
+              ? 'tbody .rowSpan-column-rowSpan' // 序号的那一列有这个类名
+              : 'tbody tr'
+          }`
+        ) || []
+      const trRowSpan = $table.querySelectorAll('tbody tr') || []
 
       printerStore.setHeight(name, getHeight($table))
 
       printerStore.setTable(name, {
         head: {
           height: getHeight(tHead),
-          widths: _.map(ths, th => getWidth(th))
+          widths: _.map(ths, th => getHeadThWidth(th))
         },
         body: {
           heights: _.map(trs, tr => getHeight(tr))
+        },
+        bodyTr: {
+          heights: _.map(trRowSpan, tr => getHeight(tr))
         }
       })
     }
@@ -143,6 +163,11 @@ class Table extends React.Component {
 
     // 列宽固定(避免跳页bug)
     const thWidths = printerStore.tablesInfo[name]?.head.widths || []
+    // 判断是那个生产单据，需要合并哪些单元格
+    const includesColText =
+      printerStore.config?.tableRowSpanTdArr?.[
+        printerStore?.config?.productionMergeType
+      ]
 
     return (
       <table>
@@ -179,46 +204,154 @@ class Table extends React.Component {
             const _special = tableData[i] && tableData[i]._special
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
-
             // 如果项为空对象展现一个占满一行的td
             const isItemNone = !_.keys(tableData[i]).length
-
-            return (
-              <tr style={{ height: `${customerRowHeight}px` }} key={i}>
-                {isItemNone ? (
-                  <td colSpan='99' />
-                ) : (
-                  _.map(columns, (col, j) => {
-                    return (
-                      <td
-                        key={j}
-                        data-name={getTableColumnName(name, col.index)}
-                        style={col.style}
-                        className={classNames({
-                          active:
-                            getTableColumnName(name, col.index) ===
-                            printerStore.selected
-                        })}
-                        dangerouslySetInnerHTML={{
-                          __html: col.isSpecialColumn
-                            ? printerStore.templateSpecialDetails(
-                                col,
-                                dataKey,
-                                i
-                              )
-                            : printerStore.templateTable(
-                                col.text,
-                                dataKey,
-                                i,
-                                pageIndex
-                              )
-                        }}
-                      />
-                    )
-                  })
-                )}
-              </tr>
+            // 将数据根据process_task_command_id进行分组
+            const tableDataGroupBy = _.groupBy(
+              tableData[i],
+              'process_task_command_id'
             )
+            // 处理数据是数组的情况(生产单据)
+            if (_.isArray(tableData[i])) {
+              return _.map(tableData[i], (item, j) => {
+                // 获取process_task_command_id对应的数组
+                const processTaskCommandIdArr =
+                  tableDataGroupBy[tableData[i][j]?.process_task_command_id]
+                // 处理特殊情况：计算分页时，一个数组中rowSpan的true和false分成了两个数组的情况
+                if (
+                  _.every(
+                    processTaskCommandIdArr,
+                    item => item.rowSpan === false
+                  )
+                ) {
+                  _.isArray(tableData[i][j])
+                    ? (tableData[i][j][0].rowSpan = true)
+                    : (tableData[i][j].rowSpan = true)
+                }
+                return (
+                  <tr style={{ height: `${customerRowHeight}px` }} key={j}>
+                    {isItemNone ? (
+                      <td colSpan='99' />
+                    ) : (
+                      _.map(columns, (col, index) => {
+                        // 跨行
+                        let isRowSpan =
+                          includesColText.includes(col.text) && j === 0
+                        // 去除单元格
+                        let rowTdRender =
+                          includesColText.includes(col.text) && j !== 0
+                        // 合并单元格的个数
+                        let rowSpanLength = tableData[i].length
+
+                        // 是熟食的组合工序聚合
+                        if (
+                          printerStore.config?.productionMergeType === '3' &&
+                          !['{{列.序号}}', '{{列.组合工序}}'].includes(
+                            col.text
+                          ) &&
+                          printerStore.config?.tableRowSpanTdArr[2].includes(
+                            col.text
+                          ) &&
+                          tableData[i][j]?.process_task_command_id
+                        ) {
+                          // 是熟食的组合工序聚合,合并单元格要发生变化
+                          // 是否跨行
+                          isRowSpan =
+                            printerStore.config.tableRowSpanTdArr[2].includes(
+                              col.text
+                            ) && tableData[i][j].rowSpan
+                          // 去除对于的单元格
+                          rowTdRender =
+                            printerStore.config.tableRowSpanTdArr[2].includes(
+                              col.text
+                            ) && !tableData[i][j].rowSpan
+                          // 合并单元格的个数
+                          rowSpanLength = processTaskCommandIdArr.length
+                        }
+
+                        return (
+                          !rowTdRender && (
+                            <td
+                              key={index}
+                              rowSpan={
+                                isRowSpan ? `${rowSpanLength}` : undefined
+                              }
+                              data-name={getTableColumnName(name, col.index)}
+                              style={{
+                                maxWidth: thWidths[index],
+                                minWidth: '24px', // 最小两个字24px
+                                ...col.headStyle
+                              }}
+                              className={
+                                ('td',
+                                classNames(
+                                  {
+                                    active:
+                                      getTableColumnName(name, col.index) ===
+                                      printerStore.selected
+                                  },
+                                  getTableRowColumnName(col.rowSpan)
+                                ))
+                              }
+                              dangerouslySetInnerHTML={{
+                                __html: printerStore.templateRowSpanTable(
+                                  col.text,
+                                  item
+                                )
+                              }}
+                            />
+                          )
+                        )
+                      })
+                    )}
+                  </tr>
+                )
+              })
+            } else {
+              return (
+                <tr style={{ height: `${customerRowHeight}px` }} key={i}>
+                  {isItemNone ? (
+                    <td colSpan='99' />
+                  ) : (
+                    _.map(columns, (col, j) => {
+                      return (
+                        <td
+                          key={j}
+                          data-name={getTableColumnName(name, col.index)}
+                          style={{
+                            maxWidth: thWidths[i],
+                            minWidth: '24px', // 最小两个字24px
+                            ...col.headStyle
+                          }}
+                          className={classNames(
+                            {
+                              active:
+                                getTableColumnName(name, col.index) ===
+                                printerStore.selected
+                            },
+                            getTableRowColumnName(col.rowSpan)
+                          )}
+                          dangerouslySetInnerHTML={{
+                            __html: col.isSpecialColumn
+                              ? printerStore.templateSpecialDetails(
+                                  col,
+                                  dataKey,
+                                  i
+                                )
+                              : printerStore.templateTable(
+                                  col.text,
+                                  dataKey,
+                                  i,
+                                  pageIndex
+                                )
+                          }}
+                        />
+                      )
+                    })
+                  )}
+                </tr>
+              )
+            }
           })}
           <SubtotalTr {...this.props} />
           <PageSummary {...this.props} />
