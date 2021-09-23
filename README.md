@@ -17,10 +17,20 @@ gm-x-printer 是新架构 erp 使用的打印库
 ├── locales # 多语言文件
 ```
 
+## 预安装
+
+- [NodeJS](https://nodejs.org/en/)
+- [yarn](https://yarnpkg.com/getting-started/install)
+- [Git](https://git-scm.com/downloads)
+- [VSCode](https://code.visualstudio.com/download)（推荐）
+
 ## 运行 gm-x-printer
 
-1. yarn
-2. yarn start
+```JS
+1. yarn（安装依赖）
+2. yarn start（启动项目）
+3. 启动项目后可以看到文件夹的目录，选择demo文件夹，就会显示常用的打印模板
+```
 
 ## 与 erp 进行连接测试
 
