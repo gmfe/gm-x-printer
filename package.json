@@ -1,6 +1,6 @@
 {
   "name": "gm-x-printer",
-  "version": "1.1.4-beta.1",
+  "version": "1.1.4-beta.2",
   "description": "diy printer",
   "main": "src/index.js",
   "scripts": {
@@ -78,7 +78,7 @@
     "file-loader": "^1.1.11",
     "gm-svg": "^0.3.0",
     "gm-util": "^5.12.2",
-    "gm-webpack": "^2.2.1",
+    "@gm-react-app/scripts": "3.8.1-beta-18.0.0",
     "happypack": "^5.0.1",
     "html-webpack-plugin": "^3.2.0",
     "husky": "^0.14.3",
@@ -92,7 +92,6 @@
     "mobx-react": "^6.1.1",
     "moment": "^2.22.2",
     "path": "^0.12.7",
-    "postcss-loader": "^6.1.1",
     "precss": "^4.0.0",
     "prettier": "^1.18.2",
     "prop-types": "^15.6.2",
@@ -101,13 +100,8 @@
     "react-dom": "^16.13.1",
     "react-hot-loader": "^4.12.14",
     "shelljs": "^0.8.3",
-    "style-loader": "^0.23.0",
     "stylelint": "^9.5.0",
     "stylelint-config-standard": "^18.2.0",
-    "terser-webpack-plugin": "^2.3.0",
-    "url-loader": "^1.1.1",
-    "webpack": "^4.17.2",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.7"
+    "terser-webpack-plugin": "^2.3.0"
   }
 }
