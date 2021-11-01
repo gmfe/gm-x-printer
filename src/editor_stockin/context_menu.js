@@ -32,7 +32,7 @@ class ContextMenu extends React.Component {
     const isMultiActive = keyArr.includes('multi')
 
     return (
-      <React.Fragment>
+      <>
         <div
           onClick={this.handleChangeTableDataKey.bind(this, 'multi', name)}
           className={isMultiActive ? 'active' : ''}
@@ -51,16 +51,17 @@ class ContextMenu extends React.Component {
         >
           {i18next.t('入库金额小计')}
         </div>
-      </React.Fragment>
+      </>
     )
   }
 
   render() {
-    const { editStore, mockData } = this.props
+    const { editStore, mockData, uploadQiniuImage } = this.props
     return (
       <CommonContextMenu
         renderTableAction={this.renderOrderActionBtn}
         insertBlockList={blockTypeList}
+        uploadQiniuImage={uploadQiniuImage}
       >
         <Printer
           key={editStore.computedPrinterKey}

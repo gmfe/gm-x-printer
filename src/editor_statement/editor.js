@@ -23,7 +23,7 @@ const tableDataKeyList = [
 @observer
 class Editor extends React.Component {
   render() {
-    const { onSave, showEditor, addFields } = this.props
+    const { onSave, showEditor, addFields, uploadQiniuImage } = this.props
 
     return (
       <div className='gm-printer-edit'>
@@ -57,7 +57,7 @@ class Editor extends React.Component {
         )}
 
         <div className='gm-printer-edit-wrap'>
-          <ContextMenu />
+          <ContextMenu uploadQiniuImage={uploadQiniuImage} />
         </div>
       </div>
     )
@@ -67,6 +67,7 @@ class Editor extends React.Component {
 Editor.propTypes = {
   config: PropTypes.object.isRequired,
   onSave: PropTypes.func,
+  uploadQiniuImage: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired

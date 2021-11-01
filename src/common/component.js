@@ -437,6 +437,12 @@ class ImageUploader extends React.Component {
       return
     }
 
+    if (this.props.uploadQiniuImage) {
+      this.props.uploadQiniuImage(file).then(json => {
+        this.props.onSuccess(json.data.url)
+      })
+      return
+    }
     const STATION_URL = {
       reqUrl: '/station/image/upload',
       imgUrl: 'http://img.guanmai.cn/station_pic'
@@ -487,7 +493,8 @@ class ImageUploader extends React.Component {
 
 ImageUploader.propTypes = {
   onSuccess: PropTypes.func.isRequired,
-  text: PropTypes.string.isRequired
+  text: PropTypes.string.isRequired,
+  uploadQiniuImage: PropTypes.func
 }
 
 class InputWithUnit extends React.Component {
