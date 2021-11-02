@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Flex, ToolTip } from '../components'
+import { Flex } from '../components'
 import { Gap, Title } from '../common/component'
 import editStore from './store'
 import { observer, inject } from 'mobx-react'
@@ -10,6 +10,7 @@ import EditorSelect from '../common/editor_select'
 import EditorField from '../common/editor_edit_field'
 import EditorAddField from '../common/editor_add_field'
 import EditorPageSummary from '../common/editor_page_summary'
+import EditTemplateType from '../common/edit_template_type'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
@@ -37,7 +38,13 @@ export const noSubtotalBtnTableDataKeySet = new Set(
 @observer
 class Editor extends React.Component {
   render() {
-    const { onSave, showEditor, addFields, showNewDate } = this.props
+    const {
+      onSave,
+      showEditor,
+      addFields,
+      showNewDate,
+      config: { templateType }
+    } = this.props
 
     return (
       <div className='gm-printer-edit'>
@@ -66,11 +73,13 @@ class Editor extends React.Component {
           <div className='gm-printer-edit-zone'>
             <EditorTitle onSave={onSave} />
             <Gap height='10px' />
-            <>
-              <>{i18next.t('模版类型')}</>
-              <ToolTip text='表示该模板是针对单一商户的配送单模板（商户配送单），或是账户合并打印配送单（账户配送单）的模板。' />
-              <span>{':' + i18next.t('商户配送单')}</span>
-            </>
+            <EditTemplateType
+              tip={i18next.t(
+                '表示该模板是针对单一商户的配送单模板（商户配送单），或是账户合并打印配送单（账户配送单）的模板。'
+              )}
+              bill={templateType}
+            />
+            <Gap height='5px' />
             <EditorSelect />
             <Gap height='5px' />
             <EditorField

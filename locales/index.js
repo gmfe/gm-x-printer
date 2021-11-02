@@ -3,10 +3,10 @@ import lng2 from './zh-HK.json'
 import lng3 from './en.json'
 import lng4 from './th.json'
 const moduleMap = {
-  'zh': lng1,
+  zh: lng1,
   'zh-HK': lng2,
-  'en': lng3,
-  'th': lng4
+  en: lng3,
+  th: lng4
 }
 let _language = 'zh'
 

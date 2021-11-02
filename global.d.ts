@@ -26,7 +26,14 @@ declare module 'gm-x-printer' {
   class EditorStockOut<T extends EditorProps> extends React.Component<T, any> {}
   class EditorPurchase<T extends EditorProps> extends React.Component<T, any> {}
   class EditorSettle<T extends EditorProps> extends React.Component<T, any> {}
-  class EditorCannibalize<T extends EditorProps> extends React.Component<T, any> {}
+  class EditorCannibalize<T extends EditorProps> extends React.Component<
+    T,
+    any
+  > {}
+  class EditorProduction<T extends EditorProps> extends React.Component<
+    T,
+    any
+  > {}
   class EditorStatement<T extends EditorProps> extends React.Component<
     T,
     any
@@ -38,7 +45,10 @@ declare module 'gm-x-printer' {
   class EditorAccount<T extends EditorProps> extends React.Component<T, any> {}
   class EditorBoxLabel<T extends EditorProps> extends React.Component<T, any> {}
   class Printer<T extends PrinterProps> extends React.Component<T, any> {}
-  class BatchPrinter<T extends BatchPrinterProps> extends React.Component<T, any> {}
+  class BatchPrinter<T extends BatchPrinterProps> extends React.Component<
+    T,
+    any
+  > {}
   const MULTI_SUFFIX: string
   function getCSS(): string
   function insertCSS(cssString: string, target?: HTMLElement | ShadowRoot): void
@@ -46,7 +56,10 @@ declare module 'gm-x-printer' {
     obj: { data: any; config: any },
     isTest?: boolean
   ): (obj: { data: any; config: any }) => Promise<any>
-  function doBatchPrint(list: any [], isTest?: boolean): (list: []) => Promise<any>
+  function doBatchPrint(
+    list: any[],
+    isTest?: boolean
+  ): (list: []) => Promise<any>
   export {
     Editor,
     EditorStockIn,
@@ -54,6 +67,7 @@ declare module 'gm-x-printer' {
     EditorPurchase,
     EditorSettle,
     EditorCannibalize,
+    EditorProduction,
     EditorStatement,
     EditorAccoutStatement,
     EditorAccount,

@@ -7,8 +7,8 @@ import editStore from './store'
 import { observer, inject } from 'mobx-react'
 import EditorTitle from '../common/editor_title'
 import EditorSelect from '../common/editor_select'
-import EditorField from '../common/editor_edit_field'
 import EditTemplateType from '../common/edit_template_type'
+import EditorField from '../common/editor_edit_field'
 import EditorAddField from '../common/editor_add_field'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
@@ -23,10 +23,28 @@ class Editor extends React.Component {
       onSave,
       showEditor,
       addFields,
-      showNewDate,
-      config: { templateType }
+      config: { productionMergeType, templateType }
     } = this.props
-
+    // 不同的生产单据，显示的数据类型不同
+    let tableDataKeyList = [
+      ['1', '3'].includes(productionMergeType) && {
+        value: '1',
+        text: i18next.t('物料聚合')
+      },
+      productionMergeType === '2' && {
+        value: '2',
+        text: i18next.t('生产成品聚合')
+      },
+      ['1', '2', '3'].includes(productionMergeType) && {
+        value: '3',
+        text: i18next.t('工序聚合')
+      },
+      productionMergeType === '4' && {
+        value: '4',
+        text: i18next.t('包装聚合')
+      }
+    ]
+    tableDataKeyList = _.filter(tableDataKeyList, item => item)
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -35,38 +53,28 @@ class Editor extends React.Component {
             text={
               <span className='gm-text-desc gm-padding-left-5'>
                 {i18next.t(
-                  '说明：选中内容进行编辑，可拖动字段移动位置，右键使用更多功能，更多详情点击'
+                  '说明：选中内容进行编辑，可拖动字段移动位置，右键使用更多功能'
                 )}
-                <a
-                  href='https://v.qq.com/x/page/t08044292dd.html'
-                  target='_blank'
-                  className='btn-link'
-                  rel='noopener noreferrer'
-                >
-                  {i18next.t('查看视频教程')}
-                </a>
               </span>
             }
           />
         </Flex>
-
         {showEditor && (
           <div className='gm-printer-edit-zone'>
             <EditorTitle onSave={onSave} />
             <Gap height='10px' />
             <EditTemplateType
               tip={i18next.t(
-                '表示该模板是针对单一商户的配送单模板（商户配送单），或是账户合并打印配送单（账户配送单）的模板。'
+                '表示该模板是针对净菜单据、熟食单据、或者是包装单据的模板。'
               )}
               bill={templateType}
             />
             <Gap height='5px' />
             <EditorSelect />
             <Gap height='5px' />
-            <EditorField showNewDate={showNewDate} />
+            <EditorField tableDataKeyList={tableDataKeyList} />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
-            <Gap height='5px' />
 
             <div id='gm-printer-tip' />
 
@@ -87,13 +95,11 @@ Editor.propTypes = {
   onSave: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
-  addFields: PropTypes.object.isRequired,
-  showNewDate: PropTypes.bool
+  addFields: PropTypes.object.isRequired
 }
 
 Editor.deaultProps = {
-  onSave: _.noop,
-  showNewDate: false
+  onSave: _.noop
 }
 
 export default Editor

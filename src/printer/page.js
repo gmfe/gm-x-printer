@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { inject, observer } from 'mobx-react'
-import { getHeight } from '../util'
+import { getPageHeight } from '../util'
 
 @inject('printerStore')
 @observer
@@ -14,7 +14,7 @@ class Page extends React.Component {
   componentDidMount() {
     const $dom = this.ref.current
 
-    this.props.printerStore.setPageHeight(getHeight($dom))
+    this.props.printerStore.setPageHeight(getPageHeight($dom))
   }
 
   render() {
