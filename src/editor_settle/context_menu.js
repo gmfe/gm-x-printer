@@ -17,13 +17,13 @@ const blockTypeList = [
 }))
 @observer
 class ContextMenu extends React.Component {
-  handleSubtotal = (name) => {
+  handleSubtotal = name => {
     const { editStore } = this.props
 
     editStore.setSubtotalShow(name)
   }
 
-  hasSubtotalBtn = (name) => {
+  hasSubtotalBtn = name => {
     if (!name) return false
 
     const arr = name.split('.')
@@ -34,7 +34,7 @@ class ContextMenu extends React.Component {
     }
   }
 
-  renderOrderActionBtn = (name) => {
+  renderOrderActionBtn = name => {
     if (!this.hasSubtotalBtn(name)) {
       return null
     }
@@ -45,18 +45,25 @@ class ContextMenu extends React.Component {
     const isSubtotalActive = subtotal.show
 
     return (
-      <React.Fragment>
-        <div onClick={this.handleSubtotal.bind(this, name)}
-          className={isSubtotalActive ? 'active' : ''}>{i18next.t('每页合计')}
+      <>
+        <div
+          onClick={this.handleSubtotal.bind(this, name)}
+          className={isSubtotalActive ? 'active' : ''}
+        >
+          {i18next.t('每页合计')}
         </div>
-      </React.Fragment>
+      </>
     )
   }
 
-  render () {
-    const { editStore, mockData } = this.props
+  render() {
+    const { editStore, mockData, uploadQiniuImage } = this.props
     return (
-      <CommonContextMenu renderTableAction={this.renderOrderActionBtn} insertBlockList={blockTypeList}>
+      <CommonContextMenu
+        renderTableAction={this.renderOrderActionBtn}
+        insertBlockList={blockTypeList}
+        uploadQiniuImage={uploadQiniuImage}
+      >
         <Printer
           key={editStore.computedPrinterKey}
           selected={editStore.selected}

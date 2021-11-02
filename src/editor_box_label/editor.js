@@ -17,7 +17,7 @@ import ContextMunu from './context_menu'
 @observer
 class Editor extends React.Component {
   render() {
-    const { onSave, showEditor, addFields } = this.props
+    const { onSave, showEditor, addFields, uploadQiniuImage } = this.props
     return (
       <div className='gm-printer-edit'>
         <Flex>
@@ -49,7 +49,7 @@ class Editor extends React.Component {
         )}
 
         <div className='gm-printer-edit-wrap'>
-          <ContextMunu />
+          <ContextMunu uploadQiniuImage={uploadQiniuImage} />
         </div>
       </div>
     )
@@ -60,6 +60,7 @@ Editor.propTypes = {
   config: PropTypes.object.isRequired,
   showEditor: PropTypes.bool,
   onSave: PropTypes.func,
+  uploadQiniuImage: PropTypes.func,
   addFields: PropTypes.object.isRequired,
   mockData: PropTypes.object.isRequired
 }

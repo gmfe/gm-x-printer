@@ -18,9 +18,12 @@ const blockTypeList = [
 @observer
 class ContextMenu extends React.Component {
   render() {
-    const { editStore, mockData } = this.props
+    const { editStore, mockData, uploadQiniuImage } = this.props
     return (
-      <CommonContextMenu insertBlockList={blockTypeList}>
+      <CommonContextMenu
+        insertBlockList={blockTypeList}
+        uploadQiniuImage={uploadQiniuImage}
+      >
         <Printer
           key={editStore.computedPrinterKey}
           selected={editStore.selected}
@@ -34,6 +37,7 @@ class ContextMenu extends React.Component {
 }
 ContextMenu.propTypes = {
   editStore: PropTypes.object.isRequired,
-  mockData: PropTypes.object.isRequired
+  mockData: PropTypes.object.isRequired,
+  uploadQiniuImage: PropTypes.func
 }
 export default ContextMenu

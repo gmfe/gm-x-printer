@@ -4,7 +4,6 @@ import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
 import { Printer } from '../printer'
-import { noSubtotalBtnTableDataKeySet } from './editor'
 
 const blockTypeList = [
   { value: '', text: i18next.t('插入文本') },
@@ -12,12 +11,12 @@ const blockTypeList = [
   { value: 'image', text: i18next.t('插入图片') },
   { value: 'counter', text: i18next.t('插入分类汇总') },
   { value: 'barcode', text: i18next.t('插入订单条形码') },
-  { value: 'qrcode', text: i18next.t('插入订单详情二维码') },
+  { value: 'qrcode', text: i18next.t('插入订单详情二维码') }
 ]
 
-@inject((stores) => ({
+@inject(stores => ({
   editStore: stores.editStore,
-  mockData: stores.mockData,
+  mockData: stores.mockData
 }))
 @observer
 class ContextMenu extends React.Component {
@@ -26,7 +25,7 @@ class ContextMenu extends React.Component {
    * @param name => ContextMenu 的 this.state.name
    * @return {boolean}
    */
-  hasSubtotalBtn = (name) => {
+  hasSubtotalBtn = name => {
     if (!name) return false
     const noSubtotalList = ['abnormal', 'abnormalDetails']
     const arr = name.split('.')
@@ -42,13 +41,13 @@ class ContextMenu extends React.Component {
     editStore.changeTableDataKey(name, key)
   }
 
-  handleSubtotal = (name) => {
+  handleSubtotal = name => {
     const { editStore } = this.props
 
     editStore.setSubtotalShow(name)
   }
 
-  renderOrderActionBtn = (name) => {
+  renderOrderActionBtn = name => {
     if (!this.hasSubtotalBtn(name)) {
       return null
     }
@@ -90,11 +89,12 @@ class ContextMenu extends React.Component {
   }
 
   render() {
-    const { editStore, mockData } = this.props
+    const { editStore, mockData, uploadQiniuImage } = this.props
     return (
       <CommonContextMenu
         renderTableAction={this.renderOrderActionBtn}
         insertBlockList={blockTypeList}
+        uploadQiniuImage={uploadQiniuImage}
       >
         <Printer
           key={editStore.computedPrinterKey}

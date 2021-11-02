@@ -56,7 +56,7 @@ class Editor extends React.Component {
   }
 
   render() {
-    const { onSave, showEditor } = this.props
+    const { onSave, showEditor, uploadQiniuImage } = this.props
 
     return (
       <div className='gm-printer-edit'>
@@ -90,7 +90,11 @@ class Editor extends React.Component {
         )}
 
         <div className='gm-printer-edit-wrap'>
-          <ContextMenu editStore={editStore} mockData={this.props.mockData} />
+          <ContextMenu
+            editStore={editStore}
+            mockData={this.props.mockData}
+            uploadQiniuImage={uploadQiniuImage}
+          />
         </div>
       </div>
     )
@@ -100,6 +104,7 @@ class Editor extends React.Component {
 Editor.propTypes = {
   config: PropTypes.object.isRequired,
   onSave: PropTypes.func,
+  uploadQiniuImage: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired

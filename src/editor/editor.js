@@ -43,7 +43,8 @@ class Editor extends React.Component {
       showEditor,
       addFields,
       showNewDate,
-      config: { templateType }
+      config: { templateType },
+      uploadQiniuImage
     } = this.props
 
     return (
@@ -98,7 +99,7 @@ class Editor extends React.Component {
         )}
 
         <div className='gm-printer-edit-wrap'>
-          <ContextMenu />
+          <ContextMenu uploadQiniuImage={uploadQiniuImage} />
         </div>
       </div>
     )
@@ -111,7 +112,8 @@ Editor.propTypes = {
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
-  showNewDate: PropTypes.bool
+  showNewDate: PropTypes.bool,
+  uploadQiniuImage: PropTypes.func
 }
 
 Editor.deaultProps = {

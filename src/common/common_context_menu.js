@@ -270,7 +270,7 @@ class CommonContextMenu extends React.Component {
   }
 
   renderPanel = () => {
-    let { insertBlockList } = this.props
+    let { insertBlockList, uploadQiniuImage } = this.props
     const { name } = this.state
     const arr = name.split('.')
     const type = arr[0]
@@ -291,6 +291,7 @@ class CommonContextMenu extends React.Component {
               onSuccess={this.handleInsertImage}
               key={v.value}
               text={v.text}
+              uploadQiniuImage={uploadQiniuImage}
             />
           ) : (
             <div
@@ -383,7 +384,8 @@ CommonContextMenu.propTypes = {
   editStore: PropTypes.object,
   insertBlockList: PropTypes.array.isRequired,
   renderTableAction: PropTypes.func,
-  children: PropTypes.element.isRequired
+  children: PropTypes.element.isRequired,
+  uploadQiniuImage: PropTypes.func
 }
 
 export default CommonContextMenu

@@ -44,11 +44,12 @@ class ContextMunu extends React.Component {
   }
 
   render() {
-    const { editStore, mockData } = this.props
+    const { editStore, mockData, uploadQiniuImage } = this.props
     return (
       <CommonContextMenu
         renderTableAction={this.renderOrderActionBtn}
         insertBlockList={blockTypeList}
+        uploadQiniuImage={uploadQiniuImage}
       >
         <Printer
           key={editStore.computedPrinterKey}
@@ -64,7 +65,8 @@ class ContextMunu extends React.Component {
 
 ContextMunu.propTypes = {
   editStore: PropTypes.object,
-  mockData: PropTypes.object
+  mockData: PropTypes.object,
+  uploadQiniuImage: PropTypes.func
 }
 
 export default ContextMunu
