@@ -24,7 +24,7 @@ class Editor extends React.Component {
       showEditor,
       addFields,
       showNewDate,
-      config: { templateType }
+      config: { templateType = i18next.t('账户模板') }
     } = this.props
 
     return (

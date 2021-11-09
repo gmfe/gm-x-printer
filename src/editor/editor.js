@@ -43,7 +43,7 @@ class Editor extends React.Component {
       showEditor,
       addFields,
       showNewDate,
-      config: { templateType },
+      config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
 
