@@ -12,6 +12,7 @@ import EditorBoxLabel from './editor_box_label'
 import EditorSaleMenus from './editor_salemenus'
 import EditorCannibalize from './editor_cannibalize'
 import EditorProduction from './editor_production'
+import EditorMaterialRequisition from './editor_material_requisition'
 import { BatchPrinter, doBatchPrint, doPrint, Printer, getCSS } from './printer'
 import { MULTI_SUFFIX } from './config'
 
@@ -31,6 +32,7 @@ export {
   EditorSaleMenus,
   EditorCannibalize,
   EditorProduction,
+  EditorMaterialRequisition,
   Printer,
   BatchPrinter,
   doPrint,
