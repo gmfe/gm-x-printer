@@ -6,6 +6,7 @@ import { inject, observer } from 'mobx-react'
 import { dispatchMsg, getStyleWithDiff } from '../util'
 import BarCode from './barcode'
 import QrCode from './qrcode'
+import { Flex } from '../components'
 
 @inject('printerStore')
 @observer
@@ -156,16 +157,23 @@ class Block extends React.Component {
       )
     } else if (type === 'barcode') {
       content = (
-        <BarCode
-          value={printerStore.template(text)}
-          textMargin={0}
-          margin={0}
-          height={35}
-          width={2}
-          displayValue={false}
-          dataName={name}
-          background='transparent'
-        />
+        <>
+          <BarCode
+            value={printerStore.template(text)}
+            textMargin={0}
+            margin={0}
+            height={35}
+            width={2}
+            displayValue={false}
+            dataName={name}
+            background='transparent'
+          />
+          {printerStore?.config?.showBarCodeText && (
+            <Flex style={{ marginLeft: '40px', marginTop: '-5px' }}>
+              {printerStore.template(text)}
+            </Flex>
+          )}
+        </>
       )
     } else if (type === 'qrcode') {
       content = <QrCode value={printerStore.template(text)} />
