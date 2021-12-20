@@ -23,7 +23,8 @@ class Editor extends React.Component {
       onSave,
       showEditor,
       addFields,
-      config: { productionMergeType, templateType }
+      config: { productionMergeType, templateType },
+      uploadQiniuImage
     } = this.props
     // 不同的生产单据，显示的数据类型不同
     let tableDataKeyList = [
@@ -65,7 +66,7 @@ class Editor extends React.Component {
             <Gap height='10px' />
             <EditTemplateType
               tip={i18next.t(
-                '表示该模板是针对净菜单据、熟食单据、或者是包装单据的模板。'
+                '表示该模板是针对单品、组合，或者是包装单据的模板。'
               )}
               bill={templateType}
             />
@@ -83,7 +84,7 @@ class Editor extends React.Component {
         )}
 
         <div className='gm-printer-edit-wrap'>
-          <ContextMenu />
+          <ContextMenu uploadQiniuImage={uploadQiniuImage} />
         </div>
       </div>
     )
@@ -95,7 +96,8 @@ Editor.propTypes = {
   onSave: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
-  addFields: PropTypes.object.isRequired
+  addFields: PropTypes.object.isRequired,
+  uploadQiniuImage: PropTypes.func
 }
 
 Editor.deaultProps = {
