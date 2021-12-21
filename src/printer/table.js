@@ -280,7 +280,7 @@ class Table extends React.Component {
                               style={{
                                 maxWidth: thWidths[index],
                                 minWidth: '24px', // 最小两个字24px
-                                ...col.headStyle
+                                ...col.style
                               }}
                               className={
                                 ('td',
@@ -321,7 +321,7 @@ class Table extends React.Component {
                           style={{
                             maxWidth: thWidths[i],
                             minWidth: '24px', // 最小两个字24px
-                            ...col.headStyle
+                            ...col.style
                           }}
                           className={classNames(
                             {
