@@ -169,6 +169,27 @@ class Table extends React.Component {
         printerStore?.config?.productionMergeType
       ]
 
+    const getTdStyle = (index, style = {}) => {
+      const width = thWidths[index]
+      const { fontSize } = style
+      let tdStyle = {}
+      let minWidth = 24
+
+      if (!width) return tdStyle
+      if (fontSize) minWidth = _.parseInt(fontSize) * 2
+      if (width >= 150) {
+        tdStyle = {
+          minWidth: width
+        }
+      } else {
+        tdStyle = {
+          minWidth,
+          width
+        }
+      }
+      return tdStyle
+    }
+
     return (
       <table>
         <thead>
@@ -180,8 +201,7 @@ class Table extends React.Component {
                 data-name={getTableColumnName(name, col.index)}
                 draggable
                 style={{
-                  maxWidth: thWidths[i],
-                  minWidth: '24px', // 最小两个字24px
+                  ...getTdStyle(i, col.style),
                   ...col.headStyle
                 }}
                 className={classNames({
@@ -319,8 +339,7 @@ class Table extends React.Component {
                           key={j}
                           data-name={getTableColumnName(name, col.index)}
                           style={{
-                            maxWidth: thWidths[i],
-                            minWidth: '24px', // 最小两个字24px
+                            ...getTdStyle(j, col.style),
                             ...col.style
                           }}
                           className={classNames(

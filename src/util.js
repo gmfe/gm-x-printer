@@ -215,6 +215,97 @@ const getDataKey = (dataKey, arrange) =>
     : dataKey
 
 /**
+ * @param {*} detailsHeights 当钱明细高度集
+ * @param {*} detailsData 当前所有tablelist
+ * @param {*} curRemainPageHeight 可容纳table的总高度
+ * @returns {ranges, detailsPageHeight} detailsPageHeight 每页高度合集
+ */
+const caclSingleDetailsPageHeight = (detailsHeights, curRemainPageHeight) => {
+  let [end, deadline] = [0, 0]
+  const begin = 0
+  /** 当前明细高度，默认为tr的border+padding的height */
+  let currentDetailsMiniHeight = 5
+  const ranges = []
+  const detailsPageHeight = []
+  /** 未进行计算的高度，留到下一次, 默认为tr的border+padding的height */
+  let remainDetailsHeight = 5
+
+  // 如果当前累计高度高于当前剩余高度，则跳出返回
+  while (end < detailsHeights.length) {
+    const height = currentDetailsMiniHeight + detailsHeights[end]
+    if (height < curRemainPageHeight) {
+      currentDetailsMiniHeight = height
+      deadline++
+    } else {
+      remainDetailsHeight += detailsHeights[end]
+    }
+    end++
+  }
+
+  ranges.push([begin, deadline], [deadline, end])
+  detailsPageHeight.push(currentDetailsMiniHeight, remainDetailsHeight)
+
+  return {
+    ranges,
+    detailsPageHeight
+  }
+}
+
+/**
+ * 取数组中位数, 有数量相同的则取最小的那个
+ * @param {*} arr
+ */
+const getArrayMid = arr => {
+  /** 数组元素出现次数的集合 */
+  const mapArr = []
+  const map = new Map()
+  let majority = 23
+  /** 次数相同的元素集合 */
+  const majorityArr = []
+  const min = Math.min(...arr)
+
+  if (arr.length === 0) return majority
+
+  _.forEach(arr, (val, key) => {
+    if (map.has(val)) {
+      map.set(val, map.get(val) + 1)
+    } else {
+      map.set(val, 1)
+    }
+  })
+
+  for (const val of map.values()) {
+    mapArr.push(val)
+  }
+  // 如果没有众数，就取最小值
+  if (Array.from(new Set(mapArr)).length === 1) {
+    // 如果说min也远远大于23， 就返回23吧
+    if (min / 23 > 10) {
+      return 23
+    }
+    return min
+  }
+
+  const maxCount = Math.max(...mapArr)
+  for (const val of map.keys()) {
+    if (map.get(val) === maxCount) {
+      majorityArr.push(val)
+    }
+  }
+  majority = Math.min(...majorityArr)
+  // 如果说取的众数也远远大于min，
+  if (majority / min > 3) {
+    // 如果说min也远远大于23， 就返回23吧
+    if (min / 23 > 10) {
+      return 23
+    }
+    return min
+  }
+
+  return majority
+}
+
+/**
  * @param {*} indexEnd 当前表格行的索引
  * @param {*} trs 当前表格的所有tr高度数组
  * @param {*} heightParams {currentPageHeight:当前计算的高度 calcHeight: pageHeight:页面的总高度currentPageMinimumHeight：当前页面的最小高度（表格的表头+合计+页眉页脚）}
@@ -274,5 +365,7 @@ export {
   getMultiNumber,
   isRowSpanTable,
   getHeight,
-  caclRowSpanTdPageHeight
+  getArrayMid,
+  caclRowSpanTdPageHeight,
+  caclSingleDetailsPageHeight
 }
