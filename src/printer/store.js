@@ -1,6 +1,12 @@
 import i18next from '../../locales'
 import { action, observable } from 'mobx'
-import { getSumTrHeight, isMultiTable, caclRowSpanTdPageHeight } from '../util'
+import {
+  getSumTrHeight,
+  isMultiTable,
+  getArrayMid,
+  caclRowSpanTdPageHeight,
+  caclSingleDetailsPageHeight
+} from '../util'
 import _ from 'lodash'
 import Big from 'big.js'
 
@@ -74,30 +80,74 @@ class PrinterStore {
   }
 
   @action
+  computedData(dataKey, table, end, currentRemainTableHeight) {
+    /** 当前数据 */
+    const tableData = this.data._table[dataKey] || []
+
+    let count = 0
+    _.forEach(Array(end).fill(1), (val, i) => {
+      const details = tableData[i]?.__details || []
+      count += details.length
+    })
+
+    /** 明细data */
+    const detailsData = tableData[end]?.__details
+    // 如果没有details 和 明细不换行, 就不用计算了
+    if (!detailsData || dataKey.includes('noLineBreak')) {
+      return []
+    }
+
+    const detailsHeights = table.body.children.slice(
+      count,
+      count + detailsData.length
+    )
+
+    const { ranges, detailsPageHeight } = caclSingleDetailsPageHeight(
+      detailsHeights,
+      currentRemainTableHeight
+    )
+
+    // 分局明细拆分后的数据
+    const splitTableData = _.map(ranges, range => {
+      const _tableData = Object.assign({}, tableData[end])
+      _tableData.__details = detailsData.slice(...range)
+      return _tableData
+    })
+
+    // 插入原table数据中
+    tableData.splice(end, 1, ...splitTableData)
+    this.data._table[dataKey] = tableData
+
+    return detailsPageHeight
+  }
+
+  @action
   computedPages() {
-    // 每页必有 页眉header, 页脚footer
+    // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
     // 退出计算! 因为页眉 + 页脚 > currentPageHeight,页面装不下其他东西
     if (allPagesHaveThisHeight > this.pageHeight) {
       return
     }
 
-    // 某一page的累计高度
+    /** 某一page的累积已填充的高度 */
     let currentPageHeight = allPagesHaveThisHeight
     // 当前在处理 contents 的索引
     let index = 0
-    // 一页承载的内容. [object, object, ...]
+    /** 一页承载的内容. [object, object, ...] */
     let page = []
-
+    /** 处理配送单有多个表格的情况 */
+    let tableCount = 0
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
 
       /* 表格内容处理 */
       if (content.type === 'table') {
+        // 是表格就++
+        tableCount++
         // 表格原始的高度和宽度信息
         const table = this.tablesInfo[`contents.table.${index}`]
-
         const { subtotal, dataKey, summaryConfig } = content
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
@@ -109,64 +159,99 @@ class PrinterStore {
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
           table.head.height + subtotalTrHeight + pageSummaryTrHeight
-        // 当前表格页面的最少高度
+        /** 当前page页面的最小高度 */
         const currentPageMinimumHeight =
           allPagesHaveThisHeight + allTableHaveThisHeight
+        /** 当前page可容纳的table高度 */
+        let pageAccomodateTableHeight = +new Big(this.pageHeight)
+          .minus(currentPageHeight)
+          .toFixed(2)
 
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0
 
         // 如果表格没有数据,那么轮一下个content
-        if (
-          table.body.heights.length === 0 || // 没有数据,不渲染此table
-          table.body.heights[0] + currentPageMinimumHeight > this.pageHeight // 页面无法容纳此table,不渲染这个table了
-        ) {
-          if (
-            table.body.heights[0] + currentPageMinimumHeight >
-            this.pageHeight
-          ) {
-            window.alert('表格明细内容过多，无法打印，请更换其他打印模板') // 例如: 采购明细放在单列-最后一列,造成一列高度大于页面高度
-          }
+        if (table.body.heights.length === 0) {
           index++
         } else {
+          /** 仅计算当前页table的累积高度 */
+          let currentTableHeight = allTableHaveThisHeight
           // 表格有数据,添加[每个表格都具有的高度]
           currentPageHeight += allTableHaveThisHeight
+          /** 当前table剩余的高度 */
+          let currentRemainTableHeight = 0
+          /** 去最小的tr高度，用于下面的计算compare,(避免特殊情况：一般来说最小tr——height = 23, 比23还小的不考虑计算) */
+          const minHeight = Math.max(getArrayMid(table.body.heights), 23)
 
-          /* 遍历表格每一行 */
+          /* 遍历表格每一行，填充表格内容 */
           while (end < table.body.heights.length) {
+            currentTableHeight += table.body.heights[end]
+            // 用于计算最后一页有footer情况的高度
             currentPageHeight += table.body.heights[end]
+            // 当前页没有多余空间
+            if (currentTableHeight > pageAccomodateTableHeight) {
+              currentRemainTableHeight = +Big(pageAccomodateTableHeight)
+                .minus(currentTableHeight)
+                .plus(table.body.heights[end])
 
-            // 当前页没有对于空间
-            if (currentPageHeight > this.pageHeight) {
-              if (end !== 0) {
-                // ‼️‼️‼️ 极端情况: 如果一行的高度 大于 页面高度, 那么就做下一行
-                if (
-                  table.body.heights[end] + currentPageMinimumHeight >
-                  this.pageHeight
-                ) {
+              /**
+               * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
+               * 2. table.body.heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
+               * 3. table.body.heights[end] 高度超过了 pageAccomodateTableHeight
+               */
+              if (
+                (currentRemainTableHeight / minHeight > 1.5 &&
+                  table.body.heights[end] / currentRemainTableHeight > 1) ||
+                table.body.heights[end] > pageAccomodateTableHeight
+              ) {
+                const detailsPageHeight = this.computedData(
+                  dataKey,
+                  table,
+                  end,
+                  currentRemainTableHeight
+                )
+
+                // 拆分明细后，同时也要更新body.heights 不能影响后续计算
+                if (detailsPageHeight.length > 0) {
+                  // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
+                  detailsPageHeight[1] = Math.max(
+                    minHeight,
+                    detailsPageHeight[1]
+                  )
+                  table.body.heights.splice(end, 1, ...detailsPageHeight)
                   end++
                 }
+              }
+              // 第一条极端会有问题
+              if (end !== 0) {
                 page.push({
                   type: 'table',
                   index,
                   begin,
                   end
                 })
+                // 此页完成任务
+                this.pages.push(page)
+                page = []
+              }
+              // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
+              // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
+              if (tableCount > 1 && end === 0) {
+                this.pages.push(page)
+                page = []
               }
 
               begin = end
-
-              // 此页完成任务
-              this.pages.push(page)
-
               // 开启新一页,重置页面高度
-              page = []
+              pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
+                allPagesHaveThisHeight
+              )
+              currentTableHeight = allTableHaveThisHeight
               currentPageHeight = currentPageMinimumHeight
             } else {
               // 有空间，继续做下行
               end++
-
               // 最后一行，把信息加入 page，并轮下一个contents
               if (end === table.body.heights.length) {
                 page.push({
@@ -190,6 +275,10 @@ class PrinterStore {
           break
         }
 
+        // 如果是最后一页，必须要加上sign的高度，否则会重叠
+        if (index === this.config.contents.length - 1) {
+          currentPageHeight += this.height?.sign
+        }
         if (currentPageHeight <= this.pageHeight) {
           // 空间充足，把信息加入 page，并轮下一个contents
           page.push({
@@ -208,7 +297,6 @@ class PrinterStore {
         }
       }
     }
-
     this.pages.push(page)
   }
 
