@@ -13,8 +13,6 @@ import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
 
-const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
-
 @withStore(editStore)
 @inject('editStore')
 @observer
@@ -42,7 +40,7 @@ class Editor extends React.Component {
             <Gap height='10px' />
             <EditorSelect />
             <Gap height='5px' />
-            <EditorField tableDataKeyList={tableDataKeyList} />
+            <EditorField />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
 
