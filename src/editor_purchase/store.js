@@ -31,7 +31,7 @@ class Store extends EditorStore {
         isSpecialColumn: true,
         specialDetailsKey: '__details',
         text: i18next.t(
-          '{{采购数量_计量单位}}{{计量单位}}*{{商户名}}*{{商品备注}}'
+          '{{采购数量_采购单位}}{{采购单位}}*{{商户名}}*{{商品备注}}'
         )
       })
     }
