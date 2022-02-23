@@ -43,7 +43,7 @@ class ContextMenu extends React.Component {
           onClick={this.handleChangeTableDataKey.bind(this, 'quantity', name)}
           className={isQuantityActive ? 'active' : ''}
         >
-          {i18next.t('调拨数小计')}
+          {i18next.t('移库数小计')}
         </div>
         {/* <div
           onClick={this.handleChangeTableDataKey.bind(this, 'money', name)}
