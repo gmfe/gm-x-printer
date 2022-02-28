@@ -6,6 +6,7 @@ import _ from 'lodash'
 import { Printer } from '../printer'
 
 const blockTypeList = [
+  { value: 'rise', text: i18next.t('插入抬头') },
   { value: '', text: i18next.t('插入文本') },
   { value: 'line', text: i18next.t('插入线条') },
   { value: 'image', text: i18next.t('插入图片') },

@@ -88,7 +88,7 @@ class Block extends React.Component {
     const {
       config: { type }
     } = this.props
-    if (!type || type === 'text') {
+    if (!type || type === 'text' || type === 'rise') {
       this.setState(
         {
           isEdit: true
@@ -124,7 +124,7 @@ class Block extends React.Component {
     const { isEdit } = this.state
     let content = null
     let specialStyle = null
-    if (!type || type === 'text') {
+    if (!type || type === 'text' || type === 'rise') {
       content = printerStore.template(text, pageIndex)
     } else if (type === 'line') {
       content = null
@@ -205,7 +205,7 @@ class Block extends React.Component {
           }}
           data-name={name}
         />
-        {(!type || type === 'text') && active && isEdit && (
+        {(!type || type === 'text' || type === 'rise') && active && isEdit && (
           <textarea
             ref={ref => (this.refEdit = ref)}
             className='gm-printer-block-text-edit'
