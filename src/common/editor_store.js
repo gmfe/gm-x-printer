@@ -309,6 +309,19 @@ class EditorStore {
           }
         })
         break
+      case 'rise':
+        blocks.push({
+          text: i18next.t('请编辑'),
+          style: {
+            position: 'absolute',
+            left: pos.left || '0px',
+            top: pos.top || '0px',
+            fontSize: '26px',
+            fontWeight: 'bold'
+          },
+          type: 'rise'
+        })
+        break
       case 'line':
         blocks.push({
           type: 'line',
@@ -376,7 +389,7 @@ class EditorStore {
 
     this.selected = getBlockName(name, blocks.length - 1)
 
-    if (!type || type === 'text') {
+    if (!type || type === 'text' || type === 'rise') {
       // 延迟下 打开textarea
       setTimeout(() => {
         dispatchMsg('gm-printer-block-edit', {

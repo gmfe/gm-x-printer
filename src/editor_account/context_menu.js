@@ -7,6 +7,7 @@ import { Printer } from '../printer'
 // import { noSubtotalBtnTableDataKeySet } from './editor'
 
 const blockTypeList = [
+  { value: 'rise', text: i18next.t('插入抬头') },
   { value: '', text: i18next.t('插入文本') },
   { value: 'line', text: i18next.t('插入线条') }
 ]

@@ -87,7 +87,7 @@ class EditorField extends React.Component {
         />
         <Gap />
 
-        {(!type || type === 'text') && (
+        {(!type || type === 'text' || type === 'rise') && (
           <div>
             <Fonter
               style={style}

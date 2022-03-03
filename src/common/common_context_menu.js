@@ -275,6 +275,11 @@ class CommonContextMenu extends React.Component {
     const arr = name.split('.')
     const type = arr[0]
 
+    // 在页眉插入抬头
+    if (type !== 'header') {
+      insertBlockList = _.filter(insertBlockList, item => item.value !== 'rise')
+    }
+
     // 页眉 页脚 签名 不添加分类汇总
     if (type === 'header' || type === 'sign' || type === 'footer') {
       insertBlockList = _.filter(
