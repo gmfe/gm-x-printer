@@ -151,7 +151,7 @@ class TextPX extends React.Component {
     return (
       <Text
         value={nValue}
-        onChange={this.handleChange}
+        onChange={_.throttle(this.handleChange, 500)}
         style={{ width: '35px' }}
       />
     )
@@ -571,6 +571,43 @@ const Hr = () => (
   />
 )
 
+class ChangeCapCheckbox extends React.Component {
+  render() {
+    const {
+      value,
+      style: { setSpecialUpperCase },
+      onChange,
+    } = this.props
+    if(value.includes("金额") ||  value.includes("销售额") || value.includes("运费") || value.includes("税额") || value.includes("成本") ){
+      return (
+        <Flex style={{ margin: '5px 0 5px 0' }}>
+          <Flex alignCenter>
+            <input
+              type='checkbox'
+              checked={setSpecialUpperCase === "true"}
+              onChange={(e)=>{
+                const field = value.match(/{{([\s\S].+?)}}/g)[0]?.replace(/[\{\}]/g, "")
+                const [preText, subText] = value.split(`{{${field}}}`)
+                const newField = field.includes("_大写") ? field.replace("_大写", "") : field + "_大写"
+                onChange("style", {
+                  ...this.props.style,
+                  setSpecialUpperCase: setSpecialUpperCase === "true" ? "false" : "true"
+                })
+                onChange("text", `${preText}{{${newField}}}${subText}`)
+              }}
+            />
+          </Flex>
+          <Flex>&nbsp;{i18next.t('显示大写金额')}</Flex>
+        </Flex>
+    )
+    }
+    else {
+      return <></>
+    }
+    
+  }
+}
+
 const SubTitle = ({ text }) => (
   <div
     style={{
@@ -656,6 +693,7 @@ export {
   TextPX,
   TextAlign,
   Separator,
+  ChangeCapCheckbox,
   Fonter,
   Position,
   Line,

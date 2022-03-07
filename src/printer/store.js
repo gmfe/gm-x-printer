@@ -1,5 +1,5 @@
 import i18next from '../../locales'
-import { action, observable } from 'mobx'
+import { action, observable, computed } from 'mobx'
 import {
   getSumTrHeight,
   isMultiTable,
@@ -10,6 +10,7 @@ import {
 import _ from 'lodash'
 import Big from 'big.js'
 
+export const TR_BASE_HEIGHT = 23
 const price = (n, f = 2) => Big(n || 0).toFixed(f)
 class PrinterStore {
   @observable ready = false
@@ -32,6 +33,8 @@ class PrinterStore {
   @observable showCombineSkuDetail = false
 
   @observable showIngredientDetail = false
+  /** 当前页剩余空白高度 */
+  @observable remainPageHeight = 0
 
   data = {}
 
@@ -42,6 +45,10 @@ class PrinterStore {
   // 选择中区域
   @observable
   selectedRegion = null
+
+  // 是否自动行数填充
+  @observable
+  isAutoFilling = false
 
   @action
   init(config, data) {
@@ -55,6 +62,16 @@ class PrinterStore {
     this.selected = null
     this.showCombineSkuDetail = config?.combineSkuDetail?.show || false
     this.showIngredientDetail = config?.ingredientDetail?.show || false
+  }
+
+  @action
+  setAutofillConfig(bol) {
+    this.isAutoFilling = bol
+  }
+
+  @action
+  setData(data) {
+    this.data = data
   }
 
   @action
@@ -77,6 +94,53 @@ class PrinterStore {
     this.ready = ready
   }
 
+  get tableConfig() {
+    const { autoFillConfig } = this.config
+    if (!this.selectedRegion && !autoFillConfig?.checked) return null
+    const _selectedRegion = this.selectedRegion || autoFillConfig.region || ''
+    const arr = _selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+
+    if (!_.has(tableConfig, 'dataKey')) return null
+    return tableConfig
+  }
+
+  get tableData() {
+    if (!this.tableConfig) return []
+    const { autoFillConfig } = this.config
+    const { dataKey } = this.tableConfig
+
+    if (autoFillConfig?.region) {
+      /** 当前数据 */
+      return this.data._table[dataKey] || []
+    }
+    if (!this.selectedRegion) return []
+
+    /** 当前数据 */
+    return this.data._table[dataKey] || []
+  }
+
+  // 空数据的长度
+  get filledTableLen() {
+    const filledData = this.tableData.filter(x => x._isEmptyData)
+    return filledData.length
+  }
+
+  // 获得表格自定义行高
+  @computed
+  get computedTableCustomerRowHeight() {
+    const _defaultRegion = this.config?.autoFillConfig?.region
+    if (this.selectedRegion || _defaultRegion) {
+      const _selectedRegion = this.selectedRegion || _defaultRegion
+      const arr = _selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const height = this.config.contents[arr[2]].customerRowHeight
+        return height === undefined ? 23 : height
+      }
+    }
+    return 23
+  }
+
   @action
   setSelected(selected) {
     this.selected = selected || null
@@ -85,6 +149,32 @@ class PrinterStore {
   @action
   setSelectedRegion(selected) {
     this.selectedRegion = selected || null
+  }
+
+  getNormalTableBodyHeights(heights, dataKey) {
+    if (!this.tableConfig) return heights
+
+    const len = this.tableData.length
+    // 如果是已经开了填充配置，回显的heights包括了填充的表格部分，关闭配置时，这种情况就要去掉填充的
+    if (_.gt(heights.length, len)) return heights.slice(0, len)
+
+    const hasEmptyData = this.tableData.some(x => x._isEmptyData)
+    const isOrderCategroy = dataKey === this.config?.autoFillConfig?.dataKey
+    const { customerRowHeight = TR_BASE_HEIGHT } = this.tableConfig
+
+    if (hasEmptyData && !this.isAutoFilling && isOrderCategroy) {
+      // 如果tableData有填充的空数据， 则去掉
+      return heights.slice(0, -this.filledTableLen)
+    } else if (this.isAutoFilling && isOrderCategroy) {
+      // 如果没有空数据，且isAutofilling是true,即选择了要填充数据
+      return [
+        ...heights,
+        ...Array(this.filledTableLen).fill(_.toNumber(customerRowHeight))
+      ]
+    } else {
+      // 正常情况
+      return heights
+    }
   }
 
   @action
@@ -141,6 +231,7 @@ class PrinterStore {
 
   @action
   computedPages() {
+    // 每次先初始化置空
     this.pages = []
     // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
@@ -204,12 +295,15 @@ class PrinterStore {
           .minus(currentPageHeight)
           .toFixed(2)
 
+        const heights = this.getNormalTableBodyHeights(
+          table.body.heights,
+          dataKey
+        )
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0
-
         // 如果表格没有数据,那么轮一下个content
-        if (table.body.heights.length === 0) {
+        if (heights.length === 0) {
           index++
         } else {
           /** 仅计算当前页table的累积高度 */
@@ -219,28 +313,28 @@ class PrinterStore {
           /** 当前table剩余的高度 */
           let currentRemainTableHeight = 0
           /** 去最小的tr高度，用于下面的计算compare,(避免特殊情况：一般来说最小tr——height = 23, 比23还小的不考虑计算) */
-          const minHeight = Math.max(getArrayMid(table.body.heights), 23)
+          const minHeight = Math.max(getArrayMid(heights), 23)
 
           /* 遍历表格每一行，填充表格内容 */
-          while (end < table.body.heights.length) {
-            currentTableHeight += table.body.heights[end]
+          while (end < heights.length) {
+            currentTableHeight += heights[end]
             // 用于计算最后一页有footer情况的高度
-            currentPageHeight += table.body.heights[end]
+            currentPageHeight += heights[end]
             // 当前页没有多余空间
             if (currentTableHeight > pageAccomodateTableHeight) {
               currentRemainTableHeight = +Big(pageAccomodateTableHeight)
                 .minus(currentTableHeight)
-                .plus(table.body.heights[end])
+                .plus(heights[end])
 
               /**
                * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
-               * 2. table.body.heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
-               * 3. table.body.heights[end] 高度超过了 pageAccomodateTableHeight
+               * 2. heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
+               * 3. heights[end] 高度超过了 pageAccomodateTableHeight
                */
               if (
                 (currentRemainTableHeight / minHeight > 1.5 &&
-                  table.body.heights[end] / currentRemainTableHeight > 1) ||
-                table.body.heights[end] > pageAccomodateTableHeight
+                  heights[end] / currentRemainTableHeight > 1) ||
+                heights[end] > pageAccomodateTableHeight
               ) {
                 const detailsPageHeight = this.computedData(
                   dataKey,
@@ -256,7 +350,7 @@ class PrinterStore {
                     minHeight,
                     detailsPageHeight[1]
                   )
-                  table.body.heights.splice(end, 1, ...detailsPageHeight)
+                  heights.splice(end, 1, ...detailsPageHeight)
                   end++
                 }
               }
@@ -290,7 +384,7 @@ class PrinterStore {
               // 有空间，继续做下行
               end++
               // 最后一行，把信息加入 page，并轮下一个contents
-              if (end === table.body.heights.length) {
+              if (end === heights.length) {
                 page.push({
                   type: 'table',
                   index,
@@ -335,6 +429,8 @@ class PrinterStore {
       }
     }
     this.pages.push(page)
+
+    this.remainPageHeight = +Big(this.pageHeight - currentPageHeight).toFixed(0)
   }
 
   @action
@@ -630,6 +726,34 @@ class PrinterStore {
     } catch (err) {
       return text
     }
+  }
+
+  // 用于初始化的计算
+  getFilledTableData(tableData) {
+    const { autoFillConfig } = this.config
+    if (!this.selectedRegion && !autoFillConfig?.checked) return []
+    const tr_count = Math.floor(
+      this.remainPageHeight / this.computedTableCustomerRowHeight
+    )
+
+    const filledData = {
+      _isEmptyData: true // 表示是填充的空白数据
+    }
+    _.map(tableData[0], (val, key) => {
+      filledData[key] = ''
+    })
+    return Array(tr_count).fill(filledData)
+  }
+
+  @action.bound
+  changeTableData() {
+    const { autoFillConfig } = this.config
+    if (!this.isAutoFilling) return
+    const dataKey = autoFillConfig?.dataKey
+    const table = this.data._table[dataKey]
+
+    table.push(...this.getFilledTableData(table))
+    this.data._table[dataKey] = table
   }
 }
 

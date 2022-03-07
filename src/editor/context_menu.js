@@ -1,5 +1,6 @@
 import i18next from '../../locales'
 import React from 'react'
+import PropTypes from 'prop-types'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
@@ -16,12 +17,25 @@ const blockTypeList = [
   { value: 'qrcode_trace', text: i18next.t('插入订单溯源二维码') }
 ]
 
-@inject(stores => ({
-  editStore: stores.editStore,
-  mockData: stores.mockData
-}))
+@inject('editStore')
 @observer
 class ContextMenu extends React.Component {
+  componentDidMount() {
+    const {
+      editStore,
+      editStore: {
+        config: { autoFillConfig }
+      }
+    } = this.props
+
+    if (autoFillConfig?.checked) {
+      editStore.handleChangeTableData(
+        autoFillConfig?.checked,
+        autoFillConfig?.dataKey
+      )
+    }
+  }
+
   /**
    * 是否存在每页合计按钮,非异常明细才有按钮
    * @param name => ContextMenu 的 this.state.name
@@ -49,11 +63,24 @@ class ContextMenu extends React.Component {
     editStore.setSubtotalShow(name)
   }
 
+  handleChangeTableData = isAutoFilling => {
+    const { editStore } = this.props
+    editStore.handleChangeTableData(isAutoFilling)
+  }
+
   renderOrderActionBtn = name => {
     if (!this.hasSubtotalBtn(name)) {
       return null
     }
 
+    const {
+      editStore: {
+        config: {
+          page: { type }
+        },
+        isAutoFilling
+      }
+    } = this.props
     const arr = name.split('.')
     const { dataKey, subtotal } = this.props.editStore.config.contents[arr[2]]
     const keyArr = dataKey.split('_')
@@ -86,6 +113,12 @@ class ContextMenu extends React.Component {
         >
           {i18next.t('每页合计')}
         </div>
+        <div
+          onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}
+          className={isAutoFilling ? 'active' : ''}
+        >
+          {i18next.t('行数填充')}
+        </div>
       </>
     )
   }
@@ -102,8 +135,11 @@ class ContextMenu extends React.Component {
           key={editStore.computedPrinterKey}
           selected={editStore.selected}
           selectedRegion={editStore.selectedRegion}
+          isAutoFilling={editStore.isAutoFilling}
+          lineheight={editStore.computedTableCustomerRowHeight}
           config={editStore.config}
-          data={mockData}
+          data={editStore.mockData}
+          getremainpageHeight={editStore.setRemainPageHeight}
         />
       </CommonContextMenu>
     )

@@ -3,7 +3,7 @@ import React from 'react'
 import classNames from 'classnames'
 import { inject, observer, Provider } from 'mobx-react'
 import PropTypes from 'prop-types'
-import PrinterStore from './store'
+import PrinterStore, { TR_BASE_HEIGHT } from './store'
 import Page from './page'
 import _ from 'lodash'
 import Panel from './panel'
@@ -60,13 +60,10 @@ class Printer extends React.Component {
 
     // 无实际意义，辅助 onReady，见 didMount
     this.state = {}
-
-    props.printerStore.init(props.config, props.data)
-    props.printerStore.setSelected(props.selected)
-    props.printerStore.setSelectedRegion(props.selectedRegion)
+    this.init()
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  async UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.selected !== this.props.selected) {
       this.props.printerStore.setSelected(nextProps.selected)
     }
@@ -91,12 +88,23 @@ class Printer extends React.Component {
       }
       this.props.printerStore.computedPages()
     }
+    /** @decscription 空白行填充补充 */
+    if (nextProps.isAutoFilling !== this.props.isAutoFilling) {
+      await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
+      await this.props.printerStore.setData(nextProps.data)
+      await this.props.printerStore.setReady(true)
+      await this.props.printerStore.computedPages()
+    }
+    if (nextProps.lineheight !== this.props.lineheight) {
+      await this.props.getremainpageHeight(
+        this.props.printerStore.remainPageHeight
+      )
+    }
   }
 
   componentDidMount() {
-    const { printerStore, config } = this.props
+    const { printerStore, config, getremainpageHeight } = this.props
     const batchPrintConfig = config.batchPrintConfig
-
     // 连续打印不需要计算
     if (batchPrintConfig !== 2) {
       // didMount 代表第一次渲染完成
@@ -106,11 +114,31 @@ class Printer extends React.Component {
       config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
         ? printerStore.computedRowTablePages()
         : printerStore.computedPages()
+
+      /** @decscription 空白行填充补充 */
+      printerStore.computedPages()
+
+      if (config.autoFillConfig?.checked) {
+        this.props.printerStore.setAutofillConfig(
+          config.autoFillConfig?.checked || false
+        )
+        this.props.printerStore.changeTableData()
+      }
+
+      // 获取剩余空白高度，传到editor
+      getremainpageHeight && getremainpageHeight(printerStore.remainPageHeight)
     }
     // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
     this.setState({}, () => {
       this.props.onReady()
     })
+  }
+
+  init() {
+    const { printerStore, config, data, selected, selectedRegion } = this.props
+    printerStore.init(config, data)
+    printerStore.setSelected(selected)
+    printerStore.setSelectedRegion(selectedRegion)
   }
 
   renderBefore() {
@@ -154,8 +182,14 @@ class Printer extends React.Component {
   }
 
   renderPage() {
-    const { printerStore } = this.props
-    const { config, showCombineSkuDetail, showIngredientDetail } = printerStore
+    const { printerStore, isSomeSubtotalTr } = this.props
+    const {
+      config,
+      remainPageHeight,
+      isAutoFilling,
+      showCombineSkuDetail,
+      showIngredientDetail
+    } = printerStore
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
@@ -164,6 +198,18 @@ class Printer extends React.Component {
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
               {_.map(page, (panel, ii) => {
+                const content = config.contents[panel.index]
+                const autoFillConfig = config?.autoFillConfig || {}
+                const isAutofillConfig =
+                  isLastPage &&
+                  isAutoFilling &&
+                  panel.end &&
+                  content?.dataKey === autoFillConfig?.dataKey
+
+                const end = isAutofillConfig
+                  ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                  : panel.end
+
                 switch (panel.type) {
                   case 'table': {
                     if (config.contents[panel.index]?.id === 'combine') {
@@ -196,10 +242,11 @@ class Printer extends React.Component {
                             )}
                             range={{
                               begin: panel.begin,
-                              end: panel.end
+                              end: end
                             }}
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
+                            isSomeSubtotalTr={isSomeSubtotalTr}
                           />
                         )
                       }
@@ -211,10 +258,11 @@ class Printer extends React.Component {
                           config={config.contents[panel.index]}
                           range={{
                             begin: panel.begin,
-                            end: panel.end
+                            end: end
                           }}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
+                          isSomeSubtotalTr={isSomeSubtotalTr}
                         />
                       )
                     }
@@ -304,7 +352,6 @@ class Printer extends React.Component {
   render() {
     const {
       selected,
-      data,
       config,
       onReady,
       selectedRegion,
@@ -340,11 +387,15 @@ Printer.propTypes = {
   printerStore: PropTypes.object,
   selected: PropTypes.string,
   selectedRegion: PropTypes.string,
+  isAutoFilling: PropTypes.bool,
+  lineheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   data: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   onReady: PropTypes.func,
   showCombineSkuDetail: PropTypes.bool,
-  showIngredientDetail: PropTypes.bool
+  showIngredientDetail: PropTypes.bool,
+  isSomeSubtotalTr: PropTypes.bool,
+  getremainpageHeight: PropTypes.func
 }
 
 Printer.defaultProps = {
