@@ -10,6 +10,7 @@ import EditorSelect from '../common/editor_select'
 import EditorField from '../common/editor_edit_field'
 import EditTemplateType from '../common/edit_template_type'
 import EditorAddField from '../common/editor_add_field'
+import EditorCutomizedConfig from '../common/editor_customize_config'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
@@ -62,6 +63,8 @@ class Editor extends React.Component {
             />
             <Gap height='5px' />
             <EditorSelect />
+            <Gap height='5px' />
+            <EditorCutomizedConfig />
             <Gap height='5px' />
             <EditorField showNewDate={showNewDate} />
             <Gap height='5px' />
