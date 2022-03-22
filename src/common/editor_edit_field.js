@@ -198,7 +198,7 @@ class EditorField extends React.Component {
         {tableDataKeyList && (
           <>
             <Flex>
-              <Flex alignCenter>{i18next.t('数据类型')}：</Flex>
+              <Flex alignCenter>{i18next.t('数据展示')}：</Flex>
               <Select
                 className='gm-printer-edit-select'
                 value={editStore.computedTableDataKeyOfSelectedRegion}

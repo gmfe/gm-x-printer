@@ -3,6 +3,7 @@ import React from 'react'
 import _ from 'lodash'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
+import PropTypes from 'prop-types'
 import { Printer } from '../printer'
 import { hasSubtotalBtnTableDataKeySet } from './editor'
 
@@ -19,6 +20,17 @@ const blockTypeList = [
 }))
 @observer
 class ContextMenu extends React.Component {
+  componentDidMount() {
+    this.props.editStore.initCombine()
+  }
+
+  componentDidUpdate() {
+    const { config } = this.props.editStore
+    if (_.filter(config.contents, c => c.id === 'combine').length > 1) {
+      this.props.editStore.initCombine()
+    }
+  }
+
   /**
    * 是否存在每页合计按钮,非异常明细才有按钮
    * @param name => ContextMenu 的 this.state.name
@@ -101,6 +113,12 @@ class ContextMenu extends React.Component {
       </CommonContextMenu>
     )
   }
+}
+
+ContextMenu.propTypes = {
+  editStore: PropTypes.object.isRequired,
+  mockData: PropTypes.object.isRequired,
+  uploadQiniuImage: PropTypes.func
 }
 
 export default ContextMenu

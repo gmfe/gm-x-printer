@@ -108,6 +108,16 @@ class EditorStore {
   }
 
   @action
+  setCombineSkuDetail(d) {
+    this.config.combineSkuDetail.show = d
+  }
+
+  @action
+  setCombineIngredientDetail(d) {
+    this.config.ingredientDetail.show = d
+  }
+
+  @action
   setConfigName(name) {
     this.config.name = name
   }
