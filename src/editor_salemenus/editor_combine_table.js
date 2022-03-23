@@ -38,11 +38,10 @@ class TableDetailEditor extends React.Component {
     const { editStore } = this.props
     editStore.setCombineIngredientDetail(bool)
     editStore.setSelected()
-    const newContent = editStore.originConfig.contents.find(
-      c =>
-        c.id === 'combine' &&
-        c.dataKey === (bool ? 'combine_withIg' : 'combine_withoutIg')
-    )
+
+    const newContent = editStore.config.contents.find(c => c.id === 'combine')
+
+    newContent.dataKey = bool ? 'combine_withIg' : 'combine_withoutIg'
 
     editStore.setConfig({
       ...editStore.config,
