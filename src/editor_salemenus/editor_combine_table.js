@@ -54,9 +54,11 @@ class TableDetailEditor extends React.Component {
 
   render() {
     const {
-      addFields: { combineTableFields }
+      addFields: { combineTableFields },
+      editStore
     } = this.props
-    const { combineSkuDetail, ingredientDetail } = this.props.editStore.config
+    const { combineSkuDetail, ingredientDetail } = editStore.config
+
     return (
       <div>
         <Title title={i18next.t('组合商品设置')} />
@@ -80,18 +82,20 @@ class TableDetailEditor extends React.Component {
               />
               <span>&nbsp;{i18next.t('子商品明细展示')}</span>
             </div>
-            <div className='gm-padding-top-5'>
-              <div>{i18next.t('添加字段')}：</div>
-              <Flex wrap>
-                {_.map(combineTableFields, o => (
-                  <FieldBtn
-                    key={o.key}
-                    name={o.key}
-                    onClick={this.handleDetailAddField.bind(this, o)}
-                  />
-                ))}
-              </Flex>
-            </div>
+            {editStore.isSelectingCombine && (
+              <div className='gm-padding-top-5'>
+                <div>{i18next.t('添加字段')}：</div>
+                <Flex wrap>
+                  {_.map(combineTableFields, o => (
+                    <FieldBtn
+                      key={o.key}
+                      name={o.key}
+                      onClick={this.handleDetailAddField.bind(this, o)}
+                    />
+                  ))}
+                </Flex>
+              </div>
+            )}
           </>
         )}
       </div>

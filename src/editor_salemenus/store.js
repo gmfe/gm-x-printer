@@ -13,6 +13,19 @@ class Store extends EditorStore {
     }
   }
 
+  /**
+   * 当前是不是选中组合商品的表格
+   */
+  @computed
+  get isSelectingCombine() {
+    return (
+      !!this.selectedRegion &&
+      this.config.contents[
+        this.selectedRegion?.match(/contents.table.(\d)/)?.[1]
+      ]?.id === 'combine'
+    )
+  }
+
   @action
   initCombine() {
     // 不展示组合详情

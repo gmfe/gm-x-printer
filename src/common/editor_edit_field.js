@@ -189,18 +189,13 @@ class EditorField extends React.Component {
       (editStore.computedTableSpecialConfig.subtotal &&
         get(subtotal, 'needUpperCase')) ||
       false
-    // 组合商品详情
-    const isCombine =
-      editStore.config.contents[
-        editStore.selectedRegion.match(/contents.table.(\d)/)[1]
-      ].id === 'combine'
 
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
         <Gap />
 
-        {tableDataKeyList && !isCombine && (
+        {tableDataKeyList && !editStore.isSelectingCombine && (
           <>
             <Flex>
               <Flex alignCenter>{i18next.t('数据展示')}：</Flex>
