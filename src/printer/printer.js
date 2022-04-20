@@ -98,7 +98,6 @@ class Printer extends React.Component {
   renderBefore() {
     const { printerStore } = this.props
     const { config } = printerStore
-
     return (
       <Page>
         <Header config={config.header} pageIndex={0} />
@@ -137,9 +136,8 @@ class Printer extends React.Component {
   }
 
   renderPage() {
-    const { printerStore } = this.props
+    const { printerStore, config: propsConfig } = this.props
     const { config } = printerStore
-
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
@@ -151,20 +149,53 @@ class Printer extends React.Component {
 
               {_.map(page, (panel, ii) => {
                 switch (panel.type) {
-                  case 'table':
-                    return (
-                      <Table
-                        key={`contents.table.${panel.index}.${ii}`}
-                        name={`contents.table.${panel.index}`}
-                        config={config.contents[panel.index]}
-                        range={{
-                          begin: panel.begin,
-                          end: panel.end
-                        }}
-                        placeholder={`${i18next.t('区域')} ${panel.index}`}
-                        pageIndex={i}
-                      />
-                    )
+                  case 'table': {
+                    if (config.contents[panel.index]?.id === 'combine') {
+                      // 需不需要展示组合商品table
+                      if (!propsConfig.combineSkuDetail.show) {
+                        return null
+                      } else {
+                        // 组合商品table需不需要展示原料
+                        if (
+                          (propsConfig.ingredientDetail.show &&
+                            config.contents[panel.index].dataKey ===
+                              'combine_withoutIg') ||
+                          (!propsConfig.ingredientDetail.show &&
+                            config.contents[panel.index].dataKey ===
+                              'combine_withIg')
+                        ) {
+                          return null
+                        }
+                        return (
+                          <Table
+                            key={`contents.table.${panel.index}.${ii}`}
+                            name={`contents.table.${panel.index}`}
+                            config={config.contents[panel.index]}
+                            range={{
+                              begin: panel.begin,
+                              end: panel.end
+                            }}
+                            placeholder={`${i18next.t('区域')} ${panel.index}`}
+                            pageIndex={i}
+                          />
+                        )
+                      }
+                    } else {
+                      return (
+                        <Table
+                          key={`contents.table.${panel.index}.${ii}`}
+                          name={`contents.table.${panel.index}`}
+                          config={config.contents[panel.index]}
+                          range={{
+                            begin: panel.begin,
+                            end: panel.end
+                          }}
+                          placeholder={`${i18next.t('区域')} ${panel.index}`}
+                          pageIndex={i}
+                        />
+                      )
+                    }
+                  }
 
                   default:
                     return (

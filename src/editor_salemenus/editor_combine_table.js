@@ -20,18 +20,18 @@ class TableDetailEditor extends React.Component {
   handleCombineShow = bool => {
     const { editStore } = this.props
     editStore.setCombineSkuDetail(bool)
-    const showDetail = editStore.config.ingredientDetail.show
-    const newContent = editStore.config.contents.filter(c => c.id !== 'combine')
-    const originCombineContent = editStore.originConfig.contents.find(
-      c =>
-        c.id === 'combine' &&
-        c.dataKey === (showDetail ? 'combine_withIg' : 'combine_withoutIg')
-    )
-    editStore.setSelected()
-    editStore.setConfig({
-      ...editStore.config,
-      contents: bool ? [...newContent, originCombineContent] : newContent
-    })
+    // const showDetail = editStore.config.ingredientDetail.show
+    // const newContent = editStore.config.contents.filter(c => c.id !== 'combine')
+    // const originCombineContent = editStore.originConfig.contents.find(
+    //   c =>
+    //     c.id === 'combine' &&
+    //     c.dataKey === (showDetail ? 'combine_withIg' : 'combine_withoutIg')
+    // )
+    // editStore.setSelected()
+    // editStore.setConfig({
+    //   ...editStore.config,
+    //   contents: bool ? [...newContent, originCombineContent] : newContent
+    // })
   }
 
   handleCombineDetailShow = bool => {
@@ -39,17 +39,17 @@ class TableDetailEditor extends React.Component {
     editStore.setCombineIngredientDetail(bool)
     editStore.setSelected()
 
-    const newContent = editStore.config.contents.find(c => c.id === 'combine')
+    // const newContent = editStore.config.contents.find(c => c.id === 'combine')
 
-    newContent.dataKey = bool ? 'combine_withIg' : 'combine_withoutIg'
+    // newContent.dataKey = bool ? 'combine_withIg' : 'combine_withoutIg'
 
-    editStore.setConfig({
-      ...editStore.config,
-      contents: [
-        ...editStore.config.contents.filter(c => c.id !== 'combine'),
-        newContent
-      ]
-    })
+    // editStore.setConfig({
+    //   ...editStore.config,
+    //   contents: [
+    //     ...editStore.config.contents.filter(c => c.id !== 'combine'),
+    //     newContent
+    //   ]
+    // })
   }
 
   render() {

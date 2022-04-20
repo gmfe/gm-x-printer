@@ -141,9 +141,21 @@ class PrinterStore {
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
-
+      const { combineSkuDetail, ingredientDetail } = this.config
       /* 表格内容处理 */
       if (content.type === 'table') {
+        /**
+         * 判断组合商品表格,
+         * 因为写死了两个固定的content，页码计算要处理一下
+         */
+        if (
+          (content.id === 'combine' && !combineSkuDetail.show) ||
+          (ingredientDetail.show && content.dataKey === 'combine_withoutIg') ||
+          (!ingredientDetail.show && content.dataKey === 'combine_withIg')
+        ) {
+          index++
+          continue
+        }
         // 是表格就++
         tableCount++
         // 表格原始的高度和宽度信息

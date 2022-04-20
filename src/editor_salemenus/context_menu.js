@@ -20,16 +20,16 @@ const blockTypeList = [
 }))
 @observer
 class ContextMenu extends React.Component {
-  componentDidMount() {
-    this.props.editStore.initCombine()
-  }
+  //   componentDidMount() {
+  //     this.props.editStore.initCombine()
+  //   }
 
-  componentDidUpdate() {
-    const { config } = this.props.editStore
-    if (_.filter(config.contents, c => c.id === 'combine').length > 1) {
-      this.props.editStore.initCombine()
-    }
-  }
+  //   componentDidUpdate() {
+  //     const { config } = this.props.editStore
+  //     if (_.filter(config.contents, c => c.id === 'combine').length > 1) {
+  //       this.props.editStore.initCombine()
+  //     }
+  //   }
 
   /**
    * 是否存在每页合计按钮,非异常明细才有按钮
