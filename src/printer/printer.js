@@ -9,6 +9,7 @@ import _ from 'lodash'
 import Panel from './panel'
 import Table from './table'
 import MergePage from './merge_page'
+import { toJS } from 'mobx'
 
 // Header Sign Footer 相对特殊，要单独处理
 const Header = props => (
@@ -67,12 +68,27 @@ class Printer extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
+    //   debugger
     if (nextProps.selected !== this.props.selected) {
       this.props.printerStore.setSelected(nextProps.selected)
     }
     if (nextProps.selectedRegion !== this.props.selectedRegion) {
       this.props.printerStore.setSelectedRegion(nextProps.selectedRegion)
     }
+
+    // this.props.printerStore.computedPages()
+
+    // if (nextProps.config.contents.find(c => c.id === 'combine')) {
+    //   this.props.printerStore.setConfig(nextProps.config)
+    //   this.props.printerStore.computedPages()
+    // }
+
+    // if (
+    //   nextProps.config.ingredientDetail.show !==
+    //   this.props.config.ingredientDetail.show
+    // ) {
+    //   nextProps.printerStore.computedPages()
+    // }
   }
 
   componentDidMount() {
@@ -138,11 +154,18 @@ class Printer extends React.Component {
   renderPage() {
     const { printerStore, config: propsConfig } = this.props
     const { config, hiddenPages4CombineTable } = printerStore
+    // const pages = printerStore.pages.filter(
+    //   page => !page.every(p => hiddenPages4CombineTable.includes(p.index))
+    // )
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
+          if (page.every(p => hiddenPages4CombineTable.includes(p.index))) {
+            return null
+          }
+          debugger
           const isLastPage = i === printerStore.pages.length - 1
-
+          console.log(toJS(printerStore.pages))
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
@@ -150,6 +173,7 @@ class Printer extends React.Component {
               {_.map(page, (panel, ii) => {
                 switch (panel.type) {
                   case 'table': {
+                    debugger
                     if (config.contents[panel.index]?.id === 'combine') {
                       // 需不需要展示组合商品table
                       if (!propsConfig.combineSkuDetail.show) {
@@ -170,7 +194,14 @@ class Printer extends React.Component {
                           <Table
                             key={`contents.table.${panel.index}.${ii}`}
                             name={`contents.table.${panel.index}`}
-                            config={config.contents[panel.index]}
+                            config={config.contents.find(
+                              c =>
+                                c.id === 'combine' &&
+                                c.dataKey ===
+                                  (propsConfig.ingredientDetail.show
+                                    ? 'combine_withIg'
+                                    : 'combine_withoutIg')
+                            )}
                             range={{
                               begin: panel.begin,
                               end: panel.end
@@ -216,10 +247,10 @@ class Printer extends React.Component {
                   style={{ bottom: config.footer.style.height }}
                 />
               )}
-              {!hiddenPages4CombineTable.includes(page.index) && (
+              {/* {!hiddenPages4CombineTable.includes(page.index) && (
                 <Footer config={config.footer} pageIndex={i} />
-              )}
-              {/* <Footer config={config.footer} pageIndex={i} /> */}
+              )} */}
+              <Footer config={config.footer} pageIndex={i} />
             </Page>
           )
         })}

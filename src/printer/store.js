@@ -165,16 +165,15 @@ class PrinterStore {
         //   index++
         //   continue
         // }
-
-        if (!combineSkuDetail.show) {
+        if (!combineSkuDetail?.show) {
           if (content.id === 'combine') {
             this.hiddenPages4CombineTable.push(index)
           }
         } else {
           if (
-            (ingredientDetail.show &&
+            (ingredientDetail?.show &&
               content.dataKey === 'combine_withoutIg') ||
-            (!ingredientDetail.show && content.dataKey === 'combine_withIg')
+            (!ingredientDetail?.show && content.dataKey === 'combine_withIg')
           ) {
             this.hiddenPages4CombineTable.push(index)
           }
