@@ -27,6 +27,8 @@ class PrinterStore {
 
   @observable pages = [] // [{type, index, begin, end}]
 
+  @observable hiddenPages4CombineTable = []
+
   data = {}
 
   // 选中某个东西，具体见 edit/store.js 定义
@@ -148,14 +150,42 @@ class PrinterStore {
          * 判断组合商品表格,
          * 因为写死了两个固定的content，页码计算要处理一下
          */
-        if (
-          (content.id === 'combine' && !combineSkuDetail.show) ||
-          (ingredientDetail.show && content.dataKey === 'combine_withoutIg') ||
-          (!ingredientDetail.show && content.dataKey === 'combine_withIg')
-        ) {
-          index++
-          continue
+
+        // if (content.id === 'combine' && !combineSkuDetail.show) {
+        //   index++
+        //   continue
+        // }
+
+        // if (
+        //   content.id === 'combine' &&
+        //   combineSkuDetail.show &&
+        //   ((ingredientDetail.show && content.dataKey === 'combine_withoutIg') ||
+        //     (!ingredientDetail.show && content.dataKey === 'combine_withIg'))
+        // ) {
+        //   index++
+        //   continue
+        // }
+
+        if (!combineSkuDetail.show) {
+          if (content.id === 'combine') {
+            this.hiddenPages4CombineTable.push(index)
+          }
+        } else {
+          if (
+            (ingredientDetail.show &&
+              content.dataKey === 'combine_withoutIg') ||
+            (!ingredientDetail.show && content.dataKey === 'combine_withIg')
+          ) {
+            this.hiddenPages4CombineTable.push(index)
+          }
         }
+        // if (
+        //   (content.id === 'combine' && !combineSkuDetail.show) ||
+        //   (ingredientDetail.show && content.dataKey === 'combine_withoutIg') ||
+        //   (!ingredientDetail.show && content.dataKey === 'combine_withIg')
+        // ) {
+        //   this.hiddenPages4CombineTable.push(index)
+        // }
         // 是表格就++
         tableCount++
         // 表格原始的高度和宽度信息

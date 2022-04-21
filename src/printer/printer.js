@@ -137,7 +137,7 @@ class Printer extends React.Component {
 
   renderPage() {
     const { printerStore, config: propsConfig } = this.props
-    const { config } = printerStore
+    const { config, hiddenPages4CombineTable } = printerStore
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
@@ -216,7 +216,10 @@ class Printer extends React.Component {
                   style={{ bottom: config.footer.style.height }}
                 />
               )}
-              <Footer config={config.footer} pageIndex={i} />
+              {!hiddenPages4CombineTable.includes(page.index) && (
+                <Footer config={config.footer} pageIndex={i} />
+              )}
+              {/* <Footer config={config.footer} pageIndex={i} /> */}
             </Page>
           )
         })}
