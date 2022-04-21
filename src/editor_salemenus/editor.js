@@ -12,6 +12,7 @@ import EditorAddField from '../common/editor_add_field'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
+import EditorSpecialTable from './editor_combine_table'
 
 // ‼️‼️🚸🚸 注意: value的命名不要用下划线! 原因是 computedTableDataKeyOfSelectedRegion 会split('_')下划线做一些事情‼️
 // 📚hasSubtotalBtn 这种表格是否支持  双栏,分类,合计  功能
@@ -83,7 +84,8 @@ class Editor extends React.Component {
             />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
-
+            <Gap height='5px' />
+            <EditorSpecialTable addFields={addFields} />
             <div id='gm-printer-tip' />
 
             <div id='gm-printer-modal' />

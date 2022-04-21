@@ -27,6 +27,12 @@ class PrinterStore {
 
   @observable pages = [] // [{type, index, begin, end}]
 
+  @observable hiddenPages4CombineTable = []
+
+  @observable showCombineSkuDetail = false
+
+  @observable showIngredientDetail = false
+
   data = {}
 
   // 选中某个东西，具体见 edit/store.js 定义
@@ -47,6 +53,8 @@ class PrinterStore {
     this.pages = [] // [page, page, ...] page 为数组
     this.data = data
     this.selected = null
+    this.showCombineSkuDetail = config?.combineSkuDetail?.show || false
+    this.showIngredientDetail = config?.ingredientDetail?.show || false
   }
 
   @action
@@ -77,6 +85,16 @@ class PrinterStore {
   @action
   setSelectedRegion(selected) {
     this.selectedRegion = selected || null
+  }
+
+  @action
+  setShowCombineSkuDetail(boo) {
+    this.showCombineSkuDetail = boo
+  }
+
+  @action
+  setShowIngredientDetail(boo) {
+    this.showIngredientDetail = boo
   }
 
   @action
@@ -123,6 +141,7 @@ class PrinterStore {
 
   @action
   computedPages() {
+    this.pages = []
     // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
     // 退出计算! 因为页眉 + 页脚 > currentPageHeight,页面装不下其他东西
@@ -141,9 +160,27 @@ class PrinterStore {
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
-
       /* 表格内容处理 */
       if (content.type === 'table') {
+        /**
+         * 判断组合商品表格,
+         * 因为写死了两个固定的content，页码计算要处理一下
+         */
+        if (content.id === 'combine' && !this.showCombineSkuDetail) {
+          index++
+          continue
+        }
+        if (
+          content?.id === 'combine' &&
+          this.showCombineSkuDetail &&
+          ((this.showIngredientDetail &&
+            content?.dataKey === 'combine_withoutIg') ||
+            (!this.showIngredientDetail &&
+              content?.dataKey === 'combine_withIg'))
+        ) {
+          index++
+          continue
+        }
         // 是表格就++
         tableCount++
         // 表格原始的高度和宽度信息

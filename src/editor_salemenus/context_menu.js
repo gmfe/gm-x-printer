@@ -3,6 +3,7 @@ import React from 'react'
 import _ from 'lodash'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
+import PropTypes from 'prop-types'
 import { Printer } from '../printer'
 import { hasSubtotalBtnTableDataKeySet } from './editor'
 
@@ -97,10 +98,18 @@ class ContextMenu extends React.Component {
           selectedRegion={editStore.selectedRegion}
           config={editStore.config}
           data={mockData}
+          showCombineSkuDetail={editStore.config?.combineSkuDetail?.show}
+          showIngredientDetail={editStore.config?.ingredientDetail?.show}
         />
       </CommonContextMenu>
     )
   }
+}
+
+ContextMenu.propTypes = {
+  editStore: PropTypes.object.isRequired,
+  mockData: PropTypes.object.isRequired,
+  uploadQiniuImage: PropTypes.func
 }
 
 export default ContextMenu

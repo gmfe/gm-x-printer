@@ -73,6 +73,24 @@ class Printer extends React.Component {
     if (nextProps.selectedRegion !== this.props.selectedRegion) {
       this.props.printerStore.setSelectedRegion(nextProps.selectedRegion)
     }
+    if (
+      !(
+        _.isNil(nextProps.showCombineSkuDetail) &&
+        _.isNil(nextProps.showIngredientDetail)
+      )
+    ) {
+      if (nextProps.showCombineSkuDetail !== this.props.showCombineSkuDetail) {
+        this.props.printerStore.setShowCombineSkuDetail(
+          nextProps.showCombineSkuDetail
+        )
+      }
+      if (nextProps.showIngredientDetail !== this.props.showIngredientDetail) {
+        this.props.printerStore.setShowIngredientDetail(
+          nextProps.showIngredientDetail
+        )
+      }
+      this.props.printerStore.computedPages()
+    }
   }
 
   componentDidMount() {
@@ -98,7 +116,6 @@ class Printer extends React.Component {
   renderBefore() {
     const { printerStore } = this.props
     const { config } = printerStore
-
     return (
       <Page>
         <Header config={config.header} pageIndex={0} />
@@ -138,33 +155,70 @@ class Printer extends React.Component {
 
   renderPage() {
     const { printerStore } = this.props
-    const { config } = printerStore
-
+    const { config, showCombineSkuDetail, showIngredientDetail } = printerStore
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
           const isLastPage = i === printerStore.pages.length - 1
-
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
-
               {_.map(page, (panel, ii) => {
                 switch (panel.type) {
-                  case 'table':
-                    return (
-                      <Table
-                        key={`contents.table.${panel.index}.${ii}`}
-                        name={`contents.table.${panel.index}`}
-                        config={config.contents[panel.index]}
-                        range={{
-                          begin: panel.begin,
-                          end: panel.end
-                        }}
-                        placeholder={`${i18next.t('区域')} ${panel.index}`}
-                        pageIndex={i}
-                      />
-                    )
+                  case 'table': {
+                    if (config.contents[panel.index]?.id === 'combine') {
+                      // 需不需要展示组合商品table
+                      if (!showCombineSkuDetail) {
+                        return null
+                      } else {
+                        // 组合商品table需不需要展示原料
+                        if (
+                          (showIngredientDetail &&
+                            config.contents[panel.index].dataKey ===
+                              'combine_withoutIg') ||
+                          (!showIngredientDetail &&
+                            config.contents[panel.index].dataKey ===
+                              'combine_withIg')
+                        ) {
+                          return null
+                        }
+                        return (
+                          <Table
+                            key={`contents.table.${panel.index}.${ii}`}
+                            name={`contents.table.${panel.index}`}
+                            config={config.contents.find(
+                              c =>
+                                c.id === 'combine' &&
+                                c.dataKey ===
+                                  (showIngredientDetail
+                                    ? 'combine_withIg'
+                                    : 'combine_withoutIg')
+                            )}
+                            range={{
+                              begin: panel.begin,
+                              end: panel.end
+                            }}
+                            placeholder={`${i18next.t('区域')} ${panel.index}`}
+                            pageIndex={i}
+                          />
+                        )
+                      }
+                    } else {
+                      return (
+                        <Table
+                          key={`contents.table.${panel.index}.${ii}`}
+                          name={`contents.table.${panel.index}`}
+                          config={config.contents[panel.index]}
+                          range={{
+                            begin: panel.begin,
+                            end: panel.end
+                          }}
+                          placeholder={`${i18next.t('区域')} ${panel.index}`}
+                          pageIndex={i}
+                        />
+                      )
+                    }
+                  }
 
                   default:
                     return (
@@ -288,7 +342,9 @@ Printer.propTypes = {
   selectedRegion: PropTypes.string,
   data: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
-  onReady: PropTypes.func
+  onReady: PropTypes.func,
+  showCombineSkuDetail: PropTypes.bool,
+  showIngredientDetail: PropTypes.bool
 }
 
 Printer.defaultProps = {

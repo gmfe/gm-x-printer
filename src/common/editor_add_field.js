@@ -49,7 +49,7 @@ class EditorAddField extends React.Component {
     } = this.props
 
     let content = null
-    if (editStore.selectedRegion === null) {
+    if (editStore.selectedRegion === null || editStore.isSelectingCombine) {
       content = null
     } else if (editStore.computedRegionIsTable) {
       content = (

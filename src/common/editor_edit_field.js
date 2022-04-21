@@ -195,10 +195,10 @@ class EditorField extends React.Component {
         <Title title={i18next.t('编辑字段')} />
         <Gap />
 
-        {tableDataKeyList && (
+        {tableDataKeyList && !editStore.isSelectingCombine && (
           <>
             <Flex>
-              <Flex alignCenter>{i18next.t('数据类型')}：</Flex>
+              <Flex alignCenter>{i18next.t('数据展示')}：</Flex>
               <Select
                 className='gm-printer-edit-select'
                 value={editStore.computedTableDataKeyOfSelectedRegion}
