@@ -579,8 +579,7 @@ class PrinterStore {
     // 做好保护，出错就返回 text
     try {
       const list = this.data._table[dataKey] || this.data._table.orders
-
-      return _.template(text, {
+      const result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         ...this.data.common,
@@ -589,6 +588,11 @@ class PrinterStore {
         [i18next.t('页码总数')]: this.pages.length,
         price: price // 提供一个价格处理函数
       })
+      // 特殊处理配送单双栏打印出现  '元/'
+      if (result === '元/') {
+        return ''
+      }
+      return result
     } catch (err) {
       return text
     }
