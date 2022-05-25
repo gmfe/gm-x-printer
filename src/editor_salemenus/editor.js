@@ -71,7 +71,6 @@ class Editor extends React.Component {
             }
           />
         </Flex>
-
         {showEditor && (
           <div className='gm-printer-edit-zone'>
             <EditorTitle onSave={onSave} />
@@ -87,11 +86,9 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorSpecialTable addFields={addFields} />
             <div id='gm-printer-tip' />
-
             <div id='gm-printer-modal' />
           </div>
         )}
-
         <div className='gm-printer-edit-wrap'>
           <ContextMenu uploadQiniuImage={uploadQiniuImage} />
         </div>
