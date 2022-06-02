@@ -41,7 +41,10 @@ class Editor extends React.Component {
     if (_.has(tableFieldsGrouped, currentTableDataKey)) {
       const tableFields = {}
       _.forEach(tableFieldsGrouped[currentTableDataKey], item => {
-        tableFields[item] = addFields.tableFields[item]
+        const fields = addFields.tableFields[item]
+        if (!_.isEmpty(fields)) {
+          tableFields[item] = addFields.tableFields[item]
+        }
       })
       return {
         ...addFields,
