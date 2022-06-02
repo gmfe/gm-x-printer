@@ -2,7 +2,7 @@ import i18next from '../../../locales'
 
 const orderTypeDefaultTableConfig = [
   {
-    head: i18next.t('下单日期_按天'),
+    head: i18next.t('下单日期（按天）'),
     headStyle: {
       textAlign: 'center'
     },
