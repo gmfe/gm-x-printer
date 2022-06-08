@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import _ from 'lodash'
 import { borderStyleList } from '../config'
-import { Flex, Tip } from '../components'
+import { Flex, Tip, ToolTip } from '../components'
 import { Request } from 'gm-util'
 import i18next from '../../locales'
 
@@ -617,17 +617,27 @@ Gap.propTypes = {
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 }
 
-const FieldBtn = ({ name, onClick }) => (
+const FieldBtn = ({ name, onClick, toolTip }) => (
   <Flex alignCenter style={{ width: '50%', margin: '3px 0' }}>
     <span className='gm-printer-edit-plus-btn' onClick={onClick}>
       +
     </span>
-    <span className='gm-padding-left-5'>{name}</span>
+    <span className='gm-padding-left-5'>
+      {toolTip ? (
+        <>
+          {name}
+          <ToolTip text={toolTip} />
+        </>
+      ) : (
+        name
+      )}
+    </span>
   </Flex>
 )
 FieldBtn.propTypes = {
   name: PropTypes.string,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  toolTip: PropTypes.string
 }
 
 const TipInfo = ({ text, color }) => (
