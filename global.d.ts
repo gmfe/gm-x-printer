@@ -20,6 +20,10 @@ declare module 'gm-x-printer' {
     list: any[]
     onReady?: () => void
   }
+  interface EditorStatementProps extends EditorProps {
+    /** 分组，用于控制切换数据展示时显隐 */
+    tableFieldsGrouped?: Record<string, any>
+  }
   // function Editor<P extends EditorProps>(props: P): React.ComponentType<P>
   class Editor<T extends EditorProps> extends React.Component<T, any> {}
   class EditorStockIn<T extends EditorProps> extends React.Component<T, any> {}
@@ -39,7 +43,7 @@ declare module 'gm-x-printer' {
     T,
     any
   > {}
-  class EditorStatement<T extends EditorProps> extends React.Component<
+  class EditorStatement<T extends EditorStatementProps> extends React.Component<
     T,
     any
   > {}

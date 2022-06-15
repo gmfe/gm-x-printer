@@ -12,18 +12,51 @@ import EditorAddField from '../common/editor_add_field'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
+import { TABLE_TYPE } from './table_type'
 
 const tableDataKeyList = [
-  { value: 'orders', text: i18next.t('账单明细') },
-  { value: 'skus', text: i18next.t('订单明细') }
+  { value: TABLE_TYPE.ORDERS, text: i18next.t('账单明细') },
+  { value: TABLE_TYPE.SKUS, text: i18next.t('订单明细') },
+  { value: TABLE_TYPE.PRODUCT, text: i18next.t('商品汇总') },
+  { value: TABLE_TYPE.ORDER_TYPE, text: i18next.t('订单类型') }
 ]
 
 @withStore(editStore)
 @inject('editStore')
 @observer
 class Editor extends React.Component {
+  /**
+   * 当前选择的“数据展示”
+   */
+  get currentTableDataKey() {
+    return this.props.editStore.computedTableDataKeyOfSelectedRegion
+  }
+
+  /**
+   * addFields 根据 currentTableDataKey 的值变化
+   */
+  get currentAddFields() {
+    const { tableFieldsGrouped, addFields } = this.props
+    const { currentTableDataKey } = this
+    if (_.has(tableFieldsGrouped, currentTableDataKey)) {
+      const tableFields = {}
+      _.forEach(tableFieldsGrouped[currentTableDataKey], item => {
+        const fields = addFields.tableFields[item]
+        if (!_.isEmpty(fields)) {
+          tableFields[item] = addFields.tableFields[item]
+        }
+      })
+      return {
+        ...addFields,
+        tableFields
+      }
+    }
+    return addFields
+  }
+
   render() {
-    const { onSave, showEditor, addFields, uploadQiniuImage } = this.props
+    const { onSave, showEditor, uploadQiniuImage } = this.props
+    const { currentAddFields } = this
 
     return (
       <div className='gm-printer-edit'>
@@ -48,7 +81,7 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorField tableDataKeyList={tableDataKeyList} />
             <Gap height='5px' />
-            <EditorAddField addFields={addFields} />
+            <EditorAddField addFields={currentAddFields} />
 
             <div id='gm-printer-tip' />
 
@@ -70,7 +103,9 @@ Editor.propTypes = {
   uploadQiniuImage: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
-  addFields: PropTypes.object.isRequired
+  addFields: PropTypes.object.isRequired,
+  tableFieldsGrouped: PropTypes.object,
+  editStore: PropTypes.object
 }
 
 Editor.deaultProps = {
