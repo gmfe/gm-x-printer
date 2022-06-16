@@ -90,7 +90,7 @@ class TableDetailEditor extends React.Component {
           <Flex alignCenter className='gm-padding-top-5'>
             <div>{i18next.t('只打印商品基本单位报价')}：</div>
             <Switch
-              checked={printBaseUnitSkuOnly}
+              checked={!!printBaseUnitSkuOnly}
               onChange={e => this.handlePrintBaseUnitSkuOnly(e)}
             />
           </Flex>

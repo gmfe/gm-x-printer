@@ -119,7 +119,10 @@ class EditorStore {
 
   @action
   setPrintBaseUnitSkuOnly(d) {
-    this.config.printBaseUnitSkuOnly = d
+    this.config = {
+      ...this.config,
+      printBaseUnitSkuOnly: d
+    }
   }
 
   @action
