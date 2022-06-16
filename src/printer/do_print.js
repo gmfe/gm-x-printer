@@ -9,8 +9,9 @@ import { afterImgAndSvgLoaded } from '../util'
 const printerId = '_gm-printer_' + Math.random()
 let $printer = window.document.getElementById(printerId)
 
-function init(isTest) {
-  isZoom() &&
+function init({ isTest, isTipZoom = true }) {
+  isTipZoom &&
+    isZoom() &&
     window.alert(
       '检测您的浏览器使用了缩放,为了避免影响打印布局,请重置缩放到100%后再进行打印'
     )
@@ -94,8 +95,12 @@ function doPrint({ data, config }, isTest) {
   return toDoPrint({ data, config })
 }
 
-function doBatchPrint(list, isTest) {
-  init(isTest)
+function doBatchPrint(
+  list,
+  isTest,
+  extraCofnig = { isPrint: true, isTipZoom: true }
+) {
+  init({ isTest, isTipZoom: extraCofnig.isTipZoom })
 
   return toDoPrintBatch(list)
 }
