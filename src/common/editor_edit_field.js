@@ -12,6 +12,7 @@ import {
   TextAlign,
   ColumnWidth,
   Textarea,
+  ChangeCapCheckbox,
   Title,
   TipInfo
 } from '../common/component'
@@ -98,6 +99,13 @@ class EditorField extends React.Component {
               style={style}
               onChange={this.handleChangeBlock.bind(this, 'style')}
             />
+
+            <ChangeCapCheckbox
+              style={style}
+              value={text}
+              onChange={this.handleChangeBlock}
+            /> 
+
             <Gap />
 
             <Textarea
