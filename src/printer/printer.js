@@ -209,6 +209,7 @@ class Printer extends React.Component {
                 const end = isAutofillConfig
                   ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                   : panel.end
+
                 switch (panel.type) {
                   case 'table': {
                     if (config.contents[panel.index]?.id === 'combine') {
@@ -241,7 +242,7 @@ class Printer extends React.Component {
                             )}
                             range={{
                               begin: panel.begin,
-                              end: panel.end
+                              end: end
                             }}
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
@@ -257,7 +258,7 @@ class Printer extends React.Component {
                           config={config.contents[panel.index]}
                           range={{
                             begin: panel.begin,
-                            end: panel.end
+                            end: end
                           }}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
