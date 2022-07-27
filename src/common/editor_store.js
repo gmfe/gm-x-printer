@@ -18,6 +18,9 @@ class EditorStore {
   mockData = []
 
   @observable
+  updateData = false
+
+  @observable
   remainPageHeihgt = 0
 
   // 初始模板
@@ -523,6 +526,25 @@ class EditorStore {
     this.clearExtraTableData(table.dataKey)
     table.subtotal.show = !table.subtotal.show
     this.setAutoFillingConfig(!this.isAutoFilling)
+    set(table.subtotal, {
+      isSsuQuantity: false
+    })
+  }
+
+  @action
+  setSubtotalSsuQuantityActiveShow(name) {
+    this.updateData = !this.updateData
+    const arr = name.split('.')
+    const table = this.config.contents[arr[2]]
+
+    if (table.subtotal.isSsuQuantity === undefined) {
+      set(table.subtotal, {
+        isSsuQuantity: true
+      })
+    } else {
+      table.subtotal.isSsuQuantity = !table.subtotal.isSsuQuantity
+      table.subtotal.show = false
+    }
   }
 
   @action

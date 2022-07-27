@@ -9,23 +9,23 @@ import { observer } from 'mobx-react'
 import { get } from 'mobx'
 
 /**
- * 每页合计（下单金额）组件组件,分页计算后,根据range来统计每页合计数据
+ * 每页合计（套账出库金额）组件,分页计算后,根据range来统计每页合计数据
  * @param props
  * @returns {*}
  */
-const SubtotalTr = props => {
+const SubtotalSsuQuantityTr = props => {
   const {
     config: {
       dataKey,
       arrange,
       subtotal,
       subtotal: {
-        show,
+        isSsuQuantity,
         style,
         fields = [
           {
-            name: i18next.t('出库金额'),
-            valueField: 'real_item_price'
+            name: i18next.t('套账下单金额'),
+            valueField: '套账下单金额'
           }
         ],
         displayName = false // 是否展示字段名
@@ -43,12 +43,9 @@ const SubtotalTr = props => {
       (a, b) => {
         let result = a
 
-        const _origin = b._origin || {}
-        const _origin2 = b['_origin' + MULTI_SUFFIX] || {}
-
-        result = a.plus(_origin[field] || 0)
-        if (_origin2[field]) {
-          result = result.plus(_origin2[field])
+        result = a.plus(b[field] || 0)
+        if (b[field + MULTI_SUFFIX]) {
+          result = result.plus(b[field + MULTI_SUFFIX])
         }
         return result
       },
@@ -57,8 +54,8 @@ const SubtotalTr = props => {
   }
 
   // 每页小计
-  // show 是否展示小计，fields<Array> 合计的字段和展现的name，displayName 是否显示名字
-  if (show && printerStore.ready) {
+  // isSsuQuantity 是否展示小计，fields<Array> 合计的字段和展现的name，displayName 是否显示名字
+  if (isSsuQuantity && printerStore.ready) {
     const list = tableData.slice(range.begin, range.end)
 
     const sum = {}
@@ -96,10 +93,10 @@ const SubtotalTr = props => {
   }
 }
 
-SubtotalTr.propTypes = {
+SubtotalSsuQuantityTr.propTypes = {
   config: PropTypes.object.isRequired,
   range: PropTypes.object.isRequired,
   printStore: PropTypes.object
 }
 
-export default observer(SubtotalTr)
+export default observer(SubtotalSsuQuantityTr)
