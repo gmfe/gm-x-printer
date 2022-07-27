@@ -17,6 +17,7 @@ import classNames from 'classnames'
 import { MULTI_SUFFIX } from '../config'
 import SpecialTr from './table_special_tr'
 import SubtotalTr from './table_subtotal_tr'
+import SubtotalSsuQuantityTr from './table_subtotal_ssu_quantity_tr'
 import PageSummary from './page_summary'
 
 @inject('printerStore')
@@ -373,6 +374,7 @@ class Table extends React.Component {
             }
           })}
           <SubtotalTr {...this.props} />
+          <SubtotalSsuQuantityTr {...this.props} />
           <PageSummary {...this.props} />
         </tbody>
       </table>

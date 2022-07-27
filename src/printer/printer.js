@@ -100,6 +100,9 @@ class Printer extends React.Component {
         this.props.printerStore.remainPageHeight
       )
     }
+    if (nextProps.updateData !== this.props.updateData) {
+      this.props.printerStore.setOverallOrder(nextProps.config)
+    }
   }
 
   componentDidMount() {
@@ -395,6 +398,7 @@ Printer.propTypes = {
   showCombineSkuDetail: PropTypes.bool,
   showIngredientDetail: PropTypes.bool,
   isSomeSubtotalTr: PropTypes.bool,
+  updateData: PropTypes.bool,
   getremainpageHeight: PropTypes.func
 }
 

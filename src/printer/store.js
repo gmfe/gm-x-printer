@@ -70,6 +70,11 @@ class PrinterStore {
   }
 
   @action
+  setOverallOrder(config) {
+    this.config = config || {}
+  }
+
+  @action
   setData(data) {
     this.data = data
   }
