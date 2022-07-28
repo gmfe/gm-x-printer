@@ -231,7 +231,7 @@ const caclSingleDetailsPageHeight = (detailsHeights, curRemainPageHeight) => {
   let remainDetailsHeight = 5
 
   // 如果当前累计高度高于当前剩余高度，则跳出返回
-  while (end < detailsHeights.length) {
+  while (end < detailsHeights?.length) {
     const height = currentDetailsMiniHeight + detailsHeights[end]
     if (height < curRemainPageHeight) {
       currentDetailsMiniHeight = height

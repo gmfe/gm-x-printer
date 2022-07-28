@@ -210,7 +210,7 @@ class PrinterStore {
       return []
     }
 
-    const detailsHeights = table.body.children.slice(
+    const detailsHeights = table.body.children?.slice(
       count,
       count + detailsData.length
     )
