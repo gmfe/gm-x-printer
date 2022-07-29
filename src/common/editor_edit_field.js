@@ -18,6 +18,8 @@ import {
 } from '../common/component'
 import { get, toJS } from 'mobx'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
+import { DiyTimeType } from '../config'
 
 @inject('editStore')
 @observer
@@ -75,7 +77,7 @@ class EditorField extends React.Component {
   }
 
   renderBlocks() {
-    const { editStore, showNewDate } = this.props
+    const { editStore } = this.props
     const { type, text, style, link } = editStore.computedSelectedInfo
 
     return (
@@ -104,7 +106,7 @@ class EditorField extends React.Component {
               style={style}
               value={text}
               onChange={this.handleChangeBlock}
-            /> 
+            />
 
             <Gap />
 
@@ -144,35 +146,9 @@ class EditorField extends React.Component {
             <TipInfo
               text={i18next.t('注：可通过修改“{{}}”中的内容更改时间格式。')}
             />
-            <TipInfo
-              text={i18next.t(
-                '1. 格式“2013-01-01 19:00:00”，输入“单据日期： {{单据日期}}”；'
-              )}
-            />
-            <TipInfo
-              text={i18next.t(
-                '2. 格式“2013-01-01”，输入“单据日期： {{单据日期_日期}}”；'
-              )}
-            />
-            <TipInfo
-              text={i18next.t(
-                '3. 格式“19:00:00"，输入“单据日期： {{单据日期_时间}}"；'
-              )}
-            />
-            {showNewDate && (
-              <>
-                <TipInfo
-                  text={i18next.t(
-                    '4. 格式“01-01 19:00:00”，输入“单据日期： {{单据日期_无年份}}”；'
-                  )}
-                />
-                <TipInfo
-                  text={i18next.t(
-                    '5. 格式“01-01”，输入“单据日期： {{单据日期_日期_无年份}}"；'
-                  )}
-                />
-              </>
-            )}
+            {_.map(DiyTimeType, (v, k) => (
+              <TipInfo text={`${k + 1}。${v.text}`} />
+            ))}
           </div>
         )}
       </div>
@@ -397,11 +373,7 @@ class EditorField extends React.Component {
 
 EditorField.propTypes = {
   editStore: PropTypes.object,
-  tableDataKeyList: PropTypes.array,
-  showNewDate: PropTypes.bool
-}
-EditorField.defaultProps = {
-  showNewDate: false
+  tableDataKeyList: PropTypes.array
 }
 
 export default EditorField

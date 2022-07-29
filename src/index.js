@@ -14,7 +14,7 @@ import EditorCannibalize from './editor_cannibalize'
 import EditorProduction from './editor_production'
 import EditorMaterialRequisition from './editor_material_requisition'
 import { BatchPrinter, doBatchPrint, doPrint, Printer, getCSS } from './printer'
-import { MULTI_SUFFIX } from './config'
+import { MULTI_SUFFIX, DiyTimeType } from './config'
 
 export * from './util'
 export { setLocale } from '../locales'
@@ -38,5 +38,6 @@ export {
   doPrint,
   doBatchPrint,
   getCSS,
-  MULTI_SUFFIX
+  MULTI_SUFFIX,
+  DiyTimeType
 }
