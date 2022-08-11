@@ -5,13 +5,16 @@ import {
   isMultiTable,
   getArrayMid,
   caclRowSpanTdPageHeight,
-  caclSingleDetailsPageHeight
+  caclSingleDetailsPageHeight,
+  getOverallOrderTrHeight
 } from '../util'
 import _ from 'lodash'
 import Big from 'big.js'
 
 export const TR_BASE_HEIGHT = 23
 const price = (n, f = 2) => Big(n || 0).toFixed(f)
+
+/** @description 这个使用来计算的 只能debugger一层一层看  我真的是醉掉😤 */
 class PrinterStore {
   @observable ready = false
 
@@ -195,7 +198,7 @@ class PrinterStore {
   @action
   computedData(dataKey, table, end, currentRemainTableHeight) {
     /** 当前数据 */
-    const tableData = this.data._table[dataKey] || []
+    const tableData = this.data._table[dataKey].slice() || []
 
     let count = 0
     _.forEach(Array(end).fill(1), (val, i) => {
@@ -209,17 +212,14 @@ class PrinterStore {
     if (!detailsData || dataKey.includes('noLineBreak')) {
       return []
     }
-
-    const detailsHeights = table.body.children.slice(
+    const detailsHeights = table.body.children?.slice(
       count,
       count + detailsData.length
     )
-
     const { ranges, detailsPageHeight } = caclSingleDetailsPageHeight(
       detailsHeights,
       currentRemainTableHeight
     )
-
     // 分局明细拆分后的数据
     const splitTableData = _.map(ranges, range => {
       const _tableData = Object.assign({}, tableData[end])
@@ -256,13 +256,13 @@ class PrinterStore {
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
+
       /* 表格内容处理 */
       if (content.type === 'table') {
         /**
          * 判断组合商品表格,
          * 因为写死了两个固定的content，页码计算要处理一下
-         */
-        if (content.id === 'combine' && !this.showCombineSkuDetail) {
+         */ if (content.id === 'combine' && !this.showCombineSkuDetail) {
           index++
           continue
         }
@@ -277,13 +277,16 @@ class PrinterStore {
           index++
           continue
         }
-        // 是表格就++
         tableCount++
         // 表格原始的高度和宽度信息
         const table = this.tablesInfo[`contents.table.${index}`]
-        const { subtotal, dataKey, summaryConfig } = content
+        const { subtotal, dataKey, summaryConfig, overallOrder } = content
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
+        // 如果显示整单合计,那么table高度多预留一行高度
+        const overallOrderTrHeight = overallOrder?.show
+          ? getOverallOrderTrHeight(overallOrder)
+          : 0
         // 如果每页合计(新的),那么table高度多预留一行高度
         const pageSummaryTrHeight =
           summaryConfig?.pageSummaryShow && !isMultiTable(dataKey) // 双栏table没有每页合计
@@ -291,7 +294,10 @@ class PrinterStore {
             : 0
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
-          table.head.height + subtotalTrHeight + pageSummaryTrHeight
+          table.head.height +
+          subtotalTrHeight +
+          pageSummaryTrHeight +
+          overallOrderTrHeight
         /** 当前page页面的最小高度 */
         const currentPageMinimumHeight =
           allPagesHaveThisHeight + allTableHaveThisHeight
@@ -341,6 +347,7 @@ class PrinterStore {
                   heights[end] / currentRemainTableHeight > 1) ||
                 heights[end] > pageAccomodateTableHeight
               ) {
+                console.log('table', table)
                 const detailsPageHeight = this.computedData(
                   dataKey,
                   table,
@@ -719,15 +726,60 @@ class PrinterStore {
     }
   }
 
+  templateRowSpanSpecialDetails(col, item) {
+    // 做好保护，出错就返回 text
+    const { specialDetailsKey, text, separator = '_', detailLastColType } = col
+    try {
+      const compiled = _.template(text, { interpolate: /{{([\s\S]+?)}}/g })
+      const detailsList = item[specialDetailsKey]
+
+      /** 简单处理下数据 */
+      const filterList = (list, type = '') => {
+        if (type === 'noLineBreak') {
+          const details = list.map(d => `${compiled(d)}`).join(separator)
+
+          return `<div class='b-table-details'>${details}</div>`
+        }
+        return list
+          .map(d => `<div class='b-table-details'> ${compiled(d)} </div>`)
+          .join('')
+      }
+      /** 明细换行和不换行处理 */
+      return !detailLastColType || detailLastColType === 'purchase_last_col'
+        ? filterList(detailsList)
+        : filterList(detailsList, 'noLineBreak')
+    } catch (err) {
+      return text
+    }
+  }
+
   templateSpecialDetails(col, dataKey, index) {
     // 做好保护，出错就返回 text
-    const { specialDetailsKey, text } = col
+    const { specialDetailsKey, text, detailLastColType, separator } = col
     try {
       const row = this.data._table[dataKey][index]
       const compiled = _.template(text, { interpolate: /{{([\s\S]+?)}}/g })
-      const detailsList = row[specialDetailsKey]
+      let detailsList = row[specialDetailsKey] || []
 
-      return detailsList.map(d => `<div>${compiled(d)}</div>`).join('')
+      /** 简单处理下数据 */
+      const filterList = (list, type = '') => {
+        if (type === 'noLineBreak') {
+          const details = list.map(d => `${compiled(d)}`).join(separator)
+
+          return `<div class='b-table-details'>${details}</div>`
+        }
+        return list
+          .map(d => `<div class='b-table-details'> ${compiled(d)} </div>`)
+          .join('')
+      }
+
+      /** 明细换行和不换行处理 */
+      detailsList =
+        !detailLastColType || detailLastColType === 'purchase_last_col'
+          ? filterList(detailsList)
+          : filterList(detailsList, 'noLineBreak')
+
+      return detailsList
     } catch (err) {
       return text
     }

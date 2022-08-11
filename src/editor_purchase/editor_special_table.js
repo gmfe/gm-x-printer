@@ -1,7 +1,8 @@
+/* eslint-disable react/prop-types */
 import i18next from '../../locales'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Flex, Option, Select } from '../components/index'
+import { Flex, Option, Select, Switch } from '../components/index'
 import {
   Gap,
   Title,
@@ -14,14 +15,7 @@ import {
 } from '../common/component'
 import _ from 'lodash'
 import { inject, observer } from 'mobx-react'
-
-const dataKeyList = [
-  { value: 'purchase_no_detail', text: i18next.t('不打印明细') },
-  { value: 'purchase_last_col', text: i18next.t('单列-总表最后一列') },
-  { value: 'purchase_one_row', text: i18next.t('单列-总表下方一行') },
-  { value: 'purchase_flex_2', text: i18next.t('双栏-总表下方一行两栏') },
-  { value: 'purchase_flex_4', text: i18next.t('四栏-总表下方一行四栏') }
-]
+import { PURCHASE_DETAIL_SHOW_OPTIONS } from './constants'
 
 @inject('editStore')
 @observer
@@ -46,9 +40,17 @@ class TableDetailEditor extends React.Component {
     editStore.setSpecialStyle(value)
   }
 
+  handleSheetUnitSummaryChange = bool => {
+    const { editStore } = this.props
+    editStore.setSheetUnitSummary(bool)
+  }
+
   render() {
     const {
-      addFields: { detailFields }
+      addFields: { detailFields },
+      editStore: {
+        config: { isSheetUnitSummary }
+      }
     } = this.props
     const {
       dataKey,
@@ -67,13 +69,23 @@ class TableDetailEditor extends React.Component {
             value={dataKey}
             onChange={this.handleDataKeyChange}
           >
-            {_.map(dataKeyList, v => (
+            {_.map(PURCHASE_DETAIL_SHOW_OPTIONS, v => (
               <Option key={v.value} value={v.value}>
                 {v.text}
               </Option>
             ))}
           </Select>
         </Flex>
+        {/* 选择单列-总表最后一列时，支持按下单单位汇总 */}
+        {dataKey === 'purchase_last_col' && (
+          <Flex alignCenter className='gm-padding-top-5'>
+            <div>{i18next.t('按下单单位汇总')}：</div>
+            <Switch
+              checked={isSheetUnitSummary}
+              onChange={this.handleSheetUnitSummaryChange}
+            />
+          </Flex>
+        )}
         {dataKey !== 'purchase_no_detail' && (
           <>
             <div className='gm-padding-top-5'>
@@ -121,22 +133,21 @@ class TableDetailEditor extends React.Component {
 class EditorSpecialTable extends React.Component {
   render() {
     const { editStore } = this.props
-    if (editStore.computedRegionIsTable) {
-      const arr = editStore.selectedRegion.split('.')
-      const tableConfig = editStore.config.contents[arr[2]]
-      // 可以编辑明细的table
-      if (tableConfig.specialConfig) {
-        return (
-          <TableDetailEditor
-            config={tableConfig}
-            addFields={this.props.addFields}
-          />
-        )
-      } else {
-        return null
-      }
-    }
-    return null
+    if (!editStore.computedRegionIsTable) return null
+    const arr = editStore.selectedRegion.split('.')
+    const tableConfig = editStore.config.contents[arr[2]]
+    const { specialConfig, dataKey = '' } = tableConfig
+    // 双栏时不展示采购明细
+    const keyArr = dataKey.split('_')
+    const isMultiActive = keyArr.includes('multi')
+    if (!specialConfig || isMultiActive) return null
+    // 可以编辑明细的table
+    return (
+      <TableDetailEditor
+        config={tableConfig}
+        addFields={this.props.addFields}
+      />
+    )
   }
 }
 

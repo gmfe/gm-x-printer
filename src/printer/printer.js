@@ -193,6 +193,7 @@ class Printer extends React.Component {
       showCombineSkuDetail,
       showIngredientDetail
     } = printerStore
+
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {

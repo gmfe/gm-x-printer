@@ -4,12 +4,7 @@ import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import { Printer } from '../printer'
 import _ from 'lodash'
-
-const blockTypeList = [
-  { value: '', text: i18next.t('插入文本') },
-  { value: 'line', text: i18next.t('插入线条') },
-  { value: 'image', text: i18next.t('插入图片') }
-]
+import { BLOCK_TYPE_LIST } from './constants'
 
 @inject(stores => ({
   editStore: stores.editStore,
@@ -68,7 +63,7 @@ class ContextMenu extends React.Component {
     return (
       <CommonContextMenu
         renderTableAction={this.renderOrderActionBtn}
-        insertBlockList={blockTypeList}
+        insertBlockList={BLOCK_TYPE_LIST}
         uploadQiniuImage={uploadQiniuImage}
       >
         <Printer

@@ -157,7 +157,8 @@ class EditorField extends React.Component {
 
   renderTable() {
     const { tableDataKeyList, editStore } = this.props
-    const { head, headStyle, text, style } = editStore.computedSelectedInfo
+    const { head, headStyle, text, style } =
+      editStore.computedSelectedInfo || {}
 
     const { specialConfig, subtotal } = editStore.computedTableSpecialConfig
     // 小计样式,specialConfig可能是undefined
