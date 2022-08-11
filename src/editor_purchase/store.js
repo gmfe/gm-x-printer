@@ -1,6 +1,6 @@
 import EditorStore from '../common/editor_store'
 import { action } from 'mobx'
-import i18next from '../../locales'
+import { PURCHASE_DETAIL, PURCHASE_DETAIL_ROW_SPAN } from './constants'
 
 class Store extends EditorStore {
   constructor({ defaultTableDataKey }) {
@@ -19,21 +19,39 @@ class Store extends EditorStore {
     const tableConfig = this.config.contents[arr[2]]
 
     // 先去掉所有明细列
-    const newCols = tableConfig.columns.filter(o => !o.isSpecialColumn)
+    const newCols = tableConfig.columns.filter(
+      o => !o.isPurchaseDetailRowSpan && !o.isSpecialColumn
+    )
     tableConfig.columns.replace(newCols)
+    this.changeSheetUnitSummary(false)
 
     // 单列-总表最后一列,在columns上修改
     if (dataKey === 'purchase_last_col') {
-      tableConfig.columns.push({
-        head: i18next.t('明细'),
-        headStyle: { textAlign: 'center' },
-        style: { textAlign: 'left' },
-        isSpecialColumn: true,
-        specialDetailsKey: '__details',
-        text: i18next.t(
-          '{{采购数量_采购单位}}{{采购单位}}*{{商户名}}*{{商品备注}}'
-        )
-      })
+      tableConfig.columns.push(PURCHASE_DETAIL)
+    }
+  }
+
+  @action.bound
+  changeSheetUnitSummary(bool) {
+    // this.isSheetUnitSummary = bool
+    this.config.isSheetUnitSummary = bool
+  }
+
+  @action.bound
+  setSheetUnitSummary(bool) {
+    this.changeSheetUnitSummary(bool)
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    const newCols = tableConfig.columns.filter(
+      o => !o.isPurchaseDetailRowSpan && !o.isSpecialColumn
+    )
+    if (bool) {
+      // 先去掉所有明细列
+      tableConfig.columns.replace(newCols)
+      tableConfig.columns.push(...PURCHASE_DETAIL_ROW_SPAN)
+    } else {
+      tableConfig.columns.replace(newCols)
+      tableConfig.columns.push(PURCHASE_DETAIL)
     }
   }
 

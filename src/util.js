@@ -229,9 +229,8 @@ const caclSingleDetailsPageHeight = (detailsHeights, curRemainPageHeight) => {
   const detailsPageHeight = []
   /** 未进行计算的高度，留到下一次, 默认为tr的border+padding的height */
   let remainDetailsHeight = 5
-
   // 如果当前累计高度高于当前剩余高度，则跳出返回
-  while (end < detailsHeights.length) {
+  while (end < detailsHeights?.length) {
     const height = currentDetailsMiniHeight + detailsHeights[end]
     if (height < curRemainPageHeight) {
       currentDetailsMiniHeight = height
@@ -345,6 +344,14 @@ const caclRowSpanTdPageHeight = (indexEnd, trs, heightParams) => {
   }
 }
 
+function getOverallOrderTrHeight(overallOrder) {
+  const { fields = [] } = overallOrder
+  const fontSize = fields?.[0]?.style?.fontSize || '12px'
+
+  // 12px => 26, 14px => 29, 16px => 33, ...
+  return (parseInt(fontSize) - 12) * 1.5 + 26
+}
+
 export {
   getPageHeight,
   getWidth,
@@ -367,5 +374,6 @@ export {
   getHeight,
   getArrayMid,
   caclRowSpanTdPageHeight,
-  caclSingleDetailsPageHeight
+  caclSingleDetailsPageHeight,
+  getOverallOrderTrHeight
 }

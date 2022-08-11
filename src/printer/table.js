@@ -19,6 +19,7 @@ import SpecialTr from './table_special_tr'
 import SubtotalTr from './table_subtotal_tr'
 import SubtotalSsuQuantityTr from './table_subtotal_ssu_quantity_tr'
 import PageSummary from './page_summary'
+import { PURCHASE_DETAIL } from '../editor_purchase/constants'
 
 @inject('printerStore')
 @observer
@@ -54,6 +55,7 @@ class Table extends React.Component {
           }`
         ) || []
       const trRowSpan = $table.querySelectorAll('tbody tr') || []
+      const detailsDiv = $table.querySelectorAll('tr td .b-table-details')
 
       printerStore.setHeight(name, getHeight($table))
 
@@ -63,7 +65,8 @@ class Table extends React.Component {
           widths: _.map(ths, th => getHeadThWidth(th))
         },
         body: {
-          heights: _.map(trs, tr => getHeight(tr))
+          heights: _.map(trs, tr => getHeight(tr)),
+          children: _.map(detailsDiv, div => getHeight(div))
         },
         bodyTr: {
           heights: _.map(trRowSpan, tr => getHeight(tr))
@@ -119,29 +122,27 @@ class Table extends React.Component {
     const {
       config: { columns, dataKey }
     } = this.props
-    const columns1 = columns.map((val, index) => ({ ...val, index }))
+    const newColumns = columns.map((val, index) => ({ ...val, index }))
     // 如果是多列表格
     if (isMultiTable(dataKey)) {
       // 多栏商品的第二列有点特殊,都带 _MULTI_SUFFIX 后缀
-      let res = columns1
+      let res = newColumns
       const colNumber = getMultiNumber(dataKey)
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
-        const columnsI = columns.map((val, index) => {
-          return {
-            ...val,
-            index,
-            text: val.text.replace(
-              /{{列\.([^{{]+)}}/g,
-              (s, s1) => `{{列.${s1}${MULTI_SUFFIX}${colNum}}}`
-            ) // {{列.xx}} => {{列.xxMULTI_SUFFIXi}}
-          }
-        })
+        const columnsI = res.map((val, index) => ({
+          ...val,
+          index,
+          text: val.text.replace(
+            /{{列\.([^{{]+)}}/g,
+            (s, s1) => `{{列.${s1}${MULTI_SUFFIX}${colNum}}}`
+          ) // {{列.xx}} => {{列.xxMULTI_SUFFIXi}}
+        }))
         res = res.concat(columnsI)
       }
       return res
     } else {
-      return columns1
+      return newColumns
     }
   }
 
@@ -165,10 +166,13 @@ class Table extends React.Component {
     // 列宽固定(避免跳页bug)
     const thWidths = printerStore.tablesInfo[name]?.head.widths || []
     // 判断是那个生产单据，需要合并哪些单元格
+    // includesColText 优先取tableRowSpanIncludes，tableRowSpanTdArr为生产专用
     const includesColText =
+      printerStore.config.tableRowSpanIncludes ||
       printerStore.config?.tableRowSpanTdArr?.[
         printerStore?.config?.productionMergeType
-      ]
+      ] ||
+      []
 
     const getTdStyle = (index, style = {}) => {
       const width = thWidths[index]
@@ -223,6 +227,7 @@ class Table extends React.Component {
         <tbody>
           {_.map(_.range(range.begin, range.end), i => {
             const _special = tableData[i] && tableData[i]._special
+
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
             // 如果项为空对象展现一个占满一行的td
@@ -263,6 +268,19 @@ class Table extends React.Component {
                           includesColText.includes(col.text) && j !== 0
                         // 合并单元格的个数
                         let rowSpanLength = tableData[i].length
+
+                        // 是否采购明细
+                        const isPurchaseDetail =
+                          col.specialDetailsKey ===
+                          PURCHASE_DETAIL.specialDetailsKey
+                        if (isPurchaseDetail) {
+                          // 采购明细跨行相关判断
+                          if (j === 0) {
+                            isRowSpan = true
+                          } else {
+                            rowTdRender = true
+                          }
+                        }
 
                         // 是熟食的组合工序聚合
                         if (
@@ -315,10 +333,15 @@ class Table extends React.Component {
                                 ))
                               }
                               dangerouslySetInnerHTML={{
-                                __html: printerStore.templateRowSpanTable(
-                                  col.text,
-                                  item
-                                )
+                                __html: col.isSpecialColumn
+                                  ? printerStore.templateRowSpanSpecialDetails(
+                                      col,
+                                      item
+                                    )
+                                  : printerStore.templateRowSpanTable(
+                                      col.text,
+                                      item
+                                    )
                               }}
                             />
                           )
@@ -373,6 +396,7 @@ class Table extends React.Component {
               )
             }
           })}
+          {/* 区域2 */}
           <SubtotalTr {...this.props} />
           <SubtotalSsuQuantityTr {...this.props} />
           <PageSummary {...this.props} />

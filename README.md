@@ -58,7 +58,7 @@ gm-x-printer 是一个单独的组件库，使用 npm 发布版本
 1. 没有登陆过，使用`npm login`登陆，一次登陆永久使用，登陆的时候会输入密码，用户名，邮箱（公司有）
 2. beta 版本包的版本发布(用来测试该版本，解决该版本的 bug)
 
-   1. 将`pageage.json`中的`version`修改为`X.X.X-beta.0`，或者运行 `npm version X.X.X-beta.0`来更新`package.json`，同时创建一个 git 标签 (请参考 https://docs.npmjs.com/cli/version)。
+   1. 将`package.json`中的`version`修改为`X.X.X-beta.0`，或者运行 `npm version X.X.X-beta.0`来更新`package.json`，同时创建一个 git 标签 (请参考 https://docs.npmjs.com/cli/version)。
 
       在你的版本末尾添加 `beta.0` 非常重要。`.0` 表示它是哪个版本。当我们对 `beta` 版进行修补发布新的 `beta` 版本时，我们会将 `.0` 递增到 `.1`，以此类推。
 
@@ -69,7 +69,7 @@ gm-x-printer 是一个单独的组件库，使用 npm 发布版本
    4. 对版本进行修补时，只需要将`beta.0`递增到`beta.1`进行版本发布即可，以此类推
 
 3. 正式版本的发布
-   1. 遵循上面的版本命名规则，修改`pageage.json`中的`version`版本号，或者运行 `npm version X.X.X`来更新`package.json`，同时创建一个 git 标签
+   1. 遵循上面的版本命名规则，修改`package.json`中的`version`版本号，或者运行 `npm version X.X.X`来更新`package.json`，同时创建一个 git 标签
    2. ⚠️ 将正式版本 push 到远程仓库
    3. 使用`npm publish`发布正式版本
    4. 在自己的分支上进行发布版本即可，发完后，将分支合并到 master 上！！！
