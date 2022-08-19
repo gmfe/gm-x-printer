@@ -9,23 +9,23 @@ import { observer } from 'mobx-react'
 import { get } from 'mobx'
 
 /**
- * 每页合计（套账下单金额）组件,分页计算后,根据range来统计每页合计数据
+ * 每页合计（套账出库金额）组件,分页计算后,根据range来统计每页合计数据
  * @param props
  * @returns {*}
  */
-const SubtotalSsuQuantityTr = props => {
+const SubtotalSsuOtQuantityTr = props => {
   const {
     config: {
       dataKey,
       arrange,
       subtotal,
       subtotal: {
-        isSsuQuantity,
+        isSsuOtQuantity,
         style,
         fields = [
           {
-            name: i18next.t('套账下单金额'),
-            valueField: '套账下单金额'
+            name: i18next.t('套账出库金额'),
+            valueField: '套账出库金额'
           }
         ],
         displayName = false // 是否展示字段名
@@ -54,8 +54,8 @@ const SubtotalSsuQuantityTr = props => {
   }
 
   // 每页小计
-  // isSsuQuantity 是否展示小计，fields<Array> 合计的字段和展现的name，displayName 是否显示名字
-  if (isSsuQuantity && printerStore.ready) {
+  // isSsuOtQuantity 是否展示小计，fields<Array> 合计的字段和展现的name，displayName 是否显示名字
+  if (isSsuOtQuantity && printerStore.ready) {
     const list = tableData.slice(range.begin, range.end)
 
     const sum = {}
@@ -93,10 +93,10 @@ const SubtotalSsuQuantityTr = props => {
   }
 }
 
-SubtotalSsuQuantityTr.propTypes = {
+SubtotalSsuOtQuantityTr.propTypes = {
   config: PropTypes.object.isRequired,
   range: PropTypes.object.isRequired,
   printStore: PropTypes.object
 }
 
-export default observer(SubtotalSsuQuantityTr)
+export default observer(SubtotalSsuOtQuantityTr)

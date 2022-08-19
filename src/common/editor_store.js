@@ -527,7 +527,8 @@ class EditorStore {
     table.subtotal.show = !table.subtotal.show
     this.setAutoFillingConfig(!this.isAutoFilling)
     set(table.subtotal, {
-      isSsuQuantity: false
+      isSsuQuantity: false,
+      isSsuOtQuantity: false
     })
   }
 
@@ -538,11 +539,34 @@ class EditorStore {
     const table = this.config.contents[arr[2]]
 
     if (table.subtotal.isSsuQuantity === undefined) {
+      table.subtotal.show = false
       set(table.subtotal, {
-        isSsuQuantity: true
+        isSsuQuantity: true,
+        isSsuOtQuantity: false
       })
     } else {
       table.subtotal.isSsuQuantity = !table.subtotal.isSsuQuantity
+      table.subtotal.isSsuOtQuantity = false
+      table.subtotal.show = false
+    }
+  }
+
+  @action
+  setSubtotalSsuOtQuantityActiveShow(name) {
+    this.updateData = !this.updateData
+    const arr = name.split('.')
+    const table = this.config.contents[arr[2]]
+
+    if (table.subtotal.isSsuOtQuantity === undefined) {
+      table.subtotal.show = false
+
+      set(table.subtotal, {
+        isSsuOtQuantity: true,
+        isSsuQuantity: false
+      })
+    } else {
+      table.subtotal.isSsuOtQuantity = !table.subtotal.isSsuOtQuantity
+      table.subtotal.isSsuQuantity = false
       table.subtotal.show = false
     }
   }

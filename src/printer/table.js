@@ -18,6 +18,8 @@ import { MULTI_SUFFIX } from '../config'
 import SpecialTr from './table_special_tr'
 import SubtotalTr from './table_subtotal_tr'
 import SubtotalSsuQuantityTr from './table_subtotal_ssu_quantity_tr'
+import SubtotalSsuOtQuantityTr from './table_subtotal_ssu_ot_quantity_tr'
+
 import PageSummary from './page_summary'
 import { PURCHASE_DETAIL } from '../editor_purchase/constants'
 
@@ -399,6 +401,8 @@ class Table extends React.Component {
           {/* 区域2 */}
           <SubtotalTr {...this.props} />
           <SubtotalSsuQuantityTr {...this.props} />
+          <SubtotalSsuOtQuantityTr {...this.props} />
+
           <PageSummary {...this.props} />
         </tbody>
       </table>
