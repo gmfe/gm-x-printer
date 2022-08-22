@@ -63,6 +63,14 @@ class EditorStore {
     this.isAutoFilling = bol
   }
 
+  /** 切换自适应 */
+  @action
+  toggleIsAdaptive(isAdaptive) {
+    this.config.sign.isAdaptive = isAdaptive ?? !this.config?.sign.isAdaptive
+    // 这里是为了让config修改后生效
+    this.config = { ...this.config }
+  }
+
   @computed
   get computedPrinterKey() {
     return _.map(this.config, (v, k) => {

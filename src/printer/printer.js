@@ -22,7 +22,9 @@ const Sign = props => (
       ...props.style,
       position: 'absolute',
       left: 0,
-      right: 0
+      right: 0,
+      // 开启自适应的话，则重置bottom
+      bottom: props.isAdaptive ? 'unset' : props.style?.bottom
     }}
     name='sign'
     placeholder={i18next.t('签名')}
@@ -30,7 +32,8 @@ const Sign = props => (
 )
 
 Sign.propTypes = {
-  style: PropTypes.object
+  style: PropTypes.object,
+  isAdaptive: PropTypes.bool
 }
 
 const Footer = props => (
@@ -289,6 +292,7 @@ class Printer extends React.Component {
                   config={config.sign}
                   pageIndex={i}
                   style={{ bottom: config.footer.style.height }}
+                  isAdaptive={this.props.config?.sign?.isAdaptive}
                 />
               )}
               <Footer config={config.footer} pageIndex={i} />

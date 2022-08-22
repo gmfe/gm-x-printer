@@ -12,6 +12,7 @@ import EditorAddField from '../common/editor_add_field'
 import EditorPageSummary from '../common/editor_page_summary'
 import EditTemplateType from '../common/edit_template_type'
 import EditorCutomizedConfig from '../common/editor_customize_config'
+import EditorAdaptive from '../common/editor_adaptive'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
@@ -92,6 +93,8 @@ class Editor extends React.Component {
             />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
+            {/* 自适应页面内容开关 */}
+            <EditorAdaptive />
             <Gap height='5px' />
             <EditorPageSummary summaryFields={addFields.summaryFields} />
 
