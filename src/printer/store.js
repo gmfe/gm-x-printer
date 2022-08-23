@@ -13,6 +13,9 @@ import Big from 'big.js'
 
 export const TR_BASE_HEIGHT = 23
 const price = (n, f = 2) => Big(n || 0).toFixed(f)
+const diyRandom = (a, b, c = 2) => {
+  return (a + Math.random() * (b - a)).toFixed(c)
+}
 
 /** @description 这个使用来计算的 只能debugger一层一层看  我真的是醉掉😤 */
 class PrinterStore {
@@ -676,7 +679,8 @@ class PrinterStore {
         ...this.data.common,
         [i18next.t('当前页码')]: pageIndex + 1,
         [i18next.t('页码总数')]: this.pages.length,
-        price: price
+        price: price,
+        diyRandom: diyRandom // 提供一个计算随机数的函数
       })
     } catch (err) {
       return text
@@ -694,7 +698,8 @@ class PrinterStore {
         [i18next.t('列')]: list[index],
         [i18next.t('当前页码')]: pageIndex + 1,
         [i18next.t('页码总数')]: this.pages.length,
-        price: price // 提供一个价格处理函数
+        price: price, // 提供一个价格处理函数
+        diyRandom: diyRandom // 提供一个计算随机数的函数
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -719,7 +724,8 @@ class PrinterStore {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         [i18next.t('列')]: item,
-        price: price // 提供一个价格处理函数
+        price: price, // 提供一个价格处理函数
+        diyRandom: diyRandom // 提供一个计算随机数的函数
       })
     } catch (err) {
       return text
