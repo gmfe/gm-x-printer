@@ -128,11 +128,11 @@ class Table extends React.Component {
     // 如果是多列表格
     if (isMultiTable(dataKey)) {
       // 多栏商品的第二列有点特殊,都带 _MULTI_SUFFIX 后缀
-      let res = newColumns
+      let res = _.slice(newColumns)
       const colNumber = getMultiNumber(dataKey)
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
-        const columnsI = res.map((val, index) => ({
+        const columnsI = newColumns.map((val, index) => ({
           ...val,
           index,
           text: val.text.replace(
