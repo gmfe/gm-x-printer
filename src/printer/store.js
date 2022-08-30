@@ -210,7 +210,10 @@ class PrinterStore {
     })
 
     /** 明细data */
-    const detailsData = tableData[end]?.__details
+    // 先判断传进来的是不是数组
+    const detailsData = Array.isArray(tableData[end])
+      ? tableData[end]?.[0]?.__details
+      : tableData[end]?.__details
     // 如果没有details 和 明细不换行, 就不用计算了
     if (!detailsData || dataKey.includes('noLineBreak')) {
       return []
@@ -223,10 +226,21 @@ class PrinterStore {
       detailsHeights,
       currentRemainTableHeight
     )
+
     // 分局明细拆分后的数据
     const splitTableData = _.map(ranges, range => {
-      const _tableData = Object.assign({}, tableData[end])
+      // 拿出被切割的details
+      const splitData = Array.isArray(tableData[end])
+        ? tableData[end]?.[0]
+        : tableData[end]
+      const _tableData = Object.assign({}, splitData)
       _tableData.__details = detailsData.slice(...range)
+      if (
+        _tableData.__details_row_span &&
+        _tableData.__details_row_span?.length > 0
+      ) {
+        _tableData.__details_row_span = detailsData.slice(...range)
+      }
       return _tableData
     })
 
