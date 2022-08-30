@@ -15,7 +15,7 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
+        test: /\.(js|ts|tsx)$/,
         use: [
           {
             loader: 'babel-loader',
@@ -25,7 +25,20 @@ module.exports = {
           }
         ]
       },
-
+      {
+        test: /\.jsx$/,
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            [
+              '@babel/preset-react',
+              {
+                runtime: 'automatic'
+              }
+            ]
+          ]
+        }
+      },
       {
         test: /\.less$/,
         use: ['style-loader', 'css-loader', 'postcss-loader', 'less-loader']
@@ -67,7 +80,7 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js', 'tsx']
+    extensions: ['.ts', '.js', '.tsx', '.jsx']
   },
   plugins: [
     new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),

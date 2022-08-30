@@ -1,7 +1,9 @@
 // tsconfig.json
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "noImplicitAny": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "jsx": "react"
   }
 }
