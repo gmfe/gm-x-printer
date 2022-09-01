@@ -350,7 +350,6 @@ class PrinterStore {
                   heights[end] / currentRemainTableHeight > 1) ||
                 heights[end] > pageAccomodateTableHeight
               ) {
-                console.log('table', table)
                 const detailsPageHeight = this.computedData(
                   dataKey,
                   table,

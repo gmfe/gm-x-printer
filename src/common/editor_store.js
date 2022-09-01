@@ -715,11 +715,13 @@ class EditorStore {
         head: key,
         headStyle: {
           textAlign: 'center',
-          width: '85px'
+          width: '85px',
+          wordBreak: 'break-all'
         },
         text: value,
         style: {
-          textAlign: 'center'
+          textAlign: 'center',
+          wordBreak: 'break-all'
         }
       })
 

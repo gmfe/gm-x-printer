@@ -7,6 +7,8 @@ import editStore from './store'
 import { observer, inject } from 'mobx-react'
 import EditorTitle from '../common/editor_title'
 import EditorSelect from '../common/editor_select'
+import EditTemplateType from '../common/edit_template_type'
+
 import EditorField from '../common/editor_edit_field'
 import EditorAddField from '../common/editor_add_field'
 import EditorSpecialTable from './editor_special_table'
@@ -24,7 +26,9 @@ class Editor extends React.Component {
       showEditor,
       addFields,
       isPurchase,
-      uploadQiniuImage
+      uploadQiniuImage,
+      batchPrintSettingKey,
+      config: { templateType }
     } = this.props
 
     return (
@@ -46,7 +50,13 @@ class Editor extends React.Component {
           <div className='gm-printer-edit-zone'>
             <EditorTitle onSave={onSave} isPurchase={isPurchase} />
             <Gap height='10px' />
-            <EditorSelect isPurchase={isPurchase} />
+            {templateType && <EditTemplateType bill={templateType} />}
+            <Gap height='5px' />
+
+            <EditorSelect
+              isPurchase={isPurchase}
+              batchPrintSettingKey={batchPrintSettingKey}
+            />
             <Gap height='5px' />
             <EditorField />
             <Gap height='5px' />
@@ -75,7 +85,8 @@ Editor.propTypes = {
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
-  isPurchase: PropTypes.bool
+  isPurchase: PropTypes.bool,
+  batchPrintSettingKey: PropTypes.string
 }
 
 Editor.deaultProps = {
