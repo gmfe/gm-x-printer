@@ -323,17 +323,14 @@ class Table extends React.Component {
                                 minWidth: '24px', // 最小两个字24px
                                 ...col.style
                               }}
-                              className={
-                                ('td',
-                                classNames(
-                                  {
-                                    active:
-                                      getTableColumnName(name, col.index) ===
-                                      printerStore.selected
-                                  },
-                                  getTableRowColumnName(col.rowSpan)
-                                ))
-                              }
+                              className={classNames({
+                                active:
+                                  getTableColumnName(name, col.index) ===
+                                  printerStore.selected,
+                                [getTableRowColumnName(
+                                  col.rowSpan
+                                )]: col.rowSpan
+                              })}
                               dangerouslySetInnerHTML={{
                                 __html: col.isSpecialColumn
                                   ? printerStore.templateRowSpanSpecialDetails(
@@ -368,14 +365,12 @@ class Table extends React.Component {
                             ...getTdStyle(j, col.style),
                             ...col.style
                           }}
-                          className={classNames(
-                            {
-                              active:
-                                getTableColumnName(name, col.index) ===
-                                printerStore.selected
-                            },
-                            getTableRowColumnName(col.rowSpan)
-                          )}
+                          className={classNames({
+                            active:
+                              getTableColumnName(name, col.index) ===
+                              printerStore.selected,
+                            [getTableRowColumnName(col.rowSpan)]: col.rowSpan
+                          })}
                           dangerouslySetInnerHTML={{
                             __html: col.isSpecialColumn
                               ? printerStore.templateSpecialDetails(

@@ -7,7 +7,7 @@ const EditTemplateType = ({ tip, bill }) => {
   return (
     <>
       <>{i18next.t('模版类型')}</>
-      <ToolTip text={tip} />
+      {tip && <ToolTip text={tip} />}
       <span>{'：' + bill}</span>
     </>
   )

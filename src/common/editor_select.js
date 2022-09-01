@@ -7,6 +7,7 @@ import { pageTypeMap, printDirectionList } from '../config'
 import _ from 'lodash'
 import { dispatchMsg } from '../util'
 import PropTypes from 'prop-types'
+import { BATCH_PRINTER_SETTING_TEXT_ENUM } from '../constants'
 
 @inject('editStore')
 @observer
@@ -126,7 +127,7 @@ class EditorSelector extends React.Component {
         </Flex>
 
         {this.props.isPurchase && (
-          <React.Fragment>
+          <>
             <Flex alignCenter className='gm-padding-top-5'>
               <div>{i18next.t('批量打印设置')}：</div>
               <Select
@@ -139,14 +140,15 @@ class EditorSelector extends React.Component {
               </Select>
             </Flex>
             <div>
-              <p style={{ color: 999, paddingLeft: 24 }}>
-                不连续打印（一张采购单不出现多供应商）
-              </p>
-              <p style={{ color: 999, paddingLeft: 24 }}>
-                连续打印（一张采购单可能出现多个供应商）
-              </p>
+              {BATCH_PRINTER_SETTING_TEXT_ENUM[
+                this.props.batchPrintSettingKey
+              ]?.map(item => (
+                <p style={{ color: 999, paddingLeft: 24 }} key={item}>
+                  {item}
+                </p>
+              ))}
             </div>
-          </React.Fragment>
+          </>
         )}
 
         <Flex alignCenter className='gm-padding-top-5 gm-text-red'>
@@ -158,10 +160,12 @@ class EditorSelector extends React.Component {
 }
 
 EditorSelector.propTypes = {
-  isPurchase: PropTypes.bool
+  isPurchase: PropTypes.bool,
+  batchPrintSettingKey: PropTypes.string
 }
 EditorSelector.deaultProps = {
-  isPurchase: false
+  isPurchase: false,
+  batchPrintSettingKey: 'purchase_by_supplier'
 }
 
 export default EditorSelector
