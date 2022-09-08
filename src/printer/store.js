@@ -223,9 +223,11 @@ class PrinterStore {
       detailsHeights,
       currentRemainTableHeight
     )
+
     // 分局明细拆分后的数据
     const splitTableData = _.map(ranges, range => {
       const _tableData = Object.assign({}, tableData[end])
+
       _tableData.__details = detailsData.slice(...range)
       return _tableData
     })
@@ -350,22 +352,23 @@ class PrinterStore {
                   heights[end] / currentRemainTableHeight > 1) ||
                 heights[end] > pageAccomodateTableHeight
               ) {
-                const detailsPageHeight = this.computedData(
-                  dataKey,
-                  table,
-                  end,
-                  currentRemainTableHeight
-                )
-
-                // 拆分明细后，同时也要更新body.heights 不能影响后续计算
-                if (detailsPageHeight.length > 0) {
-                  // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
-                  detailsPageHeight[1] = Math.max(
-                    minHeight,
-                    detailsPageHeight[1]
+                if (currentRemainTableHeight >= 23) {
+                  const detailsPageHeight = this.computedData(
+                    dataKey,
+                    table,
+                    end,
+                    currentRemainTableHeight
                   )
-                  heights.splice(end, 1, ...detailsPageHeight)
-                  end++
+                  // 拆分明细后，同时也要更新body.heights 不能影响后续计算
+                  if (detailsPageHeight.length > 0) {
+                    // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
+                    detailsPageHeight[1] = Math.max(
+                      minHeight,
+                      detailsPageHeight[1]
+                    )
+                    heights.splice(end, 1, ...detailsPageHeight)
+                    end++
+                  }
                 }
               }
               // 第一条极端会有问题
