@@ -1,6 +1,6 @@
 import EditorStore from '../common/editor_store'
 import { action } from 'mobx'
-import { PURCHASE_DETAIL, PURCHASE_DETAIL_ROW_SPAN } from './constants'
+import { PURCHASE_DETAIL, PURCHASE_DETAIL_BY_ORDER_UNIT } from './constants'
 
 class Store extends EditorStore {
   constructor({ defaultTableDataKey }) {
@@ -20,7 +20,7 @@ class Store extends EditorStore {
 
     // 先去掉所有明细列
     const newCols = tableConfig.columns.filter(
-      o => !o.isPurchaseDetailRowSpan && !o.isSpecialColumn
+      o => !o.isPurchaseDetailByOrderUnit && !o.isSpecialColumn
     )
     tableConfig.columns.replace(newCols)
     this.changeSheetUnitSummary(false)
@@ -33,24 +33,23 @@ class Store extends EditorStore {
 
   @action.bound
   changeSheetUnitSummary(bool) {
-    // this.isSheetUnitSummary = bool
     this.config.isSheetUnitSummary = bool
   }
 
+  /** 按下单单位汇总 */
   @action.bound
   setSheetUnitSummary(bool) {
     this.changeSheetUnitSummary(bool)
     const arr = this.selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
     const newCols = tableConfig.columns.filter(
-      o => !o.isPurchaseDetailRowSpan && !o.isSpecialColumn
+      o => !o.isPurchaseDetailByOrderUnit && !o.isSpecialColumn
     )
+    // 先去掉所有明细列
+    tableConfig.columns.replace(newCols)
     if (bool) {
-      // 先去掉所有明细列
-      tableConfig.columns.replace(newCols)
-      tableConfig.columns.push(...PURCHASE_DETAIL_ROW_SPAN)
+      tableConfig.columns.push(...PURCHASE_DETAIL_BY_ORDER_UNIT)
     } else {
-      tableConfig.columns.replace(newCols)
       tableConfig.columns.push(PURCHASE_DETAIL)
     }
   }
