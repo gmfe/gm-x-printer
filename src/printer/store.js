@@ -235,7 +235,6 @@ class PrinterStore {
     // 插入原table数据中
     tableData.splice(end, 1, ...splitTableData)
     this.data._table[dataKey] = tableData
-
     return detailsPageHeight
   }
 
@@ -261,7 +260,6 @@ class PrinterStore {
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
-
       /* 表格内容处理 */
       if (content.type === 'table') {
         /**
@@ -729,33 +727,6 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom // 提供一个计算随机数的函数
       })
-    } catch (err) {
-      return text
-    }
-  }
-
-  templateRowSpanSpecialDetails(col, item) {
-    // 做好保护，出错就返回 text
-    const { specialDetailsKey, text, separator = '_', detailLastColType } = col
-    try {
-      const compiled = _.template(text, { interpolate: /{{([\s\S]+?)}}/g })
-      const detailsList = item[specialDetailsKey]
-
-      /** 简单处理下数据 */
-      const filterList = (list, type = '') => {
-        if (type === 'noLineBreak') {
-          const details = list.map(d => `${compiled(d)}`).join(separator)
-
-          return `<div class='b-table-details'>${details}</div>`
-        }
-        return list
-          .map(d => `<div class='b-table-details'> ${compiled(d)} </div>`)
-          .join('')
-      }
-      /** 明细换行和不换行处理 */
-      return !detailLastColType || detailLastColType === 'purchase_last_col'
-        ? filterList(detailsList)
-        : filterList(detailsList, 'noLineBreak')
     } catch (err) {
       return text
     }

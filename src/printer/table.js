@@ -21,7 +21,6 @@ import SubtotalSsuQuantityTr from './table_subtotal_ssu_quantity_tr'
 import SubtotalSsuOtQuantityTr from './table_subtotal_ssu_ot_quantity_tr'
 
 import PageSummary from './page_summary'
-import { PURCHASE_DETAIL } from '../editor_purchase/constants'
 
 @inject('printerStore')
 @observer
@@ -271,19 +270,6 @@ class Table extends React.Component {
                         // 合并单元格的个数
                         let rowSpanLength = tableData[i].length
 
-                        // 是否采购明细
-                        const isPurchaseDetail =
-                          col.specialDetailsKey ===
-                          PURCHASE_DETAIL.specialDetailsKey
-                        if (isPurchaseDetail) {
-                          // 采购明细跨行相关判断
-                          if (j === 0) {
-                            isRowSpan = true
-                          } else {
-                            rowTdRender = true
-                          }
-                        }
-
                         // 是熟食的组合工序聚合
                         if (
                           printerStore.config?.productionMergeType === '3' &&
@@ -332,15 +318,10 @@ class Table extends React.Component {
                                 )]: col.rowSpan
                               })}
                               dangerouslySetInnerHTML={{
-                                __html: col.isSpecialColumn
-                                  ? printerStore.templateRowSpanSpecialDetails(
-                                      col,
-                                      item
-                                    )
-                                  : printerStore.templateRowSpanTable(
-                                      col.text,
-                                      item
-                                    )
+                                __html: printerStore.templateRowSpanTable(
+                                  col.text,
+                                  item
+                                )
                               }}
                             />
                           )

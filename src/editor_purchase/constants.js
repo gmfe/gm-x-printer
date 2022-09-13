@@ -1,7 +1,7 @@
 import i18next from '../../locales'
 
 /** 采购明细列 模版TEXT */
-export const DETAIL_CONFIG_TEXT = i18next.t(
+const DETAIL_CONFIG_TEXT = i18next.t(
   '{{需求数_下单单位}}{{下单单位}}*{{需求数_采购单位}}{{采购单位}}*{{商户名}}*{{商品备注}}'
 )
 
@@ -15,32 +15,26 @@ export const PURCHASE_DETAIL = {
   text: DETAIL_CONFIG_TEXT
 }
 
-/** 合并单元格的采购明细  */
-export const PURCHASE_DETAIL_ROW_SPAN = [
+/** 按下单单位汇总的采购明细  */
+export const PURCHASE_DETAIL_BY_ORDER_UNIT = [
   {
     head: i18next.t('下单单位'),
     headStyle: { textAlign: 'center' },
-    /** 是否跨行采购明细相关 */
-    isPurchaseDetailRowSpan: true,
+    isPurchaseDetailByOrderUnit: true,
     style: { textAlign: 'center' },
     text: i18next.t('{{列.下单单位}}')
   },
   {
     head: i18next.t('需求总数(下单单位)'),
     headStyle: { textAlign: 'center' },
-    isPurchaseDetailRowSpan: true,
+    isPurchaseDetailByOrderUnit: true,
 
     style: { textAlign: 'center' },
     text: i18next.t('{{列.需求总数_下单单位}}{{列.下单单位}}')
   },
   {
-    head: i18next.t('明细'),
-    headStyle: { textAlign: 'center' },
-    isPurchaseDetailRowSpan: true,
-    style: { textAlign: 'left' },
-    isSpecialColumn: true,
-    specialDetailsKey: '__details_row_span',
-    text: DETAIL_CONFIG_TEXT
+    ...PURCHASE_DETAIL,
+    isPurchaseDetailByOrderUnit: true
   }
 ]
 
