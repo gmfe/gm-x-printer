@@ -243,7 +243,6 @@ const caclSingleDetailsPageHeight = (detailsHeights, curRemainPageHeight) => {
 
   ranges.push([begin, deadline], [deadline, end])
   detailsPageHeight.push(currentDetailsMiniHeight, remainDetailsHeight)
-
   return {
     ranges,
     detailsPageHeight
