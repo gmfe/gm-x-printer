@@ -90,7 +90,7 @@ function toDoPrintBatch(list) {
 }
 
 function doPrint({ data, config }, isTest) {
-  init(isTest)
+  init({ isTest })
 
   return toDoPrint({ data, config })
 }
