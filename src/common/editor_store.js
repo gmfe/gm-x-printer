@@ -102,6 +102,13 @@ class EditorStore {
     this.config = { ...this.config }
   }
 
+  /** 是否启用特殊设置 */
+  @action
+  toggleIsSpecialSetting(val) {
+    this.config.specialSettingType = val
+    this.config = { ...this.config }
+  }
+
   @computed
   get computedPrinterKey() {
     return _.map(this.config, (v, k) => {
