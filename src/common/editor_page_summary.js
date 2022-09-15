@@ -342,9 +342,6 @@ class SummarySetting extends React.Component {
     return (
       <>
         <Title title='整单合计' />
-        <div style={{ ...COM_STYLE }}>
-          整单合计和每页合计同时出现时，优先展现每页合计
-        </div>
         <Flex alignCenter className='gm-padding-top-5'>
           <div>{i18next.t('整单合计')}：</div>
           <Switch
