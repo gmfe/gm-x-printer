@@ -162,7 +162,7 @@ class Printer extends React.Component {
                 <Table
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
-                  config={config.contents[2]}
+                  config={content}
                   range={{ begin: 0, end: list.length }}
                   pageIndex={0}
                   placeholder={`${i18next.t('区域')} ${index}`}
@@ -194,24 +194,13 @@ class Printer extends React.Component {
       remainPageHeight,
       isAutoFilling,
       showCombineSkuDetail,
-      showIngredientDetail,
-      pages
+      showIngredientDetail
     } = printerStore
+
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
-          const pagesLength = pages.length - 1
-          const isLastPage = i === pagesLength // 最后一页
-          const lastSecond = i === pagesLength - 1 // 倒数第二页
-          // TODO:
-          let isLastPageHasTable = ''
-          const hasTable = arr =>
-            _.map(arr, item => item.type).includes('table')
-          // 整单合计开启后，仅在最后一页展现,存在最后一页刚好可能没有table的情况，so将整单合计放在倒数第二页的table表格里
-          isLastPageHasTable = hasTable(pages?.[pagesLength])
-            ? isLastPage
-            : lastSecond && hasTable(pages?.[pagesLength - 1])
-
+          const isLastPage = i === printerStore.pages.length - 1
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
@@ -265,7 +254,6 @@ class Printer extends React.Component {
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
                             isSomeSubtotalTr={isSomeSubtotalTr}
-                            isLastPage={isLastPageHasTable}
                           />
                         )
                       }
@@ -274,7 +262,7 @@ class Printer extends React.Component {
                         <Table
                           key={`contents.table.${panel.index}.${ii}`}
                           name={`contents.table.${panel.index}`}
-                          config={config.contents[2]}
+                          config={config.contents[panel.index]}
                           range={{
                             begin: panel.begin,
                             end: end
@@ -282,7 +270,6 @@ class Printer extends React.Component {
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
                           isSomeSubtotalTr={isSomeSubtotalTr}
-                          isLastPage={isLastPageHasTable}
                         />
                       )
                     }
