@@ -138,8 +138,16 @@ const tableFields = {
 
 const specialFields = [
   {
-    id: 'noSpecail',
-    value: i18next.t('无特殊控制')
+    label: `"单价"或"单价(不含税)"的值为0则不打印这一行数据`,
+    value: 1
+  },
+  {
+    label: `"下单单位"与"定价单位"不一致的时候，"出库金额"与"商品销售额"展现为空`,
+    value: 2
+  },
+  {
+    label: `"下单数"为0.01时"下单数","下单金额","出库数","出库金额","商品销售额"展现为空`,
+    value: 3
   }
 ]
 

@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import _ from 'lodash'
-import { borderStyleList } from '../config'
+// eslint-disable-next-line import/named
+import { borderStyleList, TYPE_ENUM } from '../config'
 import { Flex, Tip, ToolTip } from '../components'
 import { Request } from 'gm-util'
 import i18next from '../../locales'
@@ -576,38 +577,52 @@ class ChangeCapCheckbox extends React.Component {
     const {
       value,
       style: { setSpecialUpperCase },
-      onChange,
+      onChange
     } = this.props
-    if(value.includes("金额") ||  value.includes("销售额") || value.includes("运费") || value.includes("税额") || value.includes("成本") ){
+    if (
+      value.includes('金额') ||
+      value.includes('销售额') ||
+      value.includes('运费') ||
+      value.includes('税额') ||
+      value.includes('成本')
+    ) {
       return (
         <Flex style={{ margin: '5px 0 5px 0' }}>
           <Flex alignCenter>
             <input
               type='checkbox'
-              checked={setSpecialUpperCase === "true"}
-              onChange={(e)=>{
-                const field = value.match(/{{([\s\S].+?)}}/g)[0]?.replace(/[\{\}]/g, "")
+              checked={setSpecialUpperCase === 'true'}
+              onChange={e => {
+                const field = value
+                  .match(/{{([\s\S].+?)}}/g)[0]
+                  // eslint-disable-next-line no-useless-escape
+                  ?.replace(/[\{\}]/g, '')
                 const [preText, subText] = value.split(`{{${field}}}`)
-                const newField = field.includes("_大写") ? field.replace("_大写", "") : field + "_大写"
-                onChange("style", {
+                const newField = field.includes('_大写')
+                  ? field.replace('_大写', '')
+                  : field + '_大写'
+                onChange('style', {
                   ...this.props.style,
-                  setSpecialUpperCase: setSpecialUpperCase === "true" ? "false" : "true"
+                  setSpecialUpperCase:
+                    setSpecialUpperCase === 'true' ? 'false' : 'true'
                 })
-                onChange("text", `${preText}{{${newField}}}${subText}`)
+                onChange('text', `${preText}{{${newField}}}${subText}`)
               }}
             />
           </Flex>
           <Flex>&nbsp;{i18next.t('显示大写金额')}</Flex>
         </Flex>
-    )
-    }
-    else {
+      )
+    } else {
       return <></>
     }
-    
   }
 }
-
+ChangeCapCheckbox.propTypes = {
+  value: PropTypes.string,
+  style: PropTypes.object,
+  onChange: PropTypes.func
+}
 const SubTitle = ({ text }) => (
   <div
     style={{
@@ -687,6 +702,52 @@ TipInfo.propTypes = {
   color: PropTypes.string
 }
 
+const IsShowCheckBox = props => {
+  const { type, checked, onChange } = props
+  const text = TYPE_ENUM[type]
+  return (
+    <>
+      <Flex style={{ margin: '5px 0 5px 0' }}>
+        <Flex alignCenter>
+          <input type='checkbox' checked={checked} onChange={onChange} />
+        </Flex>
+        <Flex>&nbsp;{text}</Flex>
+      </Flex>
+    </>
+  )
+}
+IsShowCheckBox.propTypes = {
+  onChange: PropTypes.func,
+  checked: PropTypes.bool,
+  type: PropTypes.string
+}
+
+const ShowInputText = props => {
+  const { value, onChange, text, type } = props
+
+  const handleChange = e => {
+    if (typeof onChange === 'function') onChange(type, e)
+  }
+  return (
+    <Flex className='gm-padding-top-5'>
+      <Flex alignCenter>{text}文案：</Flex>
+      <Flex alignCenter>
+        <input
+          className='gm-printer-edit-input-custom'
+          type='text'
+          value={value}
+          onChange={handleChange}
+        />
+      </Flex>
+    </Flex>
+  )
+}
+ShowInputText.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  text: PropTypes.string,
+  type: PropTypes.string
+}
 export {
   Text,
   Textarea,
@@ -706,5 +767,7 @@ export {
   Title,
   Gap,
   FieldBtn,
-  TipInfo
+  TipInfo,
+  IsShowCheckBox,
+  ShowInputText
 }

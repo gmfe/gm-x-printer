@@ -4,11 +4,11 @@
  * @lastTime: 2022-09-09 17:41:09
  * @LastAuthor: suxin suxin@guanmai.cn
  * @文件相对于项目的路径: /gm-x-printer/src/printer/page_summary.js
- * @message: 每页合计/整单合计——底部展现
+ * @message: 整单合计——底部展现
  */
 import React from 'react'
 import _ from 'lodash'
-import { getDataKey, isMultiTable, regExp } from '../util'
+import { getDataKey, regExp } from '../util'
 import Big from 'big.js'
 import { observer } from 'mobx-react'
 import { get } from 'mobx'
@@ -41,27 +41,27 @@ const PageSummary = props => {
   const {
     config,
     config: { dataKey, arrange, columns },
-    range,
-    printerStore
+    printerStore,
+    isLastPage
   } = props
   const _dataKey = getDataKey(dataKey, arrange)
-  const summaryConfig = get(config, 'summaryConfig')
+  const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig')
 
   const {
-    pageSummaryShow,
-    showPageType,
-    pageSummaryText,
-    summaryColumns
-  } = summaryConfig
+    orderSummaryShow,
+    showOrderType,
+    style,
+    orderSummaryText,
+    summaryOrderColumns
+  } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
-  const currentPageTableData = tableData.slice(range.begin, range.end)
-
+  const currentOrderTableData = tableData.slice()
   if (
-    pageSummaryShow &&
-    showPageType === SHOW_WAY_ENUM.bottom &&
-    printerStore.ready &&
-    !isMultiTable(_dataKey)
+    orderSummaryShow &&
+    isLastPage &&
+    showOrderType === SHOW_WAY_ENUM.bottom &&
+    printerStore.ready
   ) {
     return (
       <tr>
@@ -69,17 +69,18 @@ const PageSummary = props => {
           let html
           // 第一列
           if (index === 0) {
-            html = pageSummaryText
+            html = orderSummaryText
           } else {
             const key = regExp(col.text)
+
             html =
-              summaryColumns.map(text => regExp(text)).includes(key) && key
-                ? sumCol(key, currentPageTableData)
+              summaryOrderColumns.map(text => regExp(text)).includes(key) && key
+                ? sumCol(key, currentOrderTableData)
                 : ' '
           }
           return (
             <td
-              style={{ whiteSpace: 'nowrap', ...summaryConfig.style }}
+              style={{ whiteSpace: 'nowrap', ...style }}
               colSpan={1}
               key={index}
               dangerouslySetInnerHTML={{ __html: html }}
