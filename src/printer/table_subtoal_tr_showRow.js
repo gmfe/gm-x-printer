@@ -10,13 +10,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 // eslint-disable-next-line import/named
-import {
-  MULTI_SUFFIX,
-  TEXT_SPACE,
-  TWO_TEXT_SPACE,
-  SHOW_WAY_ENUM,
-  SHOW_PAGE_CASE_ENUM
-} from '../config'
+import { MULTI_SUFFIX, SHOW_WAY_ENUM, SHOW_PAGE_CASE_ENUM } from '../config'
 import Big from 'big.js'
 import { coverDigit2Uppercase, getDataKey } from '../util'
 import { observer } from 'mobx-react'
@@ -75,30 +69,42 @@ const SubtotalTrShowRow = props => {
   ) {
     const list = tableData.slice(range.begin, range.end)
     const sum = {}
-    let totalText = ''
     let lowerCaseFont = ''
+    let upperCaseFont = ''
     _.each(fields, v => {
       sum[v.name] = sumData(list, v.valueField)
     })
     for (const name in sum) {
       const price = sum[name]
       // 大写文案
-      const upperCaseFont = get(subtotal, SHOW_PAGE_CASE_ENUM.needUpperCase)
-        ? `${pageUpperCaseText}${TWO_TEXT_SPACE}` + coverDigit2Uppercase(price)
+
+      // 大写文案
+      upperCaseFont = get(subtotal, SHOW_PAGE_CASE_ENUM.needUpperCase)
+        ? `${pageUpperCaseText}` + coverDigit2Uppercase(price)
         : ''
       // 小写文案
+
       lowerCaseFont = get(subtotal, SHOW_PAGE_CASE_ENUM.needLowerCase)
-        ? `${pageLowerCaseText}${TWO_TEXT_SPACE}${price}`
+        ? `${pageLowerCaseText}${price}`
         : ''
-      // 大小文字合并
-      totalText =
-        pageFontSort === 'small'
-          ? `${lowerCaseFont}${
-              needLowerCase && needUpperCase ? TEXT_SPACE : ''
-            }${upperCaseFont}`
-          : `${upperCaseFont}${
-              needUpperCase && needLowerCase ? TEXT_SPACE : ''
-            }${lowerCaseFont}`
+    }
+    const renderTotalText = () => {
+      const lower = <span>{lowerCaseFont}</span>
+      const upper = <span>{upperCaseFont}</span>
+      const space = <span style={{ width: '20%', display: 'inline-block' }} />
+      return pageFontSort === 'small' ? (
+        <>
+          {lower}
+          {needLowerCase && needUpperCase ? space : ''}
+          {upper}
+        </>
+      ) : (
+        <>
+          {upper}
+          {needUpperCase && needLowerCase ? space : ''}
+          {lower}
+        </>
+      )
     }
     return (
       <tr>
@@ -119,10 +125,9 @@ const SubtotalTrShowRow = props => {
             fontWeight: 'bold',
             ...style
           }}
-          dangerouslySetInnerHTML={{
-            __html: totalText
-          }}
-        />
+        >
+          <span>{renderTotalText()}</span>
+        </td>
       </tr>
     )
   } else {

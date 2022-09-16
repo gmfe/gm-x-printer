@@ -4,7 +4,7 @@
  * @lastTime: 2022-09-09 17:41:09
  * @LastAuthor: suxin suxin@guanmai.cn
  * @文件相对于项目的路径: /gm-x-printer/src/printer/page_summary.js
- * @message: 每页合计/整单合计——底部展现
+ * @message: 每页合计——底部展现
  */
 import React from 'react'
 import _ from 'lodash'
