@@ -11,13 +11,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { observer } from 'mobx-react'
 // eslint-disable-next-line no-unused-vars
-import {
-  MULTI_SUFFIX,
-  TEXT_SPACE,
-  TWO_TEXT_SPACE,
-  SHOW_WAY_ENUM,
-  SHOW_ORDER_CASE_ENUM
-} from '../config'
+import { MULTI_SUFFIX, SHOW_WAY_ENUM, SHOW_ORDER_CASE_ENUM } from '../config'
 import Big from 'big.js'
 import { coverDigit2Uppercase, getDataKey } from '../util'
 import { get } from 'mobx'
@@ -68,33 +62,41 @@ const AllOrderSummary = props => {
     const list = tableData.slice()
 
     const sum = {}
-    let totalText = ''
     let lowerCaseFont = ''
+    let upperCaseFont = ''
+
     _.each(fields, v => {
       sum[v.name] = sumData(list, v.valueField)
     })
     for (const name in sum) {
       const price = sum[name]
       // 大写文案
-      const upperCaseFont = get(
-        subtotal,
-        SHOW_ORDER_CASE_ENUM.order_needUpperCase
-      )
-        ? `${orderUpperCaseText}${TWO_TEXT_SPACE}` + coverDigit2Uppercase(price)
+      upperCaseFont = get(subtotal, SHOW_ORDER_CASE_ENUM.order_needUpperCase)
+        ? `${orderUpperCaseText}` + coverDigit2Uppercase(price)
         : ''
       // 小写文案
       lowerCaseFont = get(subtotal, SHOW_ORDER_CASE_ENUM.order_needLowerCase)
-        ? `${orderLowerCaseText}${TWO_TEXT_SPACE}${price}`
+        ? `${orderLowerCaseText}${price}`
         : ''
-      // 大小文字合并
-      totalText =
-        orderFontSort === 'small'
-          ? `${lowerCaseFont}${
-              order_needLowerCase && order_needUpperCase ? TEXT_SPACE : ''
-            }${upperCaseFont}`
-          : `${upperCaseFont}${
-              order_needUpperCase && order_needLowerCase ? TEXT_SPACE : ''
-            }${lowerCaseFont}`
+    }
+
+    const renderTotalText = () => {
+      const lower = <span>{lowerCaseFont}</span>
+      const upper = <span>{upperCaseFont}</span>
+      const space = <span style={{ width: '20%', display: 'inline-block' }} />
+      return orderFontSort === 'small' ? (
+        <>
+          {lower}
+          {order_needLowerCase && order_needUpperCase ? space : ''}
+          {upper}
+        </>
+      ) : (
+        <>
+          {upper}
+          {order_needUpperCase && order_needLowerCase ? space : ''}
+          {lower}
+        </>
+      )
     }
     return (
       <tr>
@@ -103,7 +105,8 @@ const AllOrderSummary = props => {
           style={{
             whiteSpace: 'nowrap',
             fontWeight: 'bold',
-            textAlign: 'center'
+            textAlign: 'center',
+            ...style
           }}
           dangerouslySetInnerHTML={{
             __html: orderSummaryText
@@ -115,10 +118,9 @@ const AllOrderSummary = props => {
             fontWeight: 'bold',
             ...style
           }}
-          dangerouslySetInnerHTML={{
-            __html: totalText
-          }}
-        />
+        >
+          <span>{renderTotalText()}</span>
+        </td>
       </tr>
     )
   } else {

@@ -42,7 +42,8 @@ const PageSummary = props => {
     config,
     config: { dataKey, arrange, columns },
     printerStore,
-    isLastPage
+    isLastPage,
+    range
   } = props
   const _dataKey = getDataKey(dataKey, arrange)
   const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig')
@@ -56,7 +57,7 @@ const PageSummary = props => {
   } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
-  const currentOrderTableData = tableData.slice()
+  const currentOrderTableData = tableData.slice(range.begin, range.end)
   if (
     orderSummaryShow &&
     isLastPage &&
@@ -80,7 +81,12 @@ const PageSummary = props => {
           }
           return (
             <td
-              style={{ whiteSpace: 'nowrap', ...style }}
+              style={{
+                whiteSpace: 'nowrap',
+                fontWeight: 'bold',
+                textAlign: 'center',
+                ...style
+              }}
               colSpan={1}
               key={index}
               dangerouslySetInnerHTML={{ __html: html }}
