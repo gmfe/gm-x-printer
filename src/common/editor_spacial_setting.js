@@ -21,7 +21,7 @@ class EditorSpecialSetting extends React.Component {
       editStore: { config }
     } = this.props
     const value =
-      config.specialSettingType || addFields?.specialFields[0].value || ''
+      config.specialSettingType || addFields?.specialFields?.[0]?.value || ''
     this.setState({ value })
   }
 
