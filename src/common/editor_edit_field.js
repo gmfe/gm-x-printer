@@ -16,6 +16,7 @@ import {
   Title,
   TipInfo
 } from '../common/component'
+import { get, toJS } from 'mobx'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { DiyTimeType } from '../config'
@@ -63,6 +64,16 @@ class EditorField extends React.Component {
   handleSetTableDataKey = dataKey => {
     const { editStore } = this.props
     editStore.setTableDataKey(dataKey)
+  }
+
+  handleSpecialStyleChange = value => {
+    const { editStore } = this.props
+    editStore.setSpecialStyle(value)
+  }
+
+  handleSubtotalStyleChange = value => {
+    const { editStore } = this.props
+    editStore.setSubtotalStyle(value)
   }
 
   renderBlocks() {
@@ -148,6 +159,22 @@ class EditorField extends React.Component {
     const { tableDataKeyList, editStore } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
+
+    const { specialConfig, subtotal } = editStore.computedTableSpecialConfig
+    // 小计样式,specialConfig可能是undefined
+    const specialStyle =
+      toJS(editStore.computedTableSpecialConfig)?.specialConfig?.style || {}
+    // 小计是否大写
+    const specialTrNeedUpperCase =
+      (specialConfig && specialConfig.needUpperCase) || false
+    // 每页合计样式
+    const subtotalStyle = (subtotal && subtotal.style) || {}
+    //  每页合计是否大写
+    const subtotalNeedUpperCase =
+      (editStore.computedTableSpecialConfig.subtotal &&
+        get(subtotal, 'needUpperCase')) ||
+      false
+
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -274,6 +301,59 @@ class EditorField extends React.Component {
               />
             </div>
           </div>
+        </Flex>
+
+        <TipInfo
+          text={i18next.t('说明：谨慎修改{}中的内容,避免出现数据异常')}
+        />
+        <Gap />
+
+        <Flex>
+          <Flex>{i18next.t('小计设置')}：</Flex>
+          <Fonter
+            style={specialStyle}
+            onChange={this.handleSpecialStyleChange}
+          />
+          <Separator />
+          <TextAlign
+            style={specialStyle}
+            onChange={this.handleSpecialStyleChange}
+          />
+        </Flex>
+
+        <Flex style={{ margin: '5px 0 5px 62px' }}>
+          <Flex alignCenter>
+            <input
+              type='checkbox'
+              checked={specialTrNeedUpperCase}
+              onChange={editStore.setSpecialUpperCase}
+            />
+          </Flex>
+          <Flex>&nbsp;{i18next.t('显示大写金额')}</Flex>
+        </Flex>
+
+        <Flex>
+          <Flex>{i18next.t('合计设置')}：</Flex>
+          <Fonter
+            style={subtotalStyle}
+            onChange={this.handleSubtotalStyleChange}
+          />
+          <Separator />
+          <TextAlign
+            style={subtotalStyle}
+            onChange={this.handleSubtotalStyleChange}
+          />
+        </Flex>
+
+        <Flex style={{ margin: '5px 0 5px 62px' }}>
+          <Flex alignCenter>
+            <input
+              type='checkbox'
+              checked={subtotalNeedUpperCase}
+              onChange={editStore.setSubtotalUpperCase}
+            />
+          </Flex>
+          <Flex>&nbsp;{i18next.t('显示大写金额')}</Flex>
         </Flex>
       </div>
     )

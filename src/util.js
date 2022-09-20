@@ -351,16 +351,6 @@ function getOverallOrderTrHeight(overallOrder) {
   return (parseInt(fontSize) - 12) * 1.5 + 26
 }
 
-/**
- *
- * @param {*} text 正则将匹配的列数据{{列.列名}}
- * @returns 列名
- */
-function regExp(text) {
-  const match = /{{([^{}]+)}}/.exec(text)
-  const key = match ? match[1] : ''
-  return key ? key.split('.')[1] : ''
-}
 export {
   getPageHeight,
   getWidth,
@@ -384,6 +374,5 @@ export {
   getArrayMid,
   caclRowSpanTdPageHeight,
   caclSingleDetailsPageHeight,
-  getOverallOrderTrHeight,
-  regExp
+  getOverallOrderTrHeight
 }

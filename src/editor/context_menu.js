@@ -57,9 +57,29 @@ class ContextMenu extends React.Component {
     editStore.changeTableDataKey(name, key)
   }
 
+  handleSubtotal = name => {
+    console.log(111)
+    const { editStore } = this.props
+
+    editStore.setSubtotalShow(name)
+  }
+
   handleChangeTableData = isAutoFilling => {
     const { editStore } = this.props
     editStore.handleChangeTableData(isAutoFilling)
+  }
+
+  handleSubtotalSsuQuantity = name => {
+    console.log('isSubtotalSsuQuantityActive')
+    const { editStore } = this.props
+
+    editStore.setSubtotalSsuQuantityActiveShow(name)
+  }
+
+  handleSubtotalSsuOtQuantity = name => {
+    console.log('isSubtotalSsuQuantityActive')
+    const { editStore } = this.props
+    editStore.setSubtotalSsuOtQuantityActiveShow(name)
   }
 
   renderOrderActionBtn = name => {
@@ -68,14 +88,22 @@ class ContextMenu extends React.Component {
     }
 
     const {
-      editStore: { isAutoFilling }
+      editStore: {
+        config: {
+          page: { type }
+        },
+        isAutoFilling
+      }
     } = this.props
     const arr = name.split('.')
-    const { dataKey } = this.props.editStore.config.contents[arr[2]]
+    const { dataKey, subtotal } = this.props.editStore.config.contents[arr[2]]
     const keyArr = dataKey.split('_')
 
     const isMultiActive = keyArr.includes('multi')
     const isCategoryActive = keyArr.includes('category')
+    const isSubtotalActive = subtotal.show
+    const isSubtotalSsuQuantityActive = subtotal?.isSsuQuantity
+    const isSubtotalSsuOtQuantityActive = subtotal?.isSsuOtQuantity
 
     const isCombine = keyArr.includes('combination')
 
@@ -97,6 +125,24 @@ class ContextMenu extends React.Component {
           </div>
         )}
         <div
+          onClick={this.handleSubtotal.bind(this, name)}
+          className={isSubtotalActive ? 'active' : ''}
+        >
+          {i18next.t('每页合计（下单金额）')}
+        </div>
+        <div
+          onClick={this.handleSubtotalSsuQuantity.bind(this, name)}
+          className={isSubtotalSsuQuantityActive ? 'active' : ''}
+        >
+          {i18next.t('每页合计（套账下单金额）')}
+        </div>
+        <div
+          onClick={this.handleSubtotalSsuOtQuantity.bind(this, name)}
+          className={isSubtotalSsuOtQuantityActive ? 'active' : ''}
+        >
+          {i18next.t('每页合计（套账出库金额）')}
+        </div>
+        <div
           onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}
           className={isAutoFilling ? 'active' : ''}
         >
@@ -107,7 +153,7 @@ class ContextMenu extends React.Component {
   }
 
   render() {
-    const { editStore, uploadQiniuImage } = this.props
+    const { editStore, mockData, uploadQiniuImage } = this.props
     return (
       <CommonContextMenu
         renderTableAction={this.renderOrderActionBtn}
@@ -129,8 +175,5 @@ class ContextMenu extends React.Component {
     )
   }
 }
-ContextMenu.propTypes = {
-  editStore: PropTypes.object,
-  uploadQiniuImage: PropTypes.func
-}
+
 export default ContextMenu

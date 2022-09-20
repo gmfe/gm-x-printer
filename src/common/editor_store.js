@@ -2,7 +2,7 @@ import i18next from '../../locales'
 import { action, computed, observable, set, toJS } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
-import { dispatchMsg, getBlockName, exchange, regExp } from '../util'
+import { dispatchMsg, getBlockName, exchange } from '../util'
 
 class EditorStore {
   @observable
@@ -52,37 +52,6 @@ class EditorStore {
   isAutoFilling = false
 
   defaultTableDataKey = 'orders'
-
-  // 大小写顺序
-  @observable
-  sortPageBigOrSmall = 'small'
-
-  @observable
-  sortOrderBigOrSmall = 'big'
-
-  // 合计文案——每页合计
-  @observable
-  page_total = '合计'
-
-  // 小写文案——每页合计
-  @observable
-  page_small = '每页合计'
-
-  // 大写文案——每页合计
-  @observable
-  page_big = '大写'
-
-  // 合计文案——整单合计
-  @observable
-  order_total = '合计'
-
-  // 小写文案——整单合计
-  @observable
-  order_small = '整单合计'
-
-  // 大写文案——整单合计
-  @observable
-  order_big = '大写'
 
   // 默认table的dataKey
   setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
@@ -1045,37 +1014,14 @@ class EditorStore {
     }
   }
 
-  // 设置大写是否显示
   @action.bound
-  setSubtotalUpperCase(type) {
-    this.changeUpdateData()
+  setSubtotalUpperCase() {
     if (this.selectedRegion) {
       const arr = this.selectedRegion.split('.')
       const subtotalConfig = this.config.contents[arr[2]].subtotal
-      if (type === 'page_checkbox') {
-        const oldNeedUpperCase = subtotalConfig.needUpperCase
-        set(subtotalConfig, { needUpperCase: !oldNeedUpperCase })
-      } else {
-        const old_order_needLowerCase = subtotalConfig?.order_needUpperCase
-        set(subtotalConfig, { order_needUpperCase: !old_order_needLowerCase })
-      }
-    }
-  }
 
-  // 设置小写是否显示
-  @action.bound
-  setSubtotalLowerCase(type) {
-    this.changeUpdateData()
-    if (this.selectedRegion) {
-      const arr = this.selectedRegion.split('.')
-      const subtotalConfig = this.config.contents[arr[2]].subtotal
-      if (type === 'page_checkbox') {
-        const oldNeedUpperCase = subtotalConfig.needLowerCase
-        set(subtotalConfig, { needLowerCase: !oldNeedUpperCase })
-      } else {
-        const old_order_needLowerCase = subtotalConfig?.order_needLowerCase
-        set(subtotalConfig, { order_needLowerCase: !old_order_needLowerCase })
-      }
+      const oldNeedUpperCase = subtotalConfig.needUpperCase
+      set(subtotalConfig, { needUpperCase: !oldNeedUpperCase })
     }
   }
 
@@ -1108,14 +1054,7 @@ class EditorStore {
           pageSummaryShow: false,
           totalSummaryShow: false,
           style: { textAlign: 'center', fontSize: '12px' },
-          summaryColumns: [],
-          pageSummaryText: '合计',
-          showPageType: 'row',
-          showOrderType: 'row',
-          fields: [{ name: '{{列.商品销售额}}', valueField: '商品销售额' }],
-          pageUpperCaseText: '大写：',
-          pageLowerCaseText: '小写：',
-          pageFontSort: 'big'
+          summaryColumns: []
         }
         set(config, { summaryConfig: { ...init, ...modify } })
       }
@@ -1123,131 +1062,11 @@ class EditorStore {
         // 切换的时候，要把对应table的多余空数据清掉
         this.clearExtraTableData(config.dataKey)
       }
-
       this.config = toJS(this.config)
     }
 
     // 如果只是勾选要展示的合计类目的选项，则不需要执行以下操作， 否则会重复清空数据
     if (!('summaryColumns' in modify && 'style' in modify)) {
-      this.setAutoFillingConfig(false)
-    }
-  }
-
-  // 每页合计展示改变
-  @action
-  changeShowStyle(type, value) {
-    this.changeUpdateData()
-    if (type === 'pageSummary') {
-      this.setSummaryConfig({ showPageType: value })
-    } else {
-      this.setOrderSummaryConfig({ showOrderType: value })
-    }
-  }
-
-  @action
-  changeChoseSummaryField(type, value) {
-    this.changeUpdateData()
-    if (type === 'chose_page_summary_field') {
-      this.setSummaryConfig({
-        fields: [{ name: value, valueField: regExp(value) }]
-      })
-    } else {
-      this.setOrderSummaryConfig({
-        fields: [{ name: value, valueField: regExp(value) }]
-      })
-    }
-  }
-
-  // 改变大小写顺序
-  @action
-  changeSortBigOrSmall(type, value) {
-    this.changeUpdateData()
-    if (type === 'page_font_sort') {
-      this.sortPageBigOrSmall = value
-      this.setSummaryConfig({ pageFontSort: value })
-    } else {
-      this.sortOrderBigOrSmall = value
-      this.setOrderSummaryConfig({ orderFontSort: value })
-    }
-  }
-
-  // 修改文案系列
-  @action
-  changeSumName(type, value) {
-    this.changeUpdateData()
-    switch (type) {
-      case 'page_total':
-        this.page_total = value
-        this.setSummaryConfig({ pageSummaryText: value })
-        break
-      case 'page_small':
-        this.page_small = value
-        this.setSummaryConfig({ pageLowerCaseText: value })
-        break
-      case 'page_big':
-        this.page_big = value
-        this.setSummaryConfig({ pageUpperCaseText: value })
-        break
-      case 'order_total':
-        this.order_total = value
-        this.setOrderSummaryConfig({ orderSummaryText: value })
-        break
-      case 'order_small':
-        this.order_small = value
-        this.setOrderSummaryConfig({ orderLowerCaseText: value })
-        break
-      case 'order_big':
-        this.order_big = value
-        this.setOrderSummaryConfig({ orderUpperCaseText: value })
-        break
-      default:
-        break
-    }
-  }
-
-  // 编辑状态立即更新
-  @action
-  changeUpdateData() {
-    this.updateData = !this.updateData
-  }
-
-  // 监听整单展现状态改变
-  @action.bound
-  setOrderSummaryConfig(modify) {
-    if (this.selectedRegion) {
-      const arr = this.selectedRegion.split('.')
-      const config = this.config.contents[arr[2]]
-      const allOrderSummaryConfig = config.allOrderSummaryConfig
-      if (allOrderSummaryConfig) {
-        set(allOrderSummaryConfig, modify)
-      } else {
-        const init = {
-          fields: [{ name: '{{列.商品销售额}}', valueField: '商品销售额' }],
-          style: {
-            textAlign: 'center',
-            fontSize: '12px'
-          },
-          orderSummaryShow: false,
-          totalSummaryShow: false,
-          summaryOrderColumns: [],
-          orderSummaryText: '整单合计',
-          showOrderType: 'row',
-          orderUpperCaseText: '大写：',
-          orderLowerCaseText: '小写：',
-          orderFontSort: 'big'
-        }
-        set(config, { allOrderSummaryConfig: { ...init, ...modify } })
-      }
-      if ('orderSummaryShow' in modify) {
-        // 切换的时候，要把对应table的多余空数据清掉
-        this.clearExtraTableData(config.dataKey)
-      }
-
-      this.config = toJS(this.config)
-    }
-
-    // 如果只是勾选要展示的合计类目的选项，则不需要执行以下操作， 否则会重复清空数据
-    if (!('summaryOrderColumns' in modify && 'style' in modify)) {
       this.setAutoFillingConfig(false)
     }
   }
