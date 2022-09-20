@@ -16,11 +16,10 @@ import { inject, observer } from 'mobx-react'
 import classNames from 'classnames'
 import { MULTI_SUFFIX } from '../config'
 import SpecialTr from './table_special_tr'
-import SubtotalTr from './table_subtotal_tr'
-import SubtotalSsuQuantityTr from './table_subtotal_ssu_quantity_tr'
-import SubtotalSsuOtQuantityTr from './table_subtotal_ssu_ot_quantity_tr'
-
+import SubtotalTrShowRow from './table_subtoal_tr_showRow'
+import AllOrderSummaryRow from './table_all_order_summary'
 import PageSummary from './page_summary'
+import PageOrderSummary from './page_order_bottom_summary'
 
 @inject('printerStore')
 @observer
@@ -150,17 +149,21 @@ class Table extends React.Component {
   renderDefault() {
     let {
       config,
-      config: { dataKey, arrange, customerRowHeight = 23 },
+      config: {
+        dataKey,
+        arrange,
+        customerRowHeight = 23,
+        allOrderSummaryConfig: { orderSummaryShow }
+      },
       name,
       range,
       pageIndex,
-      printerStore
+      printerStore,
+      isLastPage
     } = this.props
-
     // 数据
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
-
     // 列
     const columns = this.getColumns()
 
@@ -375,11 +378,18 @@ class Table extends React.Component {
             }
           })}
           {/* 区域2 */}
-          <SubtotalTr {...this.props} />
-          <SubtotalSsuQuantityTr {...this.props} />
-          <SubtotalSsuOtQuantityTr {...this.props} />
+          <SubtotalTrShowRow {...this.props} />
 
           <PageSummary {...this.props} />
+          <PageOrderSummary {...this.props} />
+          {/* 最后一页才显示整单合计 且整单合计和每页合计同时存在时，优先显示每页合计 */}
+          {orderSummaryShow && isLastPage && (
+            <AllOrderSummaryRow
+              range={range}
+              config={config}
+              printerStore={printerStore}
+            />
+          )}
         </tbody>
       </table>
     )
@@ -430,7 +440,8 @@ Table.propTypes = {
   range: PropTypes.object.isRequired,
   pageIndex: PropTypes.number.isRequired,
   placeholder: PropTypes.string,
-  printerStore: PropTypes.object
+  printerStore: PropTypes.object,
+  isLastPage: PropTypes.bool
 }
 
 export default Table

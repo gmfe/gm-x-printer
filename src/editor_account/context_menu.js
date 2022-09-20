@@ -1,6 +1,6 @@
+/* eslint-disable react/prop-types */
 import i18next from '../../locales'
 import React from 'react'
-import PropTypes from 'prop-types'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
@@ -59,7 +59,7 @@ class ContextMenu extends React.Component {
       editStore: { isAutoFilling }
     } = this.props
     const arr = name.split('.')
-    const { dataKey, subtotal } = this.props.editStore.config.contents[arr[2]]
+    const { subtotal } = this.props.editStore.config.contents[arr[2]]
     // const keyArr = dataKey.split('_')
 
     const isSubtotalActive = subtotal.show
