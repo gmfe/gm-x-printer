@@ -41,33 +41,37 @@ class EditorSpecialSetting extends React.Component {
 
   render() {
     const {
+      editStore,
       editStore: { config },
       addFields
     } = this.props
     const specialFields = addFields.specialFields || []
+    if (editStore.computedRegionIsTable) {
+      return (
+        <>
+          <Title title={i18next.t('配送单特殊配置')} />
+          <Flex alignCenter className='gm-padding-top-5'>
+            <div>{i18next.t('是否启用特殊配置')}：</div>
 
-    return (
-      <>
-        <Title title={i18next.t('配送单特殊配置')} />
-        <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('是否启用特殊配置')}：</div>
-
-          <Switch
-            checked={!!config.specialSettingType}
-            onChange={this.handleToggleSpecialSetting}
-          />
-        </Flex>
-        {!!config.specialSettingType && (
-          <Flex alignCenter column className='gm-padding-top-5'>
-            <Radio.Group
-              options={specialFields}
-              onChange={this.handleChange}
-              value={this.state.value}
+            <Switch
+              checked={!!config.specialSettingType}
+              onChange={this.handleToggleSpecialSetting}
             />
           </Flex>
-        )}
-      </>
-    )
+          {!!config.specialSettingType && (
+            <Flex alignCenter column className='gm-padding-top-5'>
+              <Radio.Group
+                options={specialFields}
+                onChange={this.handleChange}
+                value={this.state.value}
+              />
+            </Flex>
+          )}
+        </>
+      )
+    } else {
+      return null
+    }
   }
 }
 

@@ -66,23 +66,23 @@ class EditorStore {
 
   // 小写文案——每页合计
   @observable
-  page_small = '每页合计'
+  page_small = '小写：'
 
   // 大写文案——每页合计
   @observable
-  page_big = '大写'
+  page_big = '大写：'
 
   // 合计文案——整单合计
   @observable
-  order_total = '合计'
+  order_total = '整单合计'
 
   // 小写文案——整单合计
   @observable
-  order_small = '整单合计'
+  order_small = '小写：'
 
   // 大写文案——整单合计
   @observable
-  order_big = '大写'
+  order_big = '大写：'
 
   // 默认table的dataKey
   setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
@@ -644,7 +644,6 @@ class EditorStore {
       o => o === 'category',
       o => o === 'orders'
     ])
-
     this.config.contents[arr[2]].dataKey = newDataKey.join('_')
   }
 
@@ -1238,18 +1237,18 @@ class EditorStore {
         }
         set(config, { allOrderSummaryConfig: { ...init, ...modify } })
       }
-      if ('orderSummaryShow' in modify) {
-        // 切换的时候，要把对应table的多余空数据清掉
-        this.clearExtraTableData(config.dataKey)
-      }
+      // if ('orderSummaryShow' in modify) {
+      //   // 切换的时候，要把对应table的多余空数据清掉
+      //   this.clearExtraTableData(config.dataKey)
+      // }
 
       this.config = toJS(this.config)
     }
 
     // 如果只是勾选要展示的合计类目的选项，则不需要执行以下操作， 否则会重复清空数据
-    if (!('summaryOrderColumns' in modify && 'style' in modify)) {
-      this.setAutoFillingConfig(false)
-    }
+    // if (!('summaryOrderColumns' in modify && 'style' in modify)) {
+    //   this.setAutoFillingConfig(false)
+    // }
   }
 }
 

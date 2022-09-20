@@ -116,7 +116,6 @@ class SummarySetting extends React.Component {
       editStore?.computedTableSpecialConfig ?? {}
     const { showPageType, fields, pageFontSort } = summaryConfig
     const { page_total, page_small, page_big } = editStore
-
     // 由于初始末班没有summary 这个object，为了UI响应数据，只能这么写了
     const hasSummaryConfig = has(
       editStore.computedTableSpecialConfig,
@@ -228,7 +227,7 @@ class SummarySetting extends React.Component {
                   value={page_small}
                   onChange={this.handleSumName}
                   type='page_small'
-                  text='小写'
+                  text='*小写*'
                 />
 
                 <IsShowCheckBox
@@ -240,7 +239,7 @@ class SummarySetting extends React.Component {
                   value={page_big}
                   onChange={this.handleSumName}
                   type='page_big'
-                  text='大写'
+                  text='*大写*'
                 />
                 <ShowInputText
                   value={page_total}
