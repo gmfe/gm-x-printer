@@ -207,11 +207,19 @@ class Printer extends React.Component {
           let isLastPageHasTable = ''
           const hasTable = arr =>
             _.map(arr, item => item.type).includes('table')
-          // 整单合计开启后，仅在最后一页展现,存在最后一页刚好可能没有table的情况，so将整单合计放在倒数第二页的table表格里
+          // 判断条件比较复杂，整单合计开启后，仅在最后一页展现,存在最后一页刚好可能没有table的情况，so将整单合计放在倒数第二页的table表格里
+          // TODO:
           isLastPageHasTable = hasTable(pages?.[pagesLength])
             ? isLastPage
             : lastSecond && hasTable(pages?.[pagesLength - 1])
-
+          // if (hasTable(pages?.[pagesLength])) {
+          //   isLastPageHasTable = isLastPage
+          // } else if (!hasTable(pages?.[pagesLength])) {
+          //   isLastPageHasTable =
+          //     lastSecond && hasTable(pages?.[pagesLength - 1])
+          // } else {
+          //   isLastPageHasTable = false
+          // }
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
