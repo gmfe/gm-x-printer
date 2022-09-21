@@ -49,7 +49,6 @@ class Editor extends React.Component {
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
-
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -97,12 +96,7 @@ class Editor extends React.Component {
             {/* 自适应页面内容开关 */}
             <EditorAdaptive />
             <Gap height='5px' />
-            {/* 配送单特殊设置 */}
-            {!!addFields?.specialFields && (
-              <EditorSpacialSetting addFields={addFields} />
-            )}
             <Gap height='5px' />
-            <EditorPageSummary summaryFields={addFields.summaryFields} />
 
             <div id='gm-printer-tip' />
 

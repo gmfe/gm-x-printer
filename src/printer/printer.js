@@ -149,10 +149,12 @@ class Printer extends React.Component {
 
   renderBefore() {
     const { printerStore } = this.props
+    const isDeliverType = this.props?.config?.isDeliverType
     const { config } = printerStore
     return (
       <Page>
         <Header config={config.header} pageIndex={0} />
+
         {_.map(config.contents, (content, index) => {
           switch (content.type) {
             case 'table':
@@ -162,10 +164,17 @@ class Printer extends React.Component {
                 <Table
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
-                  config={content}
+                  config={
+                    isDeliverType
+                      ? config.contents.find(item =>
+                          item?.dataKey?.includes('orders')
+                        ) || {}
+                      : content
+                  }
                   range={{ begin: 0, end: list.length }}
                   pageIndex={0}
                   placeholder={`${i18next.t('区域')} ${index}`}
+                  isDeliverType={isDeliverType}
                 />
               )
 
@@ -189,18 +198,29 @@ class Printer extends React.Component {
 
   renderPage() {
     const { printerStore, isSomeSubtotalTr } = this.props
+    const isDeliverType = this.props?.config?.isDeliverType
+
     const {
       config,
       remainPageHeight,
       isAutoFilling,
       showCombineSkuDetail,
-      showIngredientDetail
+      showIngredientDetail,
+      pages
     } = printerStore
-
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
-          const isLastPage = i === printerStore.pages.length - 1
+          const pagesLength = pages.length - 1
+          const isLastPage = i === pagesLength // 最后一页
+          const lastSecond = i === pagesLength - 1 // 倒数第二页
+          let isLastPageHasTable = false
+          const hasTable = arr =>
+            _.map(arr, item => item.type).includes('table')
+          // 整单合计开启后，仅在最后一页展现,存在最后一页刚好可能没有table的情况，so将整单合计放在倒数第二页的table表格里
+          isLastPageHasTable = hasTable(pages?.[pagesLength])
+            ? isLastPage
+            : lastSecond && hasTable(pages?.[pagesLength - 1])
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
@@ -254,6 +274,8 @@ class Printer extends React.Component {
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
                             isSomeSubtotalTr={isSomeSubtotalTr}
+                            isLastPage={isLastPageHasTable}
+                            isDeliverType={isDeliverType}
                           />
                         )
                       }
@@ -262,7 +284,13 @@ class Printer extends React.Component {
                         <Table
                           key={`contents.table.${panel.index}.${ii}`}
                           name={`contents.table.${panel.index}`}
-                          config={config.contents[panel.index]}
+                          config={
+                            isDeliverType
+                              ? config.contents.find(item =>
+                                  item?.dataKey?.includes('orders')
+                                ) || {}
+                              : config.contents[panel.index]
+                          }
                           range={{
                             begin: panel.begin,
                             end: end
@@ -270,6 +298,8 @@ class Printer extends React.Component {
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
                           isSomeSubtotalTr={isSomeSubtotalTr}
+                          isLastPage={isLastPageHasTable}
+                          isDeliverType={isDeliverType}
                         />
                       )
                     }
@@ -306,7 +336,6 @@ class Printer extends React.Component {
   renderMerge() {
     const { printerStore } = this.props
     const { config } = printerStore
-
     return (
       <MergePage>
         <Header config={config.header} pageIndex={0} />
@@ -323,6 +352,7 @@ class Printer extends React.Component {
                   range={{ begin: 0, end: list.length }}
                   pageIndex={0}
                   placeholder={`${i18next.t('区域')} ${index}`}
+                  isDeliverType={this.props.config?.isDeliverType}
                 />
               )
 
