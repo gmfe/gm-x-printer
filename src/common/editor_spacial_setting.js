@@ -47,7 +47,7 @@ class EditorSpecialSetting extends React.Component {
     } = this.props
     const specialFields = addFields.specialFields || []
 
-    if (!editStore.computedRegionIsTable) return
+    if (!editStore.computedRegionIsTable) return null
     return (
       <>
         <Title title={i18next.t('配送单特殊配置')} />
