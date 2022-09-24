@@ -98,13 +98,13 @@ class Editor extends React.Component {
             <EditorAdaptive />
             <Gap height='5px' />
             {/* 配送单特殊设置 */}
-            {!!addFields?.specialFields && (
+            {/* {!!addFields?.specialFields && (
               <EditorSpacialSetting addFields={addFields} />
             )}
             <Gap height='5px' />
             <EditorPageSummary summaryFields={addFields.summaryFields} />
 
-            <div id='gm-printer-tip' />
+            <div id='gm-printer-tip' /> */}
 
             <div id='gm-printer-modal' />
           </div>
