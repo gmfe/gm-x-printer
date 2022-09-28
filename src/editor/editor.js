@@ -49,7 +49,6 @@ class Editor extends React.Component {
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
-
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -102,8 +101,11 @@ class Editor extends React.Component {
               <EditorSpacialSetting addFields={addFields} />
             )}
             <Gap height='5px' />
-            <EditorPageSummary summaryFields={addFields.summaryFields} />
-
+            {!!addFields?.orderPerSummaryFields && (
+              <EditorPageSummary
+                orderPerSummaryFields={addFields.orderPerSummaryFields}
+              />
+            )}
             <div id='gm-printer-tip' />
 
             <div id='gm-printer-modal' />

@@ -2,7 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 import _ from 'lodash'
-import { borderStyleList } from '../config'
+// eslint-disable-next-line import/named
+import { borderStyleList, TYPE_ENUM } from '../config'
 import { Flex, Tip, ToolTip } from '../components'
 import { Request } from 'gm-util'
 import i18next from '../../locales'
@@ -594,6 +595,7 @@ class ChangeCapCheckbox extends React.Component {
               onChange={e => {
                 const field = value
                   .match(/{{([\s\S].+?)}}/g)[0]
+                  // eslint-disable-next-line no-useless-escape
                   ?.replace(/[\{\}]/g, '')
                 const [preText, subText] = value.split(`{{${field}}}`)
                 const newField = field.includes('_大写')
@@ -616,7 +618,11 @@ class ChangeCapCheckbox extends React.Component {
     }
   }
 }
-
+ChangeCapCheckbox.propTypes = {
+  value: PropTypes.string,
+  style: PropTypes.object,
+  onChange: PropTypes.func
+}
 const SubTitle = ({ text }) => (
   <div
     style={{
@@ -696,6 +702,52 @@ TipInfo.propTypes = {
   color: PropTypes.string
 }
 
+const IsShowCheckBox = props => {
+  const { type, checked, onChange } = props
+  const text = TYPE_ENUM[type]
+  return (
+    <>
+      <Flex style={{ margin: '5px 0 5px 0' }}>
+        <Flex alignCenter>
+          <input type='checkbox' checked={checked} onChange={onChange} />
+        </Flex>
+        <Flex>&nbsp;{text}</Flex>
+      </Flex>
+    </>
+  )
+}
+IsShowCheckBox.propTypes = {
+  onChange: PropTypes.func,
+  checked: PropTypes.bool,
+  type: PropTypes.string
+}
+
+const ShowInputText = props => {
+  const { value, onChange, text, type } = props
+
+  const handleChange = e => {
+    if (typeof onChange === 'function') onChange(type, e)
+  }
+  return (
+    <Flex className='gm-padding-top-5'>
+      <Flex alignCenter>{text}文案：</Flex>
+      <Flex alignCenter>
+        <input
+          className='gm-printer-edit-input-custom'
+          type='text'
+          value={value}
+          onChange={handleChange}
+        />
+      </Flex>
+    </Flex>
+  )
+}
+ShowInputText.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  text: PropTypes.string,
+  type: PropTypes.string
+}
 export {
   Text,
   Textarea,
@@ -715,5 +767,7 @@ export {
   Title,
   Gap,
   FieldBtn,
-  TipInfo
+  TipInfo,
+  IsShowCheckBox,
+  ShowInputText
 }
