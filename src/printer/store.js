@@ -16,6 +16,10 @@ const price = (n, f = 2) => Big(n || 0).toFixed(f)
 const diyRandom = (a, b, c = 2) => {
   return (a + Math.random() * (b - a)).toFixed(c)
 }
+const parseFloat = a => {
+  if (a === '') return ''
+  return parseFloat(+a)
+}
 
 /** @description 这个使用来计算的 只能debugger一层一层看  我真的是醉掉😤 */
 class PrinterStore {
@@ -699,7 +703,8 @@ class PrinterStore {
         [i18next.t('当前页码')]: pageIndex + 1,
         [i18next.t('页码总数')]: this.pages.length,
         price: price, // 提供一个价格处理函数
-        diyRandom: diyRandom // 提供一个计算随机数的函数
+        diyRandom: diyRandom, // 提供一个计算随机数的函数
+        parseFloat: parseFloat // 提供一个计算随机数的函数
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
