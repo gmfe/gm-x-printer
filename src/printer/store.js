@@ -16,7 +16,7 @@ const price = (n, f = 2) => Big(n || 0).toFixed(f)
 const diyRandom = (a, b, c = 2) => {
   return (a + Math.random() * (b - a)).toFixed(c)
 }
-const parseFloat = a => {
+const parseFloatFun = a => {
   if (a === '') return ''
   return parseFloat(+a)
 }
@@ -684,7 +684,8 @@ class PrinterStore {
         [i18next.t('当前页码')]: pageIndex + 1,
         [i18next.t('页码总数')]: this.pages.length,
         price: price,
-        diyRandom: diyRandom // 提供一个计算随机数的函数
+        diyRandom: diyRandom, // 提供一个计算随机数的函数
+        parseFloatFun: parseFloatFun
       })
     } catch (err) {
       return text
@@ -704,7 +705,7 @@ class PrinterStore {
         [i18next.t('页码总数')]: this.pages.length,
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
-        parseFloat: parseFloat // 提供一个计算随机数的函数
+        parseFloatFun: parseFloatFun
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -730,7 +731,7 @@ class PrinterStore {
       })({
         [i18next.t('列')]: item,
         price: price, // 提供一个价格处理函数
-        diyRandom: diyRandom // 提供一个parseFloat函数
+        diyRandom: diyRandom // 提供一个计算随机数的函数
       })
     } catch (err) {
       return text
