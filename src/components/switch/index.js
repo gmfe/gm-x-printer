@@ -12,7 +12,7 @@ class Switch extends React.Component {
       labelWidth: null,
       isReady: false
     }
-    this.handleChange = ::this.handleChange
+    this.handleChange = this.handleChange.bind(this)
   }
 
   componentDidMount() {
