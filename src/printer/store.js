@@ -12,12 +12,17 @@ import _ from 'lodash'
 import Big from 'big.js'
 
 export const TR_BASE_HEIGHT = 23
-const price = (n, f = 2) => Big(n || 0).toFixed(f)
+const price = (n, f = 2) => {
+  // 自定义函数支持多栏
+  if (n === undefined) return ''
+  return Big(n || 0).toFixed(f)
+}
 const diyRandom = (a, b, c = 2) => {
   return (a + Math.random() * (b - a)).toFixed(c)
 }
 const parseFloatFun = a => {
-  if (a === '') return ''
+  // 自定义函数支持多栏
+  if (a === '' || a === undefined) return ''
   return parseFloat(+a)
 }
 
