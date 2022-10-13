@@ -1,6 +1,6 @@
 {
   "name": "gm-x-printer",
-  "version": "1.6.13",
+  "version": "1.7.0-beta.4",
   "description": "diy printer",
   "main": "src/index.js",
   "scripts": {
@@ -9,8 +9,8 @@
     "build": "webpack -p",
     "locale": "i18n-m sync src/",
     "publish-latest": "npm publish --force-publish --registry https://registry.npmjs.org/",
-    "publish-beta": "npm publish --force-publish --dist-tag=beta --preid=beta --registry https://registry.npmjs.org/",
-    "publish-alpha": "npm publish --force-publish --dist-tag=alpha --preid=alpha --registry https://registry.npmjs.org/"
+    "publish-beta": "npm publish --force-publish --tag beta --preid=beta --registry https://registry.npmjs.org/",
+    "publish-alpha": "npm publish --force-publish --tag alpha --preid=alpha --registry https://registry.npmjs.org/"
   },
   "lint-staged": {
     "./src/**/*.js": [

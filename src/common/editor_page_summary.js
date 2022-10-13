@@ -556,13 +556,14 @@ class SummarySetting extends React.Component {
   }
 
   render() {
+    const { hideOrderSummary } = this.props
     return (
       <div>
         {/* 每页合计 */}
         {this.renderPageSummary()}
         <div style={{ height: 5, width: '100%' }} />
         {/* 整单合计 */}
-        {this.renderOrderSummary()}
+        {!hideOrderSummary && this.renderOrderSummary()}
       </div>
     )
   }
@@ -570,16 +571,23 @@ class SummarySetting extends React.Component {
 
 SummarySetting.propTypes = {
   editStore: PropTypes.object,
-  orderPerSummaryFields: PropTypes.array.isRequired
+  orderPerSummaryFields: PropTypes.array.isRequired,
+  /** 是否隐藏 “整单合计” */
+  hideOrderSummary: PropTypes.bool
 }
 
 @inject('editStore')
 @observer
 class EditorSummary extends React.Component {
   render() {
-    const { editStore, orderPerSummaryFields } = this.props
+    const { editStore, orderPerSummaryFields, hideOrderSummary } = this.props
     if (editStore.computedRegionIsTable) {
-      return <SummarySetting orderPerSummaryFields={orderPerSummaryFields} />
+      return (
+        <SummarySetting
+          orderPerSummaryFields={orderPerSummaryFields}
+          hideOrderSummary={hideOrderSummary}
+        />
+      )
     } else {
       return null
     }
@@ -588,7 +596,9 @@ class EditorSummary extends React.Component {
 
 EditorSummary.propTypes = {
   editStore: PropTypes.object,
-  orderPerSummaryFields: PropTypes.array.isRequired
+  orderPerSummaryFields: PropTypes.array.isRequired,
+  /** 是否隐藏 “整单合计” */
+  hideOrderSummary: PropTypes.bool
 }
 
 export default EditorSummary

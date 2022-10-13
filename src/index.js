@@ -14,6 +14,7 @@ import EditorCannibalize from './editor_cannibalize'
 import EditorProduction from './editor_production'
 import EditorTicket from './editor_ticket'
 import EditorMaterialRequisition from './editor_material_requisition'
+import EditorAfterSales from './editor_after_sales'
 import { BatchPrinter, doBatchPrint, doPrint, Printer, getCSS } from './printer'
 import { MULTI_SUFFIX, DiyTimeType } from './config'
 
@@ -35,6 +36,7 @@ export {
   EditorProduction,
   EditorTicket,
   EditorMaterialRequisition,
+  EditorAfterSales,
   Printer,
   BatchPrinter,
   doPrint,

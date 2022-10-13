@@ -792,6 +792,11 @@ class EditorStore {
     this.selected = null
   }
 
+  /**
+   * @param {string} name 为绑定在 DOM 上的 data-name
+   * @param {0|1} diff 0 表示向上插入、1 表示向下插入
+   * @param {string} type 插入元素的类型（为表格、区域）
+   */
   @action
   addContentByDiff(name, diff, type) {
     const arr = name.split('.')
@@ -799,6 +804,12 @@ class EditorStore {
       this.addContent(name, ~~arr[2] + diff, type)
     } else if (arr.length === 5 && arr[3] === 'column') {
       this.addContent(name, ~~arr[2] + diff, type)
+    }
+    // 向上插入内容时，需要清空当前的选择标记，否则在渲染表格时
+    // 因索引偏移导致读取配置错误。
+    // 主要场景：表格包含每页合计功能时，选中此表格，并向上插入区块。
+    if (diff === 0) {
+      this.setSelectedRegion(null)
     }
   }
 

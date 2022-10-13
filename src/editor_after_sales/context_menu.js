@@ -1,0 +1,40 @@
+import i18next from '../../locales'
+import React from 'react'
+import CommonContextMenu from '../common/common_context_menu'
+import { inject, observer } from 'mobx-react'
+import { Printer } from '../printer'
+
+const blockTypeList = [
+  { value: 'rise', text: i18next.t('插入抬头') },
+  { value: '', text: i18next.t('插入文本') },
+  { value: 'line', text: i18next.t('插入线条') },
+  { value: 'image', text: i18next.t('插入图片') }
+]
+
+@inject(stores => ({
+  editStore: stores.editStore,
+  mockData: stores.mockData
+}))
+@observer
+class ContextMenu extends React.Component {
+  render() {
+    const { editStore, mockData, uploadQiniuImage } = this.props
+    return (
+      <CommonContextMenu
+        insertBlockList={blockTypeList}
+        uploadQiniuImage={uploadQiniuImage}
+      >
+        <Printer
+          key={editStore.computedPrinterKey}
+          selected={editStore.selected}
+          selectedRegion={editStore.selectedRegion}
+          config={editStore.config}
+          data={mockData}
+          updateData={editStore.updateData}
+        />
+      </CommonContextMenu>
+    )
+  }
+}
+
+export default ContextMenu
