@@ -130,14 +130,38 @@ class Table extends React.Component {
       const colNumber = getMultiNumber(dataKey)
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
-        const columnsI = newColumns.map((val, index) => ({
-          ...val,
-          index,
-          text: val.text.replace(
-            /{{列\.([^{{]+)}}/g,
-            (s, s1) => `{{列.${s1}${MULTI_SUFFIX}${colNum}}}`
-          ) // {{列.xx}} => {{列.xxMULTI_SUFFIXi}}
-        }))
+        const columnsI = newColumns.map((val, index) => {
+          const data = {
+            ...val,
+            index,
+            text: val.text.replace(
+              // 解释下正则
+              // < (price\()? > ----  匹配< price( >函数  < ？>代表0-1个
+              // < [^{{]+ >     ----  除了{{ 的其他值      < + >代表 至少一个
+              /{{(price\(|parseFloatFun\()?列\.([^{{]+)}}/g,
+              // s {{列.序号}} s1 undefined s2 序号
+              // s--{{price(列.套账下单金额)}} s1--price(   s2---套账下单金额)
+              (s, s1, s2) => {
+                if (s1) {
+                  // 有price或者parseFloatFun函数插进来， 匹配字符串并添加后缀，生成三栏或者双栏数据
+                  // {{price(列.出库金额,1)}} ---》{{price(列.出库金额_MULTI_SUFFIX,1)}}
+                  const _s = s.replace(
+                    /[\u4e00-\u9fa5]+\.[\u4e00-\u9fa5]*[_]?[\u4e00-\u9fa5]*/g,
+                    match => `${match}${MULTI_SUFFIX}${colNum}`
+                  )
+                  return _s
+                } else {
+                  return `{{列.${s2}${MULTI_SUFFIX}${colNum}}}`
+                }
+              }
+            )
+          }
+          // 多栏商品的明细取 __details_MULTI_SUFFIX
+          if (val.specialDetailsKey)
+            data.specialDetailsKey =
+              val.specialDetailsKey + `${MULTI_SUFFIX}${colNum}`
+          return data
+        })
         res = res.concat(columnsI)
       }
       return res
