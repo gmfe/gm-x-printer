@@ -134,14 +134,14 @@ const getTableData = (data, type) => {
   const sumMoney = Big(
     _.reduce(data.details, (a, b) => a + parseFloat(b.money), 0)
   ).toFixed(2)
-  // const sumQuantity = _.reduce(data.details, (a, b) => a + b.quantity, 0)
+  const sumQuantity = _.reduce(data.details, (a, b) => a + b.quantity, 0)
   const kOrdersMulti = generateMultiData(ordinary)
   const kOrdersMultiVertical = generateMultiData2(ordinary)
-  // const skuTotalObj = {
-  //   _special: {
-  //     text: `${i18next.t('入库数小计')}：${sumQuantity}`
-  //   }
-  // }
+  const skuTotalObj = {
+    _special: {
+      text: `${i18next.t('入库数小计')}：${sumQuantity}`
+    }
+  }
   const sumMoneyObj = {
     _special: {
       text: `${i18next.t('入库金额小计')}：${sumMoney}`,

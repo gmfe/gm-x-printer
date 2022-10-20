@@ -40,12 +40,12 @@ class ContextMenu extends React.Component {
           {i18next.t('双栏商品')}
         </div>
         {/* 入库单不需要这个 */}
-        {/* <div
+        <div
           onClick={this.handleChangeTableDataKey.bind(this, 'quantity', name)}
           className={isQuantityActive ? 'active' : ''}
         >
           {i18next.t('入库数小计')}
-        </div> */}
+        </div>
         <div
           onClick={this.handleChangeTableDataKey.bind(this, 'money', name)}
           className={isMoneyActive ? 'active' : ''}
