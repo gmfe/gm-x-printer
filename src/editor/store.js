@@ -1,5 +1,6 @@
 import EditorStore from '../common/editor_store'
 import i18next from '../../locales'
+import { action } from 'mobx'
 
 class Store extends EditorStore {
   // 复写父类方法
@@ -256,6 +257,94 @@ class Store extends EditorStore {
         break
       }
       default:
+    }
+  }
+
+  @action.bound
+  addContent(name, index, type) {
+    const arr = name.split('.')
+    // 添加之前清除selected,否则content改变之后,computedSelectedSource会计算错误
+    this.selected = null
+    if ((arr.length === 3 || arr.length === 5) && arr[0] === 'contents') {
+      if (index >= 0 && index <= this.config.contents.length) {
+        if (type === 'table') {
+          this.config.contents.splice(index, 0, {
+            className: '',
+            type: 'table',
+            dataKey: 'orders',
+            subtotal: {
+              show: false,
+              needLowerCase: true,
+              needUpperCase: true,
+              order_needLowerCase: true,
+              order_needUpperCase: true
+            },
+            summaryConfig: {
+              pageSummaryShow: false,
+              totalSummaryShow: false,
+              style: {
+                textAlign: 'center',
+                fontSize: '12px'
+              },
+              summaryColumns: [],
+              pageSummaryText: '合计',
+              showPageType: 'row',
+              showOrderType: 'row',
+              chosePageSummaryField: '商品销售额',
+              fields: [{ name: '{{列.商品销售额}}', valueField: '商品销售额' }],
+              pageUpperCaseText: '大写：',
+              pageLowerCaseText: '小写：',
+              pageFontSort: 'big'
+            },
+            allOrderSummaryConfig: {
+              fields: [{ name: '{{列.商品销售额}}', valueField: '商品销售额' }],
+              style: {
+                textAlign: 'center',
+                fontSize: '12px'
+              },
+              orderSummaryShow: false,
+              totalSummaryShow: false,
+              summaryOrderColumns: [],
+              orderSummaryText: '整单合计',
+              showOrderType: 'row',
+              orderUpperCaseText: '大写：',
+              orderLowerCaseText: '小写：',
+              orderFontSort: 'big',
+              isShowOrderSummaryPer: false
+            },
+            columns: [
+              {
+                head: i18next.t('序号'),
+                headStyle: {
+                  textAlign: 'center'
+                },
+                style: {
+                  textAlign: 'center'
+                },
+                text: '{{列.序号}}'
+              },
+              {
+                head: i18next.t('表头'),
+                headStyle: {
+                  textAlign: 'center',
+                  minWidth: '30px'
+                },
+                text: i18next.t('内容'),
+                style: {
+                  textAlign: 'center'
+                }
+              }
+            ]
+          })
+        } else {
+          this.config.contents.splice(index, 0, {
+            blocks: [],
+            style: {
+              height: '100px'
+            }
+          })
+        }
+      }
     }
   }
 }

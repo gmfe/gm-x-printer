@@ -164,13 +164,7 @@ class Printer extends React.Component {
                 <Table
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
-                  config={
-                    isDeliverType
-                      ? config.contents.find(item =>
-                          item?.dataKey?.includes('orders')
-                        ) || {}
-                      : content
-                  }
+                  config={content}
                   range={{ begin: 0, end: list.length }}
                   pageIndex={0}
                   placeholder={`${i18next.t('区域')} ${index}`}
@@ -284,13 +278,7 @@ class Printer extends React.Component {
                         <Table
                           key={`contents.table.${panel.index}.${ii}`}
                           name={`contents.table.${panel.index}`}
-                          config={
-                            isDeliverType
-                              ? config.contents.find(item =>
-                                  item?.dataKey?.includes('orders')
-                                ) || {}
-                              : config.contents[panel.index]
-                          }
+                          config={config.contents[panel.index]}
                           range={{
                             begin: panel.begin,
                             end: end

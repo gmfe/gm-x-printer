@@ -31,6 +31,7 @@ declare module 'gm-x-printer' {
   class EditorPurchase<T extends EditorProps> extends React.Component<T, any> {}
   class EditorSettle<T extends EditorProps> extends React.Component<T, any> {}
   class EditorSaleMenus<T extends EditorProps> extends React.Component<T, any> {}
+  class EditorAfterSales<T extends EditorProps> extends React.Component<T, any> {}
 
   class EditorCannibalize<T extends EditorProps> extends React.Component<
     T,
@@ -85,6 +86,7 @@ declare module 'gm-x-printer' {
     Printer,
     BatchPrinter,
     EditorMaterialRequisition,
+    EditorAfterSales,
     MULTI_SUFFIX,
     insertCSS,
     getCSS,
