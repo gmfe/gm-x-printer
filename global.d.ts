@@ -30,7 +30,10 @@ declare module 'gm-x-printer' {
   class EditorStockOut<T extends EditorProps> extends React.Component<T, any> {}
   class EditorPurchase<T extends EditorProps> extends React.Component<T, any> {}
   class EditorSettle<T extends EditorProps> extends React.Component<T, any> {}
-  class EditorSaleMenus<T extends EditorProps> extends React.Component<T, any> {}
+  class EditorSaleMenus<T extends (EditorProps & {
+    /** 是否隐藏组合商品设置 */
+    hideCombineSkuSetting?: boolean
+  })> extends React.Component<T, any> {}
   class EditorAfterSales<T extends EditorProps> extends React.Component<T, any> {}
 
   class EditorCannibalize<T extends EditorProps> extends React.Component<

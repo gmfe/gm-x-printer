@@ -46,7 +46,8 @@ class Editor extends React.Component {
       showEditor,
       addFields,
       showNewDate,
-      uploadQiniuImage
+      uploadQiniuImage,
+      hideCombineSkuSetting
     } = this.props
 
     return (
@@ -84,7 +85,10 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
             <Gap height='5px' />
-            <EditorSpecialTable addFields={addFields} />
+            <EditorSpecialTable
+              addFields={addFields}
+              hideCombineSkuSetting={hideCombineSkuSetting}
+            />
             <div id='gm-printer-tip' />
             <div id='gm-printer-modal' />
           </div>
@@ -104,7 +108,8 @@ Editor.propTypes = {
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
-  showNewDate: PropTypes.bool
+  showNewDate: PropTypes.bool,
+  hideCombineSkuSetting: PropTypes.bool
 }
 
 Editor.deaultProps = {
