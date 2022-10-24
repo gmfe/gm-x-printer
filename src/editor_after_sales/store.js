@@ -131,7 +131,7 @@ class Store extends EditorStore {
                   width: '85px',
                   wordBreak: 'break-all'
                 },
-                text: '{{列.销售单价}}/{{列.下单单位}}',
+                text: '{{列.销售单价}}元/{{列.下单单位}}',
                 style: {
                   textAlign: 'center',
                   wordBreak: 'break-all'
@@ -157,7 +157,7 @@ class Store extends EditorStore {
                   width: '85px',
                   wordBreak: 'break-all'
                 },
-                text: '{{列.退款单价}}/{{列.下单单位}}',
+                text: `{{列.退款单价}}元/{{列.下单单位}}`,
                 style: {
                   textAlign: 'center',
                   wordBreak: 'break-all'
