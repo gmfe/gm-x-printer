@@ -1,7 +1,7 @@
 import i18next from '../locales'
 export const pageTypeMap = {
   A4: {
-    name: 'A4',
+    name: 'A4(210x297)',
     size: {
       width: '210mm',
       height: '297mm'
@@ -14,7 +14,7 @@ export const pageTypeMap = {
     }
   },
   A5: {
-    name: 'A5',
+    name: 'A5(148x210)',
     size: {
       width: '148mm',
       height: '210mm'
@@ -27,7 +27,7 @@ export const pageTypeMap = {
     }
   },
   'A4/2': {
-    name: i18next.t('二分纸'),
+    name: i18next.t('二分纸(210x140)'),
     size: {
       width: '210mm',
       height: '140mm'
@@ -40,7 +40,7 @@ export const pageTypeMap = {
     }
   },
   'A4/3': {
-    name: i18next.t('三分纸'),
+    name: i18next.t('三分纸(210x93)'),
     size: {
       width: '210mm',
       height: '93mm'
