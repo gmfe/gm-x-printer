@@ -14,7 +14,7 @@ import Big from 'big.js'
 export const TR_BASE_HEIGHT = 23
 const price = (n, f = 2) => {
   // 自定义函数支持多栏
-  if (n === undefined) return ''
+  if (n === undefined || n === '') return ''
   return Big(n || 0).toFixed(f)
 }
 const diyRandom = (a, b, c = 2) => {
