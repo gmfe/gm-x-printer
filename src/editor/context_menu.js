@@ -79,6 +79,8 @@ class ContextMenu extends React.Component {
 
     const isCombine = keyArr.includes('combination')
 
+    const isfakeOutstockPrice = keyArr.includes('fake')
+
     return (
       <>
         <div
@@ -89,12 +91,24 @@ class ContextMenu extends React.Component {
         </div>
         {/* 组合商品没做商品分类 */}
         {!isCombine && (
-          <div
-            onClick={this.handleChangeTableDataKey.bind(this, 'category', name)}
-            className={isCategoryActive ? 'active' : ''}
-          >
-            {i18next.t('商品分类')}
-          </div>
+          <>
+            <div
+              onClick={this.handleChangeTableDataKey.bind(
+                this,
+                'category',
+                name
+              )}
+              className={isCategoryActive ? 'active' : ''}
+            >
+              {i18next.t('分类小计(出库金额)')}
+            </div>
+            <div
+              onClick={this.handleChangeTableDataKey.bind(this, 'fake', name)}
+              className={isfakeOutstockPrice ? 'active' : ''}
+            >
+              {i18next.t('分类小计(套账出库金额)')}
+            </div>
+          </>
         )}
         <div
           onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}

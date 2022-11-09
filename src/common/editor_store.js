@@ -642,6 +642,7 @@ class EditorStore {
     newDataKey = _.sortBy(newDataKey, [
       o => o === 'multi',
       o => o === 'category',
+      o => o === 'fake',
       o => o === 'orders'
     ])
     this.config.contents[arr[2]].dataKey = newDataKey.join('_')
