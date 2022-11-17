@@ -85,11 +85,12 @@ class EditorField extends React.Component {
               style={style}
               onChange={this.handleChangeBlock.bind(this, 'style')}
             />
-            <Separator />
+            {/* 非表格字段不显示左中右 */}
+            {/* <Separator />
             <TextAlign
               style={style}
               onChange={this.handleChangeBlock.bind(this, 'style')}
-            />
+            /> */}
 
             <ChangeCapCheckbox
               style={style}
