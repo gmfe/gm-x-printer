@@ -292,7 +292,13 @@ class PrinterStore {
         tableCount++
         // 表格原始的高度和宽度信息
         const table = this.tablesInfo[`contents.table.${index}`]
-        const { subtotal, dataKey, summaryConfig, overallOrder } = content
+        const {
+          subtotal,
+          dataKey,
+          /** 本页小计 or 每页合计 */
+          summaryConfig,
+          overallOrder
+        } = content
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
         // 如果显示整单合计,那么table高度多预留一行高度
@@ -300,10 +306,9 @@ class PrinterStore {
           ? getOverallOrderTrHeight(overallOrder)
           : 0
         // 如果每页合计(新的),那么table高度多预留一行高度
-        const pageSummaryTrHeight =
-          summaryConfig?.pageSummaryShow && !isMultiTable(dataKey) // 双栏table没有每页合计
-            ? getSumTrHeight(summaryConfig)
-            : 0
+        const pageSummaryTrHeight = summaryConfig?.pageSummaryShow
+          ? getSumTrHeight(summaryConfig)
+          : 0
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
           table.head.height +
@@ -333,8 +338,6 @@ class PrinterStore {
           let currentTableHeight = allTableHaveThisHeight
           // 表格有数据,添加[每个表格都具有的高度]
           currentPageHeight += allTableHaveThisHeight
-          /** 当前table剩余的高度 */
-          let currentRemainTableHeight = 0
           /** 去最小的tr高度，用于下面的计算compare,(避免特殊情况：一般来说最小tr——height = 23, 比23还小的不考虑计算) */
           const minHeight = Math.max(getArrayMid(heights), 23)
 
@@ -345,9 +348,14 @@ class PrinterStore {
             currentPageHeight += heights[end]
             // 当前页没有多余空间
             if (currentTableHeight > pageAccomodateTableHeight) {
-              currentRemainTableHeight = +Big(pageAccomodateTableHeight)
+              /** 正是因为添加了这一行，所以超过了 */
+              const overHeight = heights[end]
+              // 因为超过，所以要退回上一个
+              end--
+              /** 当前页table渲染完后剩余的高度 */
+              const currentRemainTableHeight = +Big(pageAccomodateTableHeight)
                 .minus(currentTableHeight)
-                .plus(heights[end])
+                .plus(overHeight)
 
               /**
                * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
@@ -356,8 +364,8 @@ class PrinterStore {
                */
               if (
                 (currentRemainTableHeight / minHeight > 1.5 &&
-                  heights[end] / currentRemainTableHeight > 1) ||
-                heights[end] > pageAccomodateTableHeight
+                  overHeight / currentRemainTableHeight > 1) ||
+                overHeight > pageAccomodateTableHeight
               ) {
                 if (currentRemainTableHeight >= 23) {
                   const detailsPageHeight = this.computedData(
@@ -484,7 +492,12 @@ class PrinterStore {
         // 表格原始的高度和宽度信息
         const table = this.tablesInfo[`contents.table.${index}`]
 
-        const { subtotal, dataKey, summaryConfig } = content
+        const {
+          subtotal,
+          dataKey,
+          /** 本页小计 or 每页合计 */
+          summaryConfig
+        } = content
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
         // 如果每页合计(新的),那么table高度多预留一行高度
