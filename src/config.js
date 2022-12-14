@@ -154,6 +154,11 @@ export const DiyTimeType = [
     type: '时间',
     text: '格式“19:00:00"，输入“单据日期：{{单据日期_时间}}"；',
     format: 'HH:mm:ss'
+  },
+  {
+    type: '日期_星期',
+    text: '格式“2022-01-01 星期六”，输入“单据日期：{{单据日期_日期_星期}}”；',
+    format: 'YYYY-MM-DD dddd'
   }
 ]
 
