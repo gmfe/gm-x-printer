@@ -4803,10 +4803,10 @@ gm-svg@^0.3.0:
   resolved "https://registry.yarnpkg.com/gm-svg/-/gm-svg-0.3.23.tgz#052e0c32d08a106e361b7b7ef89afc0c1276646d"
   integrity sha512-njmYX5K5pNpcxWqSkDMXQ8mPnriQAhNpTxvcdA/yrDrW/MQDxPvVYL/c+wV+H6bqk/5xhdWA1xJu595aR5UNPg==
 
-gm-util@^5.12.2:
-  version "5.12.3"
-  resolved "https://registry.yarnpkg.com/gm-util/-/gm-util-5.12.3.tgz#e0effd09b38d91e22d4b09d31f6a431ba1bbca9c"
-  integrity sha512-oymrzYo5MeU+iI7K3pOS2aNKpDjHVdRULgre24zNTIFrrD8ljm3deTm2cefpDRIOkH/A5vEOjqW39xTzR9BgnA==
+gm-util@^5.12.6:
+  version "5.12.6"
+  resolved "https://registry.npmmirror.com/gm-util/-/gm-util-5.12.6.tgz#6d307c1b4638165dcd4f2e422fe1df628a82b586"
+  integrity sha512-yAlyRQA1nk2y1b/pnV3fg48V2rJJl5ZUgOj/COT+GWtdGy6h+uYXKbPeCjFCFo6EU1ZMtz7AiniIRh8kQpVZdA==
 
 gm-webpack@^2.2.1:
   version "2.2.4"

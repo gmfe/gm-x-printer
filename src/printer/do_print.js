@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import Printer from './printer'
 import getCSS from './get_css'
 import BatchPrinter from './batch_printer'
-import { isZoom } from 'gm-util'
+import { isZoom2 } from 'gm-util'
 import { afterImgAndSvgLoaded } from '../util'
 
 const printerId = '_gm-printer_' + Math.random()
@@ -11,9 +11,9 @@ let $printer = window.document.getElementById(printerId)
 
 function init({ isTest, isTipZoom = true }) {
   isTipZoom &&
-    isZoom() &&
+    isZoom2() &&
     window.alert(
-      '检测您的浏览器使用了缩放,为了避免影响打印布局,请重置缩放到100%后再进行打印'
+      '检测您的浏览器使用了缩放,为了避免影响打印布局,请使用快捷键 ctrl + 0 重置缩放到100%后再进行打印'
     )
   if (!$printer) {
     $printer = window.document.createElement('iframe')
