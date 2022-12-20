@@ -10,36 +10,48 @@ class Dialog extends React.Component {
   }
 
   handleOK = () => {
-    this.props.onOK().then(() => {
-      Dialog.hide()
-    }, (err) => {
-      console.error(err)
-    })
+    const { onOK } = this.props
+    Promise.resolve(onOK()).then(
+      () => {
+        Dialog.hide()
+      },
+      err => {
+        console.error(err)
+      }
+    )
   }
 
-  render () {
+  render() {
     const { children, title } = this.props
 
     return (
       <div>
-        <div className='gm-modal-mask'/>
+        <div className='gm-modal-mask' />
         <div className='gm-modal gm-animated gm-animated-fade-in-bottom gm-dialog gm-dialog-confirm'>
           <div className='gm-modal-dialog'>
-            <button onClick={() => { Dialog.hide() }} type='button' class='close gm-modal-close'>
+            <button
+              onClick={() => {
+                Dialog.hide()
+              }}
+              type='button'
+              className='close gm-modal-close'
+            >
               <span>×</span>
             </button>
             <div className='gm-modal-title-wrap'>
-              <div className='gm-modal-title'>
-                {title}
-              </div>
+              <div className='gm-modal-title'>{title}</div>
             </div>
             <div className='gm-modal-content'>
               {children}
-              <div class='gm-gap-10'/>
+              <div className='gm-gap-10' />
               <div className='text-right'>
-                <button onClick={this.handleCancel} className='btn btn-default'>{i18next.t('取消')}</button>
-                <div class='gm-gap-10'/>
-                <button onClick={this.handleOK} className='btn btn-primary'>{i18next.t('确定')}</button>
+                <button onClick={this.handleCancel} className='btn btn-default'>
+                  {i18next.t('取消')}
+                </button>
+                <div className='gm-gap-10' />
+                <button onClick={this.handleOK} className='btn btn-primary'>
+                  {i18next.t('确定')}
+                </button>
               </div>
             </div>
           </div>
@@ -50,11 +62,18 @@ class Dialog extends React.Component {
 }
 
 Dialog.render = ({ title, children, onOK, onCancel }) => {
-  ReactDOM.render(<Dialog title={title} onOK={onOK} onCancel={onCancel}>{children}</Dialog>, window.shadowRoot.getElementById('gm-printer-modal'))
+  ReactDOM.render(
+    <Dialog title={title} onOK={onOK} onCancel={onCancel}>
+      {children}
+    </Dialog>,
+    window.shadowRoot.getElementById('gm-printer-modal')
+  )
 }
 
 Dialog.hide = () => {
-  ReactDOM.unmountComponentAtNode(window.shadowRoot.getElementById('gm-printer-modal'))
+  ReactDOM.unmountComponentAtNode(
+    window.shadowRoot.getElementById('gm-printer-modal')
+  )
 }
 
 Dialog.propTypes = {
