@@ -466,7 +466,9 @@ class PrinterStore {
     }
     this.pages.push(page)
 
-    this.remainPageHeight = +Big(this.pageHeight - currentPageHeight).toFixed(0)
+    this.remainPageHeight = +Big(
+      this.pageHeight - currentPageHeight || 0
+    ).toFixed(0)
   }
 
   @action
