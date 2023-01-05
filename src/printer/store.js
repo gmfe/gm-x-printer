@@ -13,6 +13,10 @@ import Big from 'big.js'
 
 export const TR_BASE_HEIGHT = 23
 const price = (n, f = 2) => {
+  /** 有些价格会有...,传给Big会报错，那么替换掉 */
+  if (typeof n === 'string') {
+    n = n.replace(/\.+$/, '')
+  }
   // 自定义函数支持多栏
   if (n === undefined || n === '') return ''
   return Big(n || 0).toFixed(f)
