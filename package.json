@@ -10,8 +10,7 @@
     "locale": "i18n-m sync src/",
     "publish-latest": "npm publish --force-publish --registry https://registry.npmjs.org/",
     "publish-beta": "npm publish --force-publish --tag beta --preid=beta --registry https://registry.npmjs.org/",
-    "publish-alpha": "npm publish --force-publish --tag alpha --preid=alpha --registry https://registry.npmjs.org/",
-    "postpublish": "cnpm sync gm-x-printer"
+    "publish-alpha": "npm publish --force-publish --tag alpha --preid=alpha --registry https://registry.npmjs.org/"
   },
   "lint-staged": {
     "./src/**/*.js": [
