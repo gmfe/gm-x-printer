@@ -57,10 +57,10 @@ const PageSummary = props => {
   } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
-  const currentOrderTableData = tableData.slice(range.begin, range.end)
+  const currentOrderTableData = tableData
   if (
     orderSummaryShow &&
-    isLastPage &&
+    (config?.allOrderSummaryConfig?.isShowOrderSummaryPer || isLastPage) &&
     showOrderType === SHOW_WAY_ENUM.bottom &&
     printerStore.ready
   ) {
