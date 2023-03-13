@@ -133,7 +133,6 @@ class PrinterStore {
     if (!this.tableConfig) return []
     const { autoFillConfig } = this.config
     const { dataKey } = this.tableConfig
-
     if (autoFillConfig?.region) {
       /** 当前数据 */
       return this.data._table[dataKey] || []
@@ -224,6 +223,7 @@ class PrinterStore {
     /** 明细data */
     const detailsData = tableData[end]?.__details
     // 如果没有details 和 明细不换行, 就不用计算了
+
     if (!detailsData || dataKey.includes('noLineBreak')) {
       return []
     }
@@ -235,7 +235,6 @@ class PrinterStore {
       detailsHeights,
       currentRemainTableHeight
     )
-
     // 分局明细拆分后的数据
     const splitTableData = _.map(ranges, range => {
       const _tableData = Object.assign({}, tableData[end])
@@ -789,7 +788,6 @@ class PrinterStore {
           .map(d => `<div class='b-table-details'> ${compiled(d)} </div>`)
           .join('')
       }
-
       /** 明细换行和不换行处理 */
       detailsList =
         !detailLastColType || detailLastColType === 'purchase_last_col'

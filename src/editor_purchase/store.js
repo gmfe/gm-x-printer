@@ -1,6 +1,10 @@
 import EditorStore from '../common/editor_store'
 import { action } from 'mobx'
-import { PURCHASE_DETAIL, PURCHASE_DETAIL_BY_ORDER_UNIT } from './constants'
+import {
+  PURCHASE_DETAIL,
+  PURCHASE_DETAIL_NO_BREAK,
+  PURCHASE_DETAIL_BY_ORDER_UNIT
+} from './constants'
 
 class Store extends EditorStore {
   constructor({ defaultTableDataKey }) {
@@ -23,11 +27,24 @@ class Store extends EditorStore {
       o => !o.isPurchaseDetailByOrderUnit && !o.isSpecialColumn
     )
     tableConfig.columns.replace(newCols)
-    this.changeSheetUnitSummary(false)
-
     // 单列-总表最后一列,在columns上修改
-    if (dataKey === 'purchase_last_col') {
-      tableConfig.columns.push(PURCHASE_DETAIL)
+    this.changeSheetUnitSummary(false)
+    if (
+      dataKey === 'purchase_last_col' ||
+      dataKey === 'purchase_last_col_noLineBreak'
+    ) {
+      tableConfig.columns.push(
+        dataKey === 'purchase_last_col'
+          ? PURCHASE_DETAIL
+          : PURCHASE_DETAIL_NO_BREAK
+      )
+      dataKey === 'purchase_last_col'
+        ? (tableConfig.columns[
+            tableConfig.columns?.length - 1
+          ].detailLastColType = 'purchase_last_col')
+        : (tableConfig.columns[
+            tableConfig.columns?.length - 1
+          ].detailLastColType = 'purchase_last_col_noLineBreak')
     }
   }
 
@@ -38,7 +55,7 @@ class Store extends EditorStore {
 
   /** 按下单单位汇总 */
   @action.bound
-  setSheetUnitSummary(bool) {
+  setSheetUnitSummary(bool, dataKey) {
     this.changeSheetUnitSummary(bool)
     const arr = this.selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
@@ -48,10 +65,21 @@ class Store extends EditorStore {
     // 先去掉所有明细列
     tableConfig.columns.replace(newCols)
     if (bool) {
-      tableConfig.columns.push(...PURCHASE_DETAIL_BY_ORDER_UNIT)
+      tableConfig.columns.push(...PURCHASE_DETAIL_BY_ORDER_UNIT(dataKey))
     } else {
-      tableConfig.columns.push(PURCHASE_DETAIL)
+      tableConfig.columns.push(
+        dataKey === 'purchase_last_col'
+          ? PURCHASE_DETAIL
+          : PURCHASE_DETAIL_NO_BREAK
+      )
     }
+    dataKey === 'purchase_last_col'
+      ? (tableConfig.columns[
+          tableConfig.columns?.length - 1
+        ].detailLastColType = 'purchase_last_col')
+      : (tableConfig.columns[
+          tableConfig.columns?.length - 1
+        ].detailLastColType = 'purchase_last_col_noLineBreak')
   }
 
   @action.bound
@@ -61,7 +89,10 @@ class Store extends EditorStore {
 
     tableConfig.specialConfig.template_text = value
     // 单列-总表最后一列,在columns上修改
-    if (tableConfig.dataKey === 'purchase_last_col') {
+    if (
+      tableConfig.dataKey === 'purchase_last_col' ||
+      tableConfig.dataKey === 'purchase_last_col_noLineBreak'
+    ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
       specialCol.text = value
     }
@@ -74,7 +105,10 @@ class Store extends EditorStore {
 
     tableConfig.specialConfig.style = value
     // 单列-总表最后一列,在columns上修改
-    if (tableConfig.dataKey === 'purchase_last_col') {
+    if (
+      tableConfig.dataKey === 'purchase_last_col' ||
+      tableConfig.dataKey === 'purchase_last_col_noLineBreak'
+    ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
       specialCol.style = value
     }
@@ -87,7 +121,10 @@ class Store extends EditorStore {
 
     tableConfig.specialConfig.template_text += fieldText
     // 单列-总表最后一列,在columns上修改
-    if (tableConfig.dataKey === 'purchase_last_col') {
+    if (
+      tableConfig.dataKey === 'purchase_last_col' ||
+      tableConfig.dataKey === 'purchase_last_col_noLineBreak'
+    ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
       specialCol.text += fieldText
     }

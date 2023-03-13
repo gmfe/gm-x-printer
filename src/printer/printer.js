@@ -165,7 +165,7 @@ class Printer extends React.Component {
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
                   config={content}
-                  range={{ begin: 0, end: list.length }}
+                  range={{ begin: 0, end: list?.length || 0 }}
                   pageIndex={0}
                   placeholder={`${i18next.t('区域')} ${index}`}
                   isDeliverType={isDeliverType}
@@ -337,7 +337,7 @@ class Printer extends React.Component {
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
                   config={content}
-                  range={{ begin: 0, end: list.length }}
+                  range={{ begin: 0, end: list?.length || 0 }}
                   pageIndex={0}
                   placeholder={`${i18next.t('区域')} ${index}`}
                   isDeliverType={this.props.config?.isDeliverType}
