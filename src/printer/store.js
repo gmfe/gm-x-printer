@@ -466,7 +466,12 @@ class PrinterStore {
     }
     this.pages.push(page)
 
-    this.remainPageHeight = +Big(this.pageHeight - currentPageHeight).toFixed(0)
+    const safeCurrentPageHeight = Number.isNaN(currentPageHeight)
+      ? 0
+      : currentPageHeight
+    this.remainPageHeight = +Big(
+      this.pageHeight - safeCurrentPageHeight
+    ).toFixed(0)
   }
 
   @action
