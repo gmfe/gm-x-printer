@@ -215,7 +215,6 @@ class PrinterStore {
   computedData(dataKey, table, end, currentRemainTableHeight) {
     /** 当前数据 */
     const tableData = this.data._table[dataKey].slice() || []
-
     let count = 0
     _.forEach(Array(end).fill(1), (val, i) => {
       const details = tableData[i]?.__details || []
@@ -253,6 +252,7 @@ class PrinterStore {
 
   @action
   computedPages() {
+    // debugger
     // 每次先初始化置空
     this.pages = []
     // 每页必有 页眉header, 页脚footer , 签名
@@ -331,6 +331,7 @@ class PrinterStore {
           table.body.heights,
           dataKey
         )
+        console.log('heights', heights)
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0
@@ -352,10 +353,13 @@ class PrinterStore {
             currentPageHeight += heights[end]
             // 当前页没有多余空间
             if (currentTableHeight > pageAccomodateTableHeight) {
-              /** 正是因为添加了这一行，所以超过了 */
               const overHeight = heights[end]
-              // 因为超过，所以要退回上一个
-              end--
+              // 双栏合计
+              if (this.dataKey?.includes('multi')) {
+                /** 正是因为添加了这一行，所以超过了 */
+                // 因为超过，所以要退回上一个
+                end--
+              }
               /** 当前页table渲染完后剩余的高度 */
               const currentRemainTableHeight = +Big(pageAccomodateTableHeight)
                 .minus(currentTableHeight)
@@ -371,6 +375,7 @@ class PrinterStore {
                   overHeight / currentRemainTableHeight > 1) ||
                 overHeight > pageAccomodateTableHeight
               ) {
+                // debugger
                 if (currentRemainTableHeight >= 23) {
                   const detailsPageHeight = this.computedData(
                     dataKey,
