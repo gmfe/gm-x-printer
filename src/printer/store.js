@@ -354,7 +354,7 @@ class PrinterStore {
             if (currentTableHeight > pageAccomodateTableHeight) {
               const overHeight = heights[end]
               // 双栏合计
-              if (this.dataKey?.includes('multi')) {
+              if (dataKey?.includes('multi')) {
                 /** 正是因为添加了这一行，所以超过了 */
                 // 因为超过，所以要退回上一个
                 end--

@@ -2,7 +2,7 @@ import i18next from '../../locales'
 
 /** 采购明细列 模版TEXT */
 const DETAIL_CONFIG_TEXT = i18next.t(
-  '{{需求数_下单单位}}{{下单单位}}*{{需求数_采购单位}}{{采购单位}}*{{商户名}}*{{商品备注}}'
+  '{{需求数_下单单位}}{{下单单位}}*{{需求数_采购单位}}{{采购单位}}*{{商户名}}*{{商品备注}}*{{对内备注}}'
 )
 
 /** 采购明细 */
@@ -28,7 +28,6 @@ export const PURCHASE_DETAIL_NO_BREAK = {
 
 /** 按下单单位汇总的采购明细  */
 export const PURCHASE_DETAIL_BY_ORDER_UNIT = dataKey => {
-  console.log('dataKey', dataKey)
   const PURCHASE_COL =
     dataKey === 'purchase_last_col' ? PURCHASE_DETAIL : PURCHASE_DETAIL_NO_BREAK
   return [
