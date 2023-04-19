@@ -727,6 +727,7 @@ class PrinterStore {
     // 做好保护，出错就返回 text
     try {
       const list = this.data._table[dataKey] || this.data._table.orders
+      console.log(list)
       const result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
@@ -742,6 +743,18 @@ class PrinterStore {
       if (result === '元/') {
         return ''
       }
+      return result
+    } catch (err) {
+      return text
+    }
+  }
+
+  getRwoSpan(dataKey, index) {
+    try {
+      const list = this.data._table[dataKey] || this.data._table.orders
+      const result = list?.[index]?.rowSpan
+      console.log(result, 'result')
+      if (!result) return 1
       return result
     } catch (err) {
       return text

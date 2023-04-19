@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import i18next from '../../locales'
 import _ from 'lodash'
 import {
   dispatchMsg,
@@ -360,8 +361,22 @@ class Table extends React.Component {
                     <td colSpan='99' />
                   ) : (
                     _.map(columns, (col, j) => {
+                      // 是否是被合并的列
+                      const rowSpan = printerStore.getRwoSpan(dataKey, i)
+                      // 兼容是否需要rowSpan来合并
+                      const isRowSpan =
+                        col.isSpecialColumn ||
+                        col.isPurchaseDetailByOrderUnit ||
+                        rowSpan === 1
+                      // 走合并不需要展示Td
+                      const noRenderTd =
+                        rowSpan === -1 &&
+                        !col.isSpecialColumn &&
+                        !col.isPurchaseDetailByOrderUnit
+                      if (noRenderTd) return null
                       return (
                         <td
+                          rowSpan={isRowSpan || rowSpan}
                           key={j}
                           data-name={getTableColumnName(name, col.index)}
                           style={{
