@@ -1,6 +1,6 @@
 {
   "name": "gm-x-printer",
-  "version": "1.8.6",
+  "version": "1.8.7",
   "description": "diy printer",
   "main": "src/index.js",
   "scripts": {
@@ -80,7 +80,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "file-loader": "^1.1.11",
     "gm-svg": "^0.3.0",
-    "gm-util": "^5.12.2",
+    "gm-util": "^5.12.6",
     "gm-webpack": "^2.2.1",
     "happypack": "^5.0.1",
     "html-webpack-plugin": "4.0.0",

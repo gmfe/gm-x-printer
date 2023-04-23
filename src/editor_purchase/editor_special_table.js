@@ -42,7 +42,8 @@ class TableDetailEditor extends React.Component {
 
   handleSheetUnitSummaryChange = bool => {
     const { editStore } = this.props
-    editStore.setSheetUnitSummary(bool)
+    const { dataKey } = this.props.config
+    editStore.setSheetUnitSummary(bool, dataKey)
   }
 
   render() {
@@ -77,7 +78,8 @@ class TableDetailEditor extends React.Component {
           </Select>
         </Flex>
         {/* 选择单列-总表最后一列时，支持按下单单位汇总 */}
-        {dataKey === 'purchase_last_col' && (
+        {(dataKey === 'purchase_last_col' ||
+          dataKey === 'purchase_last_col_noLineBreak') && (
           <Flex alignCenter className='gm-padding-top-5'>
             <div>{i18next.t('按下单单位汇总')}：</div>
             <Switch
