@@ -113,8 +113,8 @@ const SubtotalTrShowRow = props => {
           style={{
             whiteSpace: 'nowrap',
             fontWeight: 'bold',
-            textAlign: 'center',
-            ...style
+            ...style,
+            textAlign: 'center'
           }}
           dangerouslySetInnerHTML={{
             __html: pageSummaryText
