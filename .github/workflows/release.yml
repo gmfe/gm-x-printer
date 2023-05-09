@@ -37,13 +37,13 @@ jobs:
         run: |
           if [[ ${{ github.ref }} == *refs/tags/*-beta* ]]; then
             echo "beta"
-            npm publish --force-publish --dist-tag=beta --preid=beta
+            nr publish-beta
           elif [[ ${{ github.ref }} == *refs/tags/*-alpha* ]]; then
             echo "alpha"
-            npm publish --force-publish --dist-tag=alpha --preid=alpha
+            nr publish-alpha
           else
             echo "latest"
-            npm publish --force-publish
+            nr publish-latest
           fi
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
