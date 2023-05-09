@@ -9,9 +9,9 @@
     "build": "webpack -p",
     "locale": "i18n-m sync src/",
     "tag": "bumpp",
-    "publish-latest": "npm publish --force-publish --registry https://registry.npmjs.org/",
-    "publish-beta": "npm publish --force-publish --dist-tag=beta --preid=beta --registry https://registry.npmjs.org/",
-    "publish-alpha": "npm publish --force-publish --dist-tag=alpha --preid=alpha --registry https://registry.npmjs.org/"
+    "publish-latest": "npm publish --registry https://registry.npmjs.org/",
+    "publish-beta": "npm publish --tag beta --registry https://registry.npmjs.org/",
+    "publish-alpha": "npm publish  --tag alpha --registry https://registry.npmjs.org/"
   },
   "lint-staged": {
     "./src/**/*.js": [
