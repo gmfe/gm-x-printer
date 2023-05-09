@@ -105,8 +105,8 @@ const AllOrderSummary = props => {
           style={{
             whiteSpace: 'nowrap',
             fontWeight: 'bold',
-            textAlign: 'center',
-            ...style
+            ...style,
+            textAlign: 'center'
           }}
           dangerouslySetInnerHTML={{
             __html: orderSummaryText
