@@ -8,10 +8,7 @@
     "start": "webpack-dev-server --hot",
     "build": "webpack -p",
     "locale": "i18n-m sync src/",
-    "tag": "bumpp",
-    "publish-latest": "npm publish --force-publish --registry https://registry.npmjs.org/",
-    "publish-beta": "npm publish --force-publish --dist-tag=beta --preid=beta --registry https://registry.npmjs.org/",
-    "publish-alpha": "npm publish --force-publish --dist-tag=alpha --preid=alpha --registry https://registry.npmjs.org/"
+    "release": "bumpp"
   },
   "lint-staged": {
     "./src/**/*.js": [

@@ -35,12 +35,12 @@ jobs:
 
       - name: Release
         run: |
-          if [[ ${{ github.ref }} == refs/tags/*-beta ]]; then
-            nr publish-beta
-          elif [[ ${{ github.ref }} == refs/tags/*-alpha ]]; then
-            nr publish-alpha
+          if [[ ${{ github.ref }} == *refs/tags/*-beta* ]]; then
+            npm publish --tag beta
+          elif [[ ${{ github.ref }} == *refs/tags/*-alpha* ]]; then
+            npm publish --tag alpha
           else
-            nr publish-latest
+            npm publish
           fi
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
