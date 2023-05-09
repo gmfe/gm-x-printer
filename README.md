@@ -62,9 +62,11 @@ gm-x-printer 是一个单独的打印库，使用 github action 发布版本
    1. 提pr到master
    2. 切换到master，之后执行yarn release选择正式版本（注意minor和patch的区别)![image-20230509125629476](./assets/image-20230509125629476.png)
 
-3. 选择后版本后再输入y，会自动生成tag和push，触发github action的release.yml![image-20230509125812166](./assets/image-20230509125812166.png)
+3. 选择后版本后再输入y，会自动生成tag和push，触发github action的release.yml，且生成changelog![image-20230509125812166](./assets/image-20230509125812166.png)
 
 ![image-20230509125922115](./assets/image-20230509125922115.png)
+
+![image-20230509130332523](./assets/image-20230509130332523.png)
 
 自此自动发包完成！
 
