@@ -5,8 +5,10 @@ permissions:
 
 on:
   push:
-    tags:
-      - 'v*'
+    # tags:
+    #   - 'v*'
+    branches:
+      - feature/*
 
 jobs:
   release:
