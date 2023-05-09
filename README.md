@@ -51,28 +51,22 @@ gm-x-printer 是新架构 erp 使用的打印库
 
 ## 版本发布
 
-gm-x-printer 是一个单独的组件库，使用 npm 发布版本
+gm-x-printer 是一个单独的打印库，使用 github action 发布版本
 
-首先先切换到 npm 的环境
+1. beta版本包的版本发布(在自己的feature|fix分支)，执行yarn release 后选择beta版本
 
-1. 没有登陆过，使用`npm login`登陆，一次登陆永久使用，登陆的时候会输入密码，用户名，邮箱（公司有）
-2. beta 版本包的版本发布(用来测试该版本，解决该版本的 bug)
+   ![image-20230509125111428](./assets/image-20230509125111428.png)
 
-   1. 将`package.json`中的`version`修改为`X.X.X-beta.0`，或者运行 `npm version X.X.X-beta.0`来更新`package.json`，同时创建一个 git 标签 (请参考 https://docs.npmjs.com/cli/version)。
+2. 正式版本的发布
 
-      在你的版本末尾添加 `beta.0` 非常重要。`.0` 表示它是哪个版本。当我们对 `beta` 版进行修补发布新的 `beta` 版本时，我们会将 `.0` 递增到 `.1`，以此类推。
+   1. 提pr到master
+   2. 切换到master，之后执行yarn release选择正式版本（注意minor和patch的区别)![image-20230509125629476](./assets/image-20230509125629476.png)
 
-   2. ⚠️ 将该版本的包 push 到远程仓库
+3. 选择后版本后再输入y，会自动生成tag和push，触发github action的release.yml![image-20230509125812166](./assets/image-20230509125812166.png)
 
-   3. 使用`npm publish --tag beta`发布测试版本
+![image-20230509125922115](./assets/image-20230509125922115.png)
 
-   4. 对版本进行修补时，只需要将`beta.0`递增到`beta.1`进行版本发布即可，以此类推
-
-3. 正式版本的发布
-   1. 遵循上面的版本命名规则，修改`package.json`中的`version`版本号，或者运行 `npm version X.X.X`来更新`package.json`，同时创建一个 git 标签
-   2. ⚠️ 将正式版本 push 到远程仓库
-   3. 使用`npm publish`发布正式版本
-   4. 在自己的分支上进行发布版本即可，发完后，将分支合并到 master 上！！！
+自此自动发包完成！
 
 ## 模板文件(template_config)
 
