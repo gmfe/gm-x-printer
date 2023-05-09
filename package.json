@@ -8,7 +8,7 @@
     "start": "webpack-dev-server --hot",
     "build": "webpack -p",
     "locale": "i18n-m sync src/",
-    "tag": "bumpp"
+    "release": "bumpp"
   },
   "lint-staged": {
     "./src/**/*.js": [
