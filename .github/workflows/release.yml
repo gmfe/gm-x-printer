@@ -36,14 +36,11 @@ jobs:
       - name: Release
         run: |
           if [[ ${{ github.ref }} == *refs/tags/*-beta* ]]; then
-            # npm publish --force-publish --dist-tag=beta --preid=beta
-            echo "skip beta"
+            npm publish --force-publish --dist-tag=beta --preid=beta
           elif [[ ${{ github.ref }} == *refs/tags/*-alpha* ]]; then
-            # npm publish --force-publish --dist-tag=alpha --preid=alpha
-            echo "skip alpha"
+            npm publish --force-publish --dist-tag=alpha --preid=alpha
           else
-            # npm publish --force-publish
-            echo "skip publish"
+            npm publish --force-publish
           fi
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
