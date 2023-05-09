@@ -36,11 +36,11 @@ jobs:
       - name: Release
         run: |
           if [[ ${{ github.ref }} == *refs/tags/*-beta* ]]; then
-            nr publish-beta
+            npm publish --force-publish --dist-tag=beta --preid=beta
           elif [[ ${{ github.ref }} == *refs/tags/*-alpha* ]]; then
-            nr publish-alpha
+            npm publish --force-publish --dist-tag=alpha --preid=alpha
           else
-            nr publish-latest
+            npm publish --force-publish
           fi
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
