@@ -35,9 +35,9 @@ jobs:
 
       - name: Release
         run: |
-          if [[ ${{ github.ref }} == refs/tags/*-beta ]]; then
+          if [[ ${{ github.ref }} == *refs/tags/*-beta* ]]; then
             nr publish-beta
-          elif [[ ${{ github.ref }} == refs/tags/*-alpha ]]; then
+          elif [[ ${{ github.ref }} == *refs/tags/*-alpha* ]]; then
             nr publish-alpha
           else
             nr publish-latest
