@@ -748,6 +748,11 @@ class PrinterStore {
     }
   }
 
+  getColumnsData(dataKey, index) {
+    const list = this.data._table[dataKey] || this.data._table
+    return list[index]
+  }
+
   /**
    * 计算合并单元格的数据
    * @param {string} text thead的名称

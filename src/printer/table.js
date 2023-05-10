@@ -266,6 +266,20 @@ class Table extends React.Component {
                 // 获取process_task_command_id对应的数组
                 const processTaskCommandIdArr =
                   tableDataGroupBy[tableData[i][j]?.process_task_command_id]
+                // 获取rowSpan对应的数组
+                // rowSpan是一个字符串数组，里面装的是要合并的单元格的label
+                // 利用rowSpan把tableData[i]分组
+                const rowSpanGroup = {}
+                tableData[i].forEach(item => {
+                  if (item.rowSpan) {
+                    item.rowSpan.forEach(rowSpanItem => {
+                      if (!rowSpanGroup[rowSpanItem]) {
+                        rowSpanGroup[rowSpanItem] = []
+                      }
+                      rowSpanGroup[rowSpanItem].push(item)
+                    })
+                  }
+                })
                 // 处理特殊情况：计算分页时，一个数组中rowSpan的true和false分成了两个数组的情况
                 if (
                   _.every(
@@ -292,6 +306,11 @@ class Table extends React.Component {
                         // 合并单元格的个数
                         let rowSpanLength = tableData[i].length
 
+                        const trHtml = printerStore.templateRowSpanTable(
+                          col.text,
+                          item
+                        )
+
                         // 是熟食的组合工序聚合
                         if (
                           printerStore.config?.productionMergeType === '3' &&
@@ -317,7 +336,20 @@ class Table extends React.Component {
                           // 合并单元格的个数
                           rowSpanLength = processTaskCommandIdArr.length
                         }
-
+                        if (item.rowSpan) {
+                          if (item.rowSpan.includes(col.text)) {
+                            // 第一个单元格才显示
+                            if (j === 0) {
+                              isRowSpan = true
+                              rowSpanLength = rowSpanGroup[col.text].length
+                            } else {
+                              rowTdRender = true
+                            }
+                          } else {
+                            rowTdRender = false
+                            isRowSpan = false
+                          }
+                        }
                         return (
                           !rowTdRender && (
                             <td
@@ -329,21 +361,23 @@ class Table extends React.Component {
                               style={{
                                 maxWidth: thWidths[index],
                                 minWidth: '24px', // 最小两个字24px
-                                ...col.style
+                                ...col.style,
+                                ...(item.style ?? {})
                               }}
-                              className={classNames({
-                                active:
-                                  getTableColumnName(name, col.index) ===
-                                  printerStore.selected,
-                                [getTableRowColumnName(
-                                  col.rowSpan
-                                )]: col.rowSpan
-                              })}
+                              className={classNames(
+                                {
+                                  active:
+                                    getTableColumnName(name, col.index) ===
+                                    printerStore.selected,
+                                  [getTableRowColumnName(
+                                    col.rowSpan
+                                  )]: item.rowSpan ? j === 0 : col.rowSpan
+                                },
+                                // 加上自定义的class
+                                item.class
+                              )}
                               dangerouslySetInnerHTML={{
-                                __html: printerStore.templateRowSpanTable(
-                                  col.text,
-                                  item
-                                )
+                                __html: trHtml
                               }}
                             />
                           )
@@ -360,20 +394,30 @@ class Table extends React.Component {
                     <td colSpan='99' />
                   ) : (
                     _.map(columns, (col, j) => {
+                      // 获取当前td的数据
+                      const columnsData = printerStore.getColumnsData(
+                        dataKey,
+                        i
+                      )
                       return (
                         <td
                           key={j}
                           data-name={getTableColumnName(name, col.index)}
                           style={{
                             ...getTdStyle(j, col.style),
-                            ...col.style
+                            ...col.style,
+                            ...(columnsData.style ?? {})
                           }}
-                          className={classNames({
-                            active:
-                              getTableColumnName(name, col.index) ===
-                              printerStore.selected,
-                            [getTableRowColumnName(col.rowSpan)]: col.rowSpan
-                          })}
+                          className={classNames(
+                            {
+                              active:
+                                getTableColumnName(name, col.index) ===
+                                printerStore.selected
+                            },
+                            columnsData && columnsData.class,
+                            j === 0 && columnsData && columnsData.tdClass
+                            // 增加自定义class
+                          )}
                           dangerouslySetInnerHTML={{
                             __html: col.isSpecialColumn
                               ? printerStore.templateSpecialDetails(

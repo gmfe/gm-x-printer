@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
+import { toJS } from 'mobx'
 import { Printer } from '../printer'
 
 const blockTypeList = [
@@ -135,7 +136,8 @@ class ContextMenu extends React.Component {
           isAutoFilling={editStore.isAutoFilling}
           lineheight={editStore.computedTableCustomerRowHeight}
           config={editStore.config}
-          data={editStore.mockData}
+          // 传入mobx对象，会导致后面各种判断失效
+          data={toJS(editStore.mockData)}
           getremainpageHeight={editStore.setRemainPageHeight}
           updateData={editStore.updateData}
         />
