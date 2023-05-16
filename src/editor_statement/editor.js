@@ -18,6 +18,7 @@ const tableDataKeyList = [
   { value: TABLE_TYPE.ORDERS, text: i18next.t('账单明细') },
   { value: TABLE_TYPE.SKUS, text: i18next.t('订单明细') },
   { value: TABLE_TYPE.PRODUCT, text: i18next.t('商品汇总') },
+  { value: TABLE_TYPE.TYPE, text: i18next.t('分类汇总') },
   { value: TABLE_TYPE.ORDER_TYPE, text: i18next.t('订单类型') }
 ]
 
