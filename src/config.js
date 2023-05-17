@@ -78,6 +78,19 @@ export const pageTypeMap = {
       paddingLeft: '16mm'
     }
   },
+  '210x280': {
+    name: '210x280',
+    size: {
+      width: '210mm',
+      height: '280mm'
+    },
+    gap: {
+      paddingTop: '5mm',
+      paddingRight: '16mm',
+      paddingBottom: '5mm',
+      paddingLeft: '16mm'
+    }
+  },
   DIY: {
     name: i18next.t('自定义纸张'),
     size: {

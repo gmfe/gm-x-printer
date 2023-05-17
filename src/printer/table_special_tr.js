@@ -88,7 +88,9 @@ const SpecialTr = ({ data, config }) => {
         <tr>
           <td
             colSpan={99}
-            style={Object.assign({ fontWeight: 'bold' }, style)}
+            style={Object.assign({ fontWeight: 'bold' }, style, {
+              textAlign: 'left'
+            })}
             dangerouslySetInnerHTML={{
               __html:
                 needUpperCase && data.upperCaseText
