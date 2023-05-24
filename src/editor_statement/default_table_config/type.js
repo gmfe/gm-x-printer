@@ -30,17 +30,17 @@ const skusDefaultTableConfig = [
       textAlign: 'center'
     },
     text: '{{列.售后金额}}'
-  },
-  {
-    head: i18next.t('待售后金额'),
-    headStyle: {
-      textAlign: 'center'
-    },
-    style: {
-      textAlign: 'center'
-    },
-    text: '{{列.待售后金额}}'
   }
+  // {
+  //   head: i18next.t('待售后金额'),
+  //   headStyle: {
+  //     textAlign: 'center'
+  //   },
+  //   style: {
+  //     textAlign: 'center'
+  //   },
+  //   text: '{{列.待售后金额}}'
+  // }
 ]
 
 export default skusDefaultTableConfig
