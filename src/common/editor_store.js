@@ -547,6 +547,19 @@ class EditorStore {
           text: `{{qrcode_trace}}`
         })
         break
+      // 备注单元格
+      case 'remark':
+        blocks.push({
+          text: i18next.t('请编辑'),
+          type: 'remark',
+          style: {
+            borderColor: 'black',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            width: '100%'
+          }
+        })
+        break
       default:
         window.alert(i18next.t('出错啦，未识别类型，此信息不应该出现'))
     }
