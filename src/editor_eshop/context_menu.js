@@ -24,6 +24,7 @@ class ContextMenu extends React.Component {
       <CommonContextMenu
         insertBlockList={blockTypeList}
         uploadQiniuImage={uploadQiniuImage}
+        type='eshop'
       >
         <Printer
           key={editStore.computedPrinterKey}

@@ -322,6 +322,8 @@ class Table extends React.Component {
                         // 学生餐配送单：
                         // 如果是餐次餐标，需要判断processTaskCommandIdArr
                         if (
+                          printerStore.config &&
+                          printerStore.config.tableRowSpanIncludes &&
                           printerStore.config.tableRowSpanIncludes.includes(
                             '{{列.配送内容}}'
                           ) &&

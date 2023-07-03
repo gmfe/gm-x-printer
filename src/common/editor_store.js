@@ -871,6 +871,30 @@ class EditorStore {
               }
             ]
           })
+        } else if (type === 'eshop_table') {
+          this.config.contents.splice(index, 0, {
+            className: '',
+            type: 'table',
+            dataKey: '1',
+            subtotal: {
+              show: false
+            },
+            columns: [
+              {
+                head: i18next.t('菜品'),
+                headStyle: {
+                  textAlign: 'center',
+                  minWidth: '30px'
+                },
+                text: i18next.t('{{列.菜品}}'),
+                style: {
+                  textAlign: 'center'
+                },
+                rowSpan: 'rowSpan',
+                noRemove: 'isRemove' // 是否允许删除该列
+              }
+            ]
+          })
         } else {
           this.config.contents.splice(index, 0, {
             blocks: [],
