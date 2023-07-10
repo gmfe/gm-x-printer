@@ -145,6 +145,11 @@ class CommonContextMenu extends React.Component {
     })
   }
 
+  handleAddTable = diff => {
+    const type = this.props.type === 'eshop' ? 'eshop_table' : 'table'
+    this.handleAddContent(diff, type)
+  }
+
   handleInsertImage = imgURL => {
     this.handleInsertBlock('image', imgURL)
   }
@@ -191,7 +196,6 @@ class CommonContextMenu extends React.Component {
     const arr = name.split('.')
     const { className } = editStore.config.contents[arr[2]]
     const isActive = c => className === c
-
     return (
       <>
         {renderTableAction && (
@@ -224,22 +228,10 @@ class CommonContextMenu extends React.Component {
         <div onClick={this.handleRemoveContent}>{i18next.t('移除区域')}</div>
 
         <Hr />
-        <div
-          onClick={this.handleAddContent.bind(
-            this,
-            0,
-            this.props.type === 'eshop' ? 'eshop_table' : 'table'
-          )}
-        >
+        <div onClick={this.handleAddTable.bind(this, 0)}>
           {i18next.t('向上插入表格')}
         </div>
-        <div
-          onClick={this.handleAddContent.bind(
-            this,
-            1,
-            this.props.type === 'eshop' ? 'eshop_table' : 'table'
-          )}
-        >
+        <div onClick={this.handleAddTable.bind(this, 1)}>
           {i18next.t('向下插入表格')}
         </div>
       </>
@@ -333,10 +325,10 @@ class CommonContextMenu extends React.Component {
               {i18next.t('移除区域')}
             </div>
             <Hr />
-            <div onClick={this.handleAddContent.bind(this, 0, 'table')}>
+            <div onClick={this.handleAddTable.bind(this, 0)}>
               {i18next.t('向上插入表格')}
             </div>
-            <div onClick={this.handleAddContent.bind(this, 1, 'table')}>
+            <div onClick={this.handleAddTable.bind(this, 1)}>
               {i18next.t('向下插入表格')}
             </div>
           </>
