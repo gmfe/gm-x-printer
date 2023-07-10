@@ -890,7 +890,6 @@ class EditorStore {
                 style: {
                   textAlign: 'center'
                 },
-                rowSpan: 'rowSpan',
                 noRemove: 'isRemove' // 是否允许删除该列
               }
             ]
