@@ -177,6 +177,16 @@ class Block extends React.Component {
       )
     } else if (type === 'qrcode' || type === 'qrcode_trace') {
       content = <QrCode value={printerStore.template(text)} />
+    } else if (type === 'remark') {
+      content = (
+        <div
+          style={{
+            padding: '10px 0'
+          }}
+        >
+          {printerStore.template(text, pageIndex)}
+        </div>
+      )
     }
 
     const active = name === printerStore.selected

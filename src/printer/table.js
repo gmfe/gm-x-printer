@@ -56,7 +56,6 @@ class Table extends React.Component {
         ) || []
       const trRowSpan = $table.querySelectorAll('tbody tr') || []
       const detailsDiv = $table.querySelectorAll('tr td .b-table-details')
-
       printerStore.setHeight(name, getHeight($table))
 
       printerStore.setTable(name, {
@@ -262,6 +261,8 @@ class Table extends React.Component {
             )
             // 处理数据是数组的情况(生产单据)
             if (_.isArray(tableData[i])) {
+              // 合并的坐标
+              let rowSpanKey = 0
               return _.map(tableData[i], (item, j) => {
                 // 获取process_task_command_id对应的数组
                 const processTaskCommandIdArr =
@@ -284,6 +285,7 @@ class Table extends React.Component {
                     ) : (
                       _.map(columns, (col, index) => {
                         // 跨行
+                        const span = processTaskCommandIdArr.length
                         let isRowSpan =
                           includesColText.includes(col.text) && j === 0
                         // 去除单元格
@@ -317,7 +319,24 @@ class Table extends React.Component {
                           // 合并单元格的个数
                           rowSpanLength = processTaskCommandIdArr.length
                         }
-
+                        // 学生餐配送单：
+                        // 如果是餐次餐标，需要判断processTaskCommandIdArr
+                        if (
+                          printerStore.config &&
+                          printerStore.config.tableRowSpanIncludes &&
+                          printerStore.config.tableRowSpanIncludes.includes(
+                            '{{列.配送内容}}'
+                          ) &&
+                          printerStore.config.type === 'eshop_delivery' &&
+                          col.text.includes('{{列.配送内容}}')
+                        ) {
+                          if (j === span + rowSpanKey) {
+                            rowTdRender = false
+                            isRowSpan = true
+                            rowSpanKey = j
+                          }
+                          rowSpanLength = processTaskCommandIdArr.length
+                        }
                         return (
                           !rowTdRender && (
                             <td
@@ -464,7 +483,8 @@ Table.propTypes = {
   pageIndex: PropTypes.number.isRequired,
   placeholder: PropTypes.string,
   printerStore: PropTypes.object,
-  isLastPage: PropTypes.bool
+  isLastPage: PropTypes.bool,
+  isDeliverType: PropTypes.bool
 }
 
 export default Table

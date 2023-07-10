@@ -224,10 +224,22 @@ class CommonContextMenu extends React.Component {
         <div onClick={this.handleRemoveContent}>{i18next.t('移除区域')}</div>
 
         <Hr />
-        <div onClick={this.handleAddContent.bind(this, 0, 'table')}>
+        <div
+          onClick={this.handleAddContent.bind(
+            this,
+            0,
+            this.props.type === 'eshop' ? 'eshop_table' : 'table'
+          )}
+        >
           {i18next.t('向上插入表格')}
         </div>
-        <div onClick={this.handleAddContent.bind(this, 1, 'table')}>
+        <div
+          onClick={this.handleAddContent.bind(
+            this,
+            1,
+            this.props.type === 'eshop' ? 'eshop_table' : 'table'
+          )}
+        >
           {i18next.t('向下插入表格')}
         </div>
       </>
@@ -337,7 +349,6 @@ class CommonContextMenu extends React.Component {
     const { children } = this.props
     const { name, popup } = this.state
     const arr = (name && name.split('.')) || []
-
     return (
       <div
         onClick={this.handleCancel}
@@ -387,6 +398,7 @@ Menu.propTypes = {
 
 CommonContextMenu.propTypes = {
   editStore: PropTypes.object,
+  type: PropTypes.string,
   insertBlockList: PropTypes.array.isRequired,
   renderTableAction: PropTypes.func,
   children: PropTypes.element.isRequired,

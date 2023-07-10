@@ -15,6 +15,7 @@ import EditorProduction from './editor_production'
 import EditorTicket from './editor_ticket'
 import EditorMaterialRequisition from './editor_material_requisition'
 import EditorAfterSales from './editor_after_sales'
+import EditEshop from './editor_eshop'
 import { BatchPrinter, doBatchPrint, doPrint, Printer, getCSS } from './printer'
 import { MULTI_SUFFIX, DiyTimeType } from './config'
 
@@ -37,6 +38,7 @@ export {
   EditorTicket,
   EditorMaterialRequisition,
   EditorAfterSales,
+  EditEshop,
   Printer,
   BatchPrinter,
   doPrint,
