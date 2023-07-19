@@ -36,15 +36,18 @@ class EditorSelector extends React.Component {
     this.props.editStore.setBatchPrintConfig(type)
   }
 
+  handleTemplateType = type => {
+    this.props.editStore.setTemplateType(type)
+  }
+
   render() {
     const {
-      config: { name, page, batchPrintConfig },
+      config: { name, page, batchPrintConfig, templateType },
       computedRegionList,
       computedSelectedRegionTip,
       selectedRegion
     } = this.props.editStore
     const isDIY = page.type === 'DIY'
-
     return (
       <div>
         <Flex alignCenter>
@@ -126,29 +129,44 @@ class EditorSelector extends React.Component {
           </Select>
         </Flex>
 
-        {this.props.isPurchase && (
-          <>
-            <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('批量打印设置')}：</div>
-              <Select
-                className='gm-printer-edit-select'
-                value={batchPrintConfig}
-                onChange={this.handleSetBatchPrintConfig}
-              >
-                <Option value={1}>不连续打印</Option>
-                <Option value={2}>连续打印</Option>
-              </Select>
-            </Flex>
-            <div>
-              {BATCH_PRINTER_SETTING_TEXT_ENUM[
-                this.props.batchPrintSettingKey
-              ]?.map(item => (
-                <p style={{ color: 999, paddingLeft: 24 }} key={item}>
-                  {item}
-                </p>
-              ))}
-            </div>
-          </>
+        {this.props.isPurchase ||
+          (this.props.type === 'picking' && (
+            <>
+              <Flex alignCenter className='gm-padding-top-5'>
+                <div>{i18next.t('批量打印设置')}：</div>
+                <Select
+                  className='gm-printer-edit-select'
+                  value={batchPrintConfig}
+                  onChange={this.handleSetBatchPrintConfig}
+                >
+                  <Option value={1}>不连续打印</Option>
+                  <Option value={2}>连续打印</Option>
+                </Select>
+              </Flex>
+              <div>
+                {BATCH_PRINTER_SETTING_TEXT_ENUM[
+                  this.props.batchPrintSettingKey
+                ]?.map(item => (
+                  <p style={{ color: 999, paddingLeft: 24 }} key={item}>
+                    {item}
+                  </p>
+                ))}
+              </div>
+            </>
+          ))}
+
+        {this.props.type === 'picking' && (
+          <Flex alignCenter className='gm-padding-top-5'>
+            <div>{i18next.t('模板类型')}：</div>
+            <Select
+              className='gm-printer-edit-select'
+              value={templateType}
+              onChange={this.handleTemplateType}
+            >
+              <Option value={1}>商品分拣单</Option>
+              <Option value={2}>客户分拣单</Option>
+            </Select>
+          </Flex>
         )}
 
         <Flex alignCenter className='gm-padding-top-5 gm-text-red'>
@@ -161,7 +179,8 @@ class EditorSelector extends React.Component {
 
 EditorSelector.propTypes = {
   isPurchase: PropTypes.bool,
-  batchPrintSettingKey: PropTypes.string
+  batchPrintSettingKey: PropTypes.string,
+  type: PropTypes.string
 }
 EditorSelector.deaultProps = {
   isPurchase: false,
