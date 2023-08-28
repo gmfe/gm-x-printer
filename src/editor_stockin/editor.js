@@ -20,8 +20,7 @@ const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
 @observer
 class Editor extends React.Component {
   render() {
-    const { onSave, showEditor, addFields, uploadQiniuImage } = this.props
-
+    const { onSave, showEditor, addFields, uploadQiniuImage, type } = this.props
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -41,7 +40,7 @@ class Editor extends React.Component {
           <div className='gm-printer-edit-zone'>
             <EditorTitle onSave={onSave} />
             <Gap height='10px' />
-            <EditorSelect />
+            <EditorSelect type={type} />
             <Gap height='5px' />
             <EditorField tableDataKeyList={tableDataKeyList} />
             <Gap height='5px' />
@@ -54,7 +53,7 @@ class Editor extends React.Component {
         )}
 
         <div className='gm-printer-edit-wrap'>
-          <ContextMenu uploadQiniuImage={uploadQiniuImage} />
+          <ContextMenu type={type} uploadQiniuImage={uploadQiniuImage} />
         </div>
       </div>
     )
@@ -67,7 +66,8 @@ Editor.propTypes = {
   uploadQiniuImage: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
-  addFields: PropTypes.object.isRequired
+  addFields: PropTypes.object.isRequired,
+  type: PropTypes.string
 }
 
 Editor.deaultProps = {

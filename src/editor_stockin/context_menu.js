@@ -1,5 +1,6 @@
 import i18next from '../../locales'
 import React from 'react'
+import PropTypes from 'prop-types'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import { Printer } from '../printer'
@@ -40,18 +41,26 @@ class ContextMenu extends React.Component {
           {i18next.t('双栏商品')}
         </div>
         {/* 入库单不需要这个 */}
-        <div
-          onClick={this.handleChangeTableDataKey.bind(this, 'quantity', name)}
-          className={isQuantityActive ? 'active' : ''}
-        >
-          {i18next.t('入库数小计')}
-        </div>
-        <div
-          onClick={this.handleChangeTableDataKey.bind(this, 'money', name)}
-          className={isMoneyActive ? 'active' : ''}
-        >
-          {i18next.t('入库金额小计')}
-        </div>
+        {this.props.type !== 'picking' && (
+          <>
+            <div
+              onClick={this.handleChangeTableDataKey.bind(
+                this,
+                'quantity',
+                name
+              )}
+              className={isQuantityActive ? 'active' : ''}
+            >
+              {i18next.t('入库数小计')}
+            </div>
+            <div
+              onClick={this.handleChangeTableDataKey.bind(this, 'money', name)}
+              className={isMoneyActive ? 'active' : ''}
+            >
+              {i18next.t('入库金额小计')}
+            </div>
+          </>
+        )}
       </>
     )
   }
@@ -74,6 +83,10 @@ class ContextMenu extends React.Component {
       </CommonContextMenu>
     )
   }
+}
+
+ContextMenu.propTypes = {
+  type: PropTypes.string
 }
 
 export default ContextMenu
