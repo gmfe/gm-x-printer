@@ -1,10 +1,11 @@
 import React from 'react'
 import QRCode from 'qrcode.react'
 import PropTypes from 'prop-types'
+import _ from 'lodash'
 
 const QrCode = props => {
-  const { value } = props
-  return <QRCode value={value} size={75} />
+  const { value, size } = props
+  return <QRCode value={value} size={_.isFinite(size) ? size : 75} />
 }
 
 QrCode.propTypes = {
