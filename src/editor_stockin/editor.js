@@ -35,6 +35,9 @@ class Editor extends React.Component {
             }
           />
         </Flex>
+        <div style={{ display: 'none' }}>
+          {this.props?.editStore?.config?.templateType}
+        </div>
 
         {showEditor && (
           <div className='gm-printer-edit-zone'>
@@ -44,7 +47,13 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorField tableDataKeyList={tableDataKeyList} />
             <Gap height='5px' />
-            <EditorAddField addFields={addFields} />
+            {typeof addFields === 'function' ? (
+              <EditorAddField
+                addFields={addFields(this?.props?.editStore?.config)}
+              />
+            ) : (
+              <EditorAddField addFields={addFields} />
+            )}
 
             <div id='gm-printer-tip' />
 
@@ -67,7 +76,8 @@ Editor.propTypes = {
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
-  type: PropTypes.string
+  type: PropTypes.string,
+  editStore: PropTypes.object
 }
 
 Editor.deaultProps = {
