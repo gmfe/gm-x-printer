@@ -176,7 +176,12 @@ class Block extends React.Component {
         </>
       )
     } else if (type === 'qrcode' || type === 'qrcode_trace') {
-      content = <QrCode value={printerStore.template(text)} />
+      content = (
+        <QrCode
+          value={printerStore.template(text)}
+          size={parseInt(style.height)}
+        />
+      )
     } else if (type === 'remark') {
       content = (
         <div

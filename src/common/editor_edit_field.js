@@ -113,19 +113,20 @@ class EditorField extends React.Component {
             onChange={this.handleChangeBlock.bind(this, 'style')}
           />
         )}
-        {type === 'image' && (
+        {(type === 'image' || type === 'qrcode' || type === 'qrcode_trace') && (
           <div>
             <Size
               style={style}
               onChange={this.handleChangeBlock.bind(this, 'style')}
             />
             <Gap />
-
-            <Textarea
-              value={link}
-              placeholder={i18next.t('请输入链接')}
-              onChange={this.handleChangeBlock.bind(this, 'link')}
-            />
+            {type === 'image' && (
+              <Textarea
+                value={link}
+                placeholder={i18next.t('请输入链接')}
+                onChange={this.handleChangeBlock.bind(this, 'link')}
+              />
+            )}
           </div>
         )}
         <TipInfo
