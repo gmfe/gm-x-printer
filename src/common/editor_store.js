@@ -473,11 +473,13 @@ class EditorStore {
         blocks.push({
           text: i18next.t('请编辑'),
           style: {
-            position: 'absolute',
+            right: '0px',
             left: pos.left || '0px',
             top: pos.top || '0px',
+            position: 'absolute',
+            fontWeight: 'bold',
             fontSize: '26px',
-            fontWeight: 'bold'
+            textAlign: 'center'
           },
           type: 'rise'
         })
