@@ -82,6 +82,10 @@ class Table extends React.Component {
         heights: _.map(trRowSpan, tr => getHeight(tr))
       }
     })
+    // 需要判断一下tableData是否为空
+    if (!tableData.length) {
+      this.props.printerStore.setTableReady(this.props.name, true)
+    }
   }
 
   handleClick = e => {
