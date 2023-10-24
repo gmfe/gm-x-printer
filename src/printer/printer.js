@@ -114,40 +114,49 @@ class Printer extends React.Component {
     const batchPrintConfig = config.batchPrintConfig
     // didMount 代表第一次渲染完成
     // 需要等table计算完成之后，才能计算 pages
-    const disposer = reaction(
-      () => printerStore.tableReady,
-      tableReady => {
-        const tableIsReady = Object.keys(tableReady).every(
-          key => tableReady[key]
-        )
-        if (tableIsReady) {
-          // 连续打印不需要计算
-          if (batchPrintConfig !== 2) {
-            printerStore.setReady(true)
-            // 开始计算，获取各种数据
-            config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
-              ? printerStore.computedRowTablePages()
-              : printerStore.computedPages()
-            /** @decscription 空白行填充补充 */
-            printerStore.computedPages()
-            if (config.autoFillConfig?.checked) {
-              this.props.printerStore.setAutofillConfig(
-                config.autoFillConfig?.checked || false
-              )
-              this.props.printerStore.changeTableData()
-            }
-            // 获取剩余空白高度，传到editor
-            getremainpageHeight &&
-              getremainpageHeight(printerStore.remainPageHeight)
-          }
-          disposer()
-          this.setState({}, () => {
-            this.props.onReady()
-          })
+
+    const compute = () => {
+      // 连续打印不需要计算
+      if (batchPrintConfig !== 2) {
+        printerStore.setReady(true)
+        // 开始计算，获取各种数据
+        config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
+          ? printerStore.computedRowTablePages()
+          : printerStore.computedPages()
+        /** @decscription 空白行填充补充 */
+        printerStore.computedPages()
+        if (config.autoFillConfig?.checked) {
+          this.props.printerStore.setAutofillConfig(
+            config.autoFillConfig?.checked || false
+          )
+          this.props.printerStore.changeTableData()
         }
+        // 获取剩余空白高度，传到editor
+        getremainpageHeight &&
+          getremainpageHeight(printerStore.remainPageHeight)
       }
-    )
-    // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
+      // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
+      this.setState({}, () => {
+        this.props.onReady()
+      })
+    }
+
+    if (Object.keys(printerStore.tableReady).length === 0) {
+      compute()
+    } else {
+      const disposer = reaction(
+        () => printerStore.tableReady,
+        tableReady => {
+          const tableIsReady = Object.keys(tableReady).every(
+            key => tableReady[key]
+          )
+          if (tableIsReady) {
+            compute()
+            disposer()
+          }
+        }
+      )
+    }
   }
 
   init() {
