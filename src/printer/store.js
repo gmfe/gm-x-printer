@@ -34,6 +34,12 @@ const parseFloatFun = a => {
 class PrinterStore {
   @observable ready = false
 
+  /**
+   * 需要等待table渲染完毕才能计算
+   */
+  // eslint-disable-next-line
+  @observable tableReady = {}
+
   // eslint-disable-next-line
   @observable config = {}
   // eslint-disable-next-line
@@ -81,6 +87,12 @@ class PrinterStore {
     this.selected = null
     this.showCombineSkuDetail = config?.combineSkuDetail?.show || false
     this.showIngredientDetail = config?.ingredientDetail?.show || false
+    this.tableReady = {}
+    config.contents.map((v, index) => {
+      if (v.type === 'table') {
+        this.tableReady[`contents.table.${index}`] = false
+      }
+    })
   }
 
   @action
@@ -110,12 +122,23 @@ class PrinterStore {
 
   @action
   setTable(name, table) {
-    this.tablesInfo[name] = table
+    this.tablesInfo = {
+      ...this.tablesInfo,
+      [name]: table
+    }
   }
 
   @action
   setReady(ready) {
     this.ready = ready
+  }
+
+  @action
+  setTableReady(name, ready) {
+    this.tableReady = {
+      ...this.tableReady,
+      [name]: ready
+    }
   }
 
   get tableConfig() {
@@ -330,7 +353,6 @@ class PrinterStore {
           table.body.heights,
           dataKey
         )
-        console.log('heights', heights)
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0

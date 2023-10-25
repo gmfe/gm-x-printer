@@ -33,6 +33,19 @@ class Table extends React.Component {
   }
 
   componentDidMount() {
+    if (!this.props.printerStore.ready) {
+      this.getTableHeight()
+    }
+  }
+
+  componentDidUpdate() {
+    if (!this.props.printerStore.tableReady[this.props.name]) {
+      this.getTableHeight()
+      this.props.printerStore.setTableReady(this.props.name, true)
+    }
+  }
+
+  getTableHeight = () => {
     let {
       name,
       printerStore,
@@ -41,36 +54,37 @@ class Table extends React.Component {
     // 数据
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
+    const $table = this.ref.current.querySelector('table')
+    const tHead = $table.querySelector('thead')
+    const ths = tHead.querySelectorAll('th') || []
+    const trs =
+      $table.querySelectorAll(
+        `${
+          isRowSpanTable(tableData)
+            ? 'tbody .rowSpan-column-rowSpan' // 序号的那一列有这个类名
+            : 'tbody tr'
+        }`
+      ) || []
+    const trRowSpan = $table.querySelectorAll('tbody tr') || []
+    const detailsDiv = $table.querySelectorAll('tr td .b-table-details')
+    printerStore.setHeight(name, getHeight($table))
 
-    if (!printerStore.ready) {
-      const $table = this.ref.current.querySelector('table')
-      const tHead = $table.querySelector('thead')
-      const ths = tHead.querySelectorAll('th') || []
-      const trs =
-        $table.querySelectorAll(
-          `${
-            isRowSpanTable(tableData)
-              ? 'tbody .rowSpan-column-rowSpan' // 序号的那一列有这个类名
-              : 'tbody tr'
-          }`
-        ) || []
-      const trRowSpan = $table.querySelectorAll('tbody tr') || []
-      const detailsDiv = $table.querySelectorAll('tr td .b-table-details')
-      printerStore.setHeight(name, getHeight($table))
-
-      printerStore.setTable(name, {
-        head: {
-          height: getHeight(tHead),
-          widths: _.map(ths, th => getHeadThWidth(th))
-        },
-        body: {
-          heights: _.map(trs, tr => getHeight(tr)),
-          children: _.map(detailsDiv, div => getHeight(div))
-        },
-        bodyTr: {
-          heights: _.map(trRowSpan, tr => getHeight(tr))
-        }
-      })
+    printerStore.setTable(name, {
+      head: {
+        height: getHeight(tHead),
+        widths: _.map(ths, th => getHeadThWidth(th))
+      },
+      body: {
+        heights: _.map(trs, tr => getHeight(tr)),
+        children: _.map(detailsDiv, div => getHeight(div))
+      },
+      bodyTr: {
+        heights: _.map(trRowSpan, tr => getHeight(tr))
+      }
+    })
+    // 需要判断一下tableData是否为空
+    if (!tableData.length) {
+      this.props.printerStore.setTableReady(this.props.name, true)
     }
   }
 
