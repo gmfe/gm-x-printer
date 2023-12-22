@@ -109,6 +109,17 @@ class EditorStore {
     this.config = { ...this.config }
   }
 
+  @action
+  changeIsMergeCustomData = e => {
+    this.config.isMergeCustomData = Number(e.target.value)
+  }
+
+  // 自定义字段不同时，是否合并数据
+  @computed
+  get isMergeCustomData() {
+    return this.config.isMergeCustomData
+  }
+
   @computed
   get computedPrinterKey() {
     return _.map(this.config, (v, k) => {
@@ -209,6 +220,7 @@ class EditorStore {
       { batchPrintConfig: 1, templateType: 1 },
       config
     )
+    console.log(config)
     this.originConfig = config
     this.selected = null
     this.selectedRegion = null

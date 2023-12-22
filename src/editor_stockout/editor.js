@@ -43,7 +43,7 @@ class Editor extends React.Component {
             <Gap height='10px' />
             <EditorSelect />
             <Gap height='5px' />
-            <EditorField tableDataKeyList={tableDataKeyList} />
+            <EditorField type='OUT_STOCK' tableDataKeyList={tableDataKeyList} />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
 

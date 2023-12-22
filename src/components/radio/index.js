@@ -27,7 +27,7 @@ Radio.propTypes = {
   checked: PropTypes.bool
 }
 
-const RadioGroup = ({ onChange, options, children, value }) => {
+const RadioGroup = ({ onChange, options, children, value, style }) => {
   if (!Array.isArray(options)) return children
   return options.map(item => {
     return (
@@ -37,6 +37,7 @@ const RadioGroup = ({ onChange, options, children, value }) => {
         label={item.label}
         checked={value === item.value}
         onChange={onChange}
+        style={style}
       />
     )
   })
