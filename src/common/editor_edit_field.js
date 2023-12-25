@@ -147,10 +147,9 @@ class EditorField extends React.Component {
   }
 
   renderTable() {
-    const { tableDataKeyList, editStore, type } = this.props
+    const { tableDataKeyList, editStore, type, showMergeOption } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
-
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -220,7 +219,7 @@ class EditorField extends React.Component {
         </Flex>
 
         <Gap height='5px' />
-        {type === 'OUT_STOCK' && (
+        {type === 'OUT_STOCK' && showMergeOption && (
           <Flex>
             <div>
               <Radio.Group
@@ -237,6 +236,9 @@ class EditorField extends React.Component {
                 onChange={editStore.changeIsMergeCustomData}
                 value={editStore.isMergeCustomData}
               />
+              <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                {i18next.t('合并打印设置只针对自定义字段')}
+              </Flex>
             </div>
           </Flex>
         )}
@@ -320,7 +322,8 @@ class EditorField extends React.Component {
 EditorField.propTypes = {
   editStore: PropTypes.object,
   tableDataKeyList: PropTypes.array,
-  type: PropTypes.string
+  type: PropTypes.string,
+  showMergeOption: PropTypes.bool
 }
 
 export default EditorField

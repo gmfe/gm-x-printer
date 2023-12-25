@@ -111,7 +111,10 @@ class EditorStore {
 
   @action
   changeIsMergeCustomData = e => {
-    this.config.isMergeCustomData = Number(e.target.value)
+    this.config = {
+      ...this.config,
+      isMergeCustomData: Number(e.target.value)
+    }
   }
 
   // 自定义字段不同时，是否合并数据
