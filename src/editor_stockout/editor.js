@@ -20,7 +20,13 @@ const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
 @observer
 class Editor extends React.Component {
   render() {
-    const { onSave, showEditor, addFields, uploadQiniuImage } = this.props
+    const {
+      onSave,
+      showEditor,
+      addFields,
+      uploadQiniuImage,
+      showMergeOption
+    } = this.props
 
     return (
       <div className='gm-printer-edit'>
@@ -43,7 +49,11 @@ class Editor extends React.Component {
             <Gap height='10px' />
             <EditorSelect />
             <Gap height='5px' />
-            <EditorField tableDataKeyList={tableDataKeyList} />
+            <EditorField
+              showMergeOption={showMergeOption}
+              type='OUT_STOCK'
+              tableDataKeyList={tableDataKeyList}
+            />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
 
@@ -67,11 +77,13 @@ Editor.propTypes = {
   uploadQiniuImage: PropTypes.func,
   showEditor: PropTypes.bool,
   mockData: PropTypes.object.isRequired,
-  addFields: PropTypes.object.isRequired
+  addFields: PropTypes.object.isRequired,
+  showMergeOption: PropTypes.bool
 }
 
 Editor.deaultProps = {
-  onSave: _.noop
+  onSave: _.noop,
+  showMergeOption: false
 }
 
 export default Editor

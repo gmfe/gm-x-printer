@@ -1,6 +1,6 @@
 import i18next from '../../locales'
 import React from 'react'
-import { Flex, Option, Select } from '../components'
+import { Flex, Option, Select, Radio } from '../components'
 import { observer, inject } from 'mobx-react'
 import {
   Fonter,
@@ -147,7 +147,7 @@ class EditorField extends React.Component {
   }
 
   renderTable() {
-    const { tableDataKeyList, editStore } = this.props
+    const { tableDataKeyList, editStore, type, showMergeOption } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
     return (
@@ -217,6 +217,31 @@ class EditorField extends React.Component {
         <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
           {i18next.t('商品排列仅适用于双栏商品设置')}
         </Flex>
+
+        <Gap height='5px' />
+        {type === 'OUT_STOCK' && showMergeOption && (
+          <Flex>
+            <div>
+              <Radio.Group
+                options={[
+                  {
+                    label: i18next.t('不同项合并打印（打印在一行上）'),
+                    value: 1
+                  },
+                  {
+                    label: i18next.t('不同项分开打印（分开行打印）'),
+                    value: 0
+                  }
+                ]}
+                onChange={editStore.changeIsMergeCustomData}
+                value={editStore.isMergeCustomData}
+              />
+              <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                {i18next.t('合并打印设置只针对自定义字段')}
+              </Flex>
+            </div>
+          </Flex>
+        )}
 
         <Gap height='5px' />
 
@@ -296,7 +321,9 @@ class EditorField extends React.Component {
 
 EditorField.propTypes = {
   editStore: PropTypes.object,
-  tableDataKeyList: PropTypes.array
+  tableDataKeyList: PropTypes.array,
+  type: PropTypes.string,
+  showMergeOption: PropTypes.bool
 }
 
 export default EditorField
