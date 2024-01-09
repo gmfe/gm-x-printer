@@ -1,28 +1,62 @@
 import React, { useState } from 'react'
 import classNames from 'classnames'
+import _ from 'lodash'
 
 import Option from '../select/option'
 
-const TagSelect = ({ options = [], value = [], onChange }) => {
+const TagSelect = ({
+  options = [],
+  value = [],
+  onChange,
+  isMultiple = true
+}) => {
   const [open, setOpen] = useState(false)
   const domRef = React.useRef(null)
   const inputRef = React.useRef(null)
+  const [inputValue, setInputValue] = useState('')
+
+  const showInput = isMultiple || open
+
+  const computedOptions = React.useMemo(() => {
+    let newOptions = _.uniq([...value, ...options])
+    if (inputValue) {
+      newOptions = options.filter(option => option.indexOf(inputValue) !== -1)
+      if (options.indexOf(inputValue) === -1) {
+        newOptions.unshift(inputValue)
+      }
+    }
+    return newOptions
+  }, [inputValue, options, value])
+
+  const addTag = tag => {
+    setInputValue('')
+    if (isMultiple) {
+      onChange([...value, tag])
+    } else {
+      onChange([tag])
+      setOpen(false)
+    }
+  }
 
   const removeTag = tag => {
     onChange(value.filter(t => t !== tag))
   }
+  const removeLastTag = () => {
+    onChange(value.slice(0, value.length - 1))
+  }
+
   // 键盘事件
   const handleKeyDown = e => {
     switch (e.keyCode) {
       case 8:
         if (!e.target.value) {
-          onChange(value.slice(0, value.length - 1))
+          removeLastTag()
         }
         break
       case 13:
         if (e.target.value) {
           if (value.indexOf(e.target.value) === -1) {
-            onChange([...value, e.target.value])
+            addTag(e.target.value)
           }
           e.target.value = ''
         }
@@ -57,6 +91,12 @@ const TagSelect = ({ options = [], value = [], onChange }) => {
       }
     }
   }, [open])
+  React.useEffect(() => {
+    if (!open) {
+      setInputValue('')
+    }
+  }, [open])
+
   return (
     <div
       className={classNames('gm-select gm-tag-select ', {
@@ -66,13 +106,26 @@ const TagSelect = ({ options = [], value = [], onChange }) => {
     >
       <label onClick={handleClick}>
         <div className='gm-select-selection'>
-          {value.map((tag, index) => (
-            <div key={index} className='gm-tag'>
-              <span>{tag}</span>
-              <i className='gm-icon-close' onClick={() => removeTag(tag)} />
-            </div>
-          ))}
-          <input ref={inputRef} onKeyDown={e => handleKeyDown(e)} />
+          {isMultiple
+            ? value.map((tag, index) => (
+                <div key={index} className='gm-tag'>
+                  <span>{tag}</span>
+                  <i className='gm-icon-close' onClick={() => removeTag(tag)} />
+                </div>
+              ))
+            : !open && (
+                <div>
+                  <span>{value}</span>
+                </div>
+              )}
+          {showInput && (
+            <input
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              ref={inputRef}
+              onKeyDown={e => handleKeyDown(e)}
+            />
+          )}
         </div>
       </label>
       {open && (
@@ -80,18 +133,18 @@ const TagSelect = ({ options = [], value = [], onChange }) => {
           key='list'
           className='gm-select-list gm-animated gm-animated-fade-in-right'
         >
-          {options.length === 0 && (
+          {computedOptions.length === 0 && (
             <div className='gm-select-list-empty'>无匹配选项</div>
           )}
-          {options.map((option, index) => (
+          {computedOptions.map((option, index) => (
             <Option
               key={index}
               className={value.indexOf(option) !== -1 ? 'selected' : ''}
               onClick={() => {
                 if (value.indexOf(option) === -1) {
-                  onChange([...value, option])
+                  addTag(option)
                 } else {
-                  onChange(value.filter(tag => tag !== option))
+                  removeTag(option)
                 }
                 inputRef.current.focus()
               }}

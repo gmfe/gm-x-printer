@@ -142,6 +142,7 @@ class EditorSelector extends React.Component {
             <Observer>
               {() => (
                 <TagSelect
+                  isMultiple={false}
                   value={tags}
                   onChange={this.handleSetTags}
                   options={templateTags}
