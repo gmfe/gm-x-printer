@@ -42,17 +42,19 @@ const TagSelect = ({ options = [], value = [], onChange }) => {
   }
 
   React.useEffect(() => {
-    if (open) {
-      const shadowDiv = document.querySelector('#shadowroot')
-      const shadowRoot = shadowDiv.shadowRoot
-
+    const shadowDiv = document.querySelector('#shadowroot')
+    if (!shadowDiv) {
+      return
+    }
+    const shadowRoot = shadowDiv.shadowRoot
+    if (open && shadowRoot) {
       if (!shadowRoot) {
         return
       }
       shadowRoot.addEventListener('click', handleDocumentClick)
-    }
-    return () => {
-      document.body.removeEventListener('click', handleDocumentClick)
+      return () => {
+        shadowRoot.removeEventListener('click', handleDocumentClick)
+      }
     }
   }, [open])
   return (
