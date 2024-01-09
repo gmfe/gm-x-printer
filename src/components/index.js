@@ -6,6 +6,7 @@ import Dialog from './dialog'
 import Switch from './switch'
 import ToolTip from './tooltip'
 import Radio from './radio'
+import TagSelect from './tag_select'
 
 export {
   Flex,
@@ -18,5 +19,6 @@ export {
   Dialog,
   Switch,
   ToolTip,
-  Radio
+  Radio,
+  TagSelect
 }

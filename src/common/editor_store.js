@@ -84,14 +84,49 @@ class EditorStore {
   @observable
   order_big = '大写：'
 
+  // 当前模板已有的标签
+  @observable
+  templateTags = null
+
+  @observable
+  tags = []
+
   // 默认table的dataKey
   setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
 
   defaultTableSubtotal = { show: false }
 
   @action
+  init(config, data, templateTags) {
+    console.log(this.config)
+    // batchPrintConfig: 1 不连续打印（一张采购单不出现多供应商）2 连续打印（一张采购单可能出现多个供应商）
+    this.config = Object.assign(
+      { batchPrintConfig: 1, templateType: 1 },
+      config
+    )
+    this.originConfig = config
+    this.selected = null
+    this.selectedRegion = null
+    this.insertPanel = 'header'
+    this.mockData = data
+    this.isAutoFilling = false
+    this.templateTags = templateTags
+    console.log(this.config)
+    if (this.config.tags) {
+      this.tags = this.config.tags.split(',')
+    } else {
+      this.tags = []
+    }
+  }
+
+  @action
   setAutoFillingConfig(bol) {
     this.isAutoFilling = bol
+  }
+
+  @action
+  setTemplateTags(tags) {
+    this.templateTags = tags
   }
 
   /** 切换自适应 */
@@ -217,19 +252,9 @@ class EditorStore {
   }
 
   @action
-  init(config, data) {
-    // batchPrintConfig: 1 不连续打印（一张采购单不出现多供应商）2 连续打印（一张采购单可能出现多个供应商）
-    this.config = Object.assign(
-      { batchPrintConfig: 1, templateType: 1 },
-      config
-    )
-    console.log(config)
-    this.originConfig = config
-    this.selected = null
-    this.selectedRegion = null
-    this.insertPanel = 'header'
-    this.mockData = data
-    this.isAutoFilling = false
+  setTags(tags) {
+    this.tags = tags
+    this.config.tags = tags.join(',')
   }
 
   @action
