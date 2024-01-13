@@ -6,7 +6,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "webpack-dev-server --hot",
-    "build": "webpack -p",
+    "build": "webpack --progress --colors --config ./webpack.prod.config.js",
     "locale": "i18n-m sync src/",
     "release": "bumpp"
   },
@@ -23,6 +23,10 @@
   "types": "global.d.ts",
   "author": "",
   "license": "ISC",
+  "files": [
+    "lib",
+    "global.d.ts"
+  ],
   "bugs": {
     "url": "https://github.com/gmfe/gm-printer/issues"
   },
@@ -106,6 +110,7 @@
     "terser-webpack-plugin": "^2.3.8",
     "url-loader": "^1.1.2",
     "webpack": "^4.47.0",
+    "webpack-bundle-analyzer": "^4.10.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.3"
   }
