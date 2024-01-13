@@ -34,7 +34,7 @@ jobs:
         run: nci
 
       - name: Build
-        run: npx ni build
+        run: npm run build
 
       - name: Release
         run: |
