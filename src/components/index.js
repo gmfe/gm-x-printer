@@ -20,3 +20,5 @@ export {
   ToolTip,
   Radio
 }
+
+export * from './svg'

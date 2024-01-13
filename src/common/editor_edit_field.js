@@ -14,6 +14,7 @@ import {
   Textarea,
   ChangeCapCheckbox,
   Title,
+  Border,
   TipInfo
 } from '../common/component'
 import PropTypes from 'prop-types'

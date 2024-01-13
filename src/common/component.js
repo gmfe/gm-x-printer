@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import _ from 'lodash'
 // eslint-disable-next-line import/named
 import { borderStyleList, TYPE_ENUM } from '../config'
-import { Flex, Tip, ToolTip } from '../components'
+import { Flex, Tip, ToolTip, MaterialSymbolsBorderOuter } from '../components'
 import { Request } from 'gm-util'
 import i18next from '../../locales'
 
@@ -225,6 +225,28 @@ class Fonter extends React.Component {
         >
           U
         </span>
+        <span
+          className={classNames('gm-printer-edit-btn', {
+            active: style.border === '1px solid',
+            lineHeight: 20
+          })}
+          onClick={() =>
+            this.handleChange(
+              'border',
+              style.border === '1px solid' ? '' : '1px solid'
+            )
+          }
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              height: '100%'
+            }}
+          >
+            <MaterialSymbolsBorderOuter style={{ fontSize: 14 }} />
+          </div>
+        </span>
       </span>
     )
   }
@@ -278,6 +300,15 @@ class TextAlign extends React.Component {
       </span>
     )
   }
+}
+
+// 边框
+const Border = () => {
+  return (
+    <span>
+      <div>123123</div>
+    </span>
+  )
 }
 
 TextAlign.propTypes = {
@@ -769,5 +800,6 @@ export {
   FieldBtn,
   TipInfo,
   IsShowCheckBox,
-  ShowInputText
+  ShowInputText,
+  Border
 }
