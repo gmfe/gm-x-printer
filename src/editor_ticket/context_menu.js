@@ -58,7 +58,6 @@ class ContextMenu extends React.Component {
   }
 
   handleSubtotal = name => {
-    console.log(111)
     const { editStore } = this.props
 
     editStore.setSubtotalShow(name)

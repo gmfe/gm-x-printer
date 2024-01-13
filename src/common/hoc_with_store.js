@@ -98,10 +98,20 @@ const withStore = store => WrapComponent =>
     }
 
     handleKeyDown = e => {
-      if (e.target !== window.document.body) {
+      // 如果没有选中任何一个, 则不处理
+      if (!this.store.computedIsSelectBlock) {
         return
       }
-
+      // 阻止任何的input输入
+      const path = e.composedPath()
+      const actualTarget = path?.[0]
+      if (
+        actualTarget &&
+        (actualTarget.tagName === 'INPUT' ||
+          actualTarget.tagName === 'TEXTAREA')
+      ) {
+        return
+      }
       if (e.code.startsWith('Arrow')) {
         e.preventDefault()
 

@@ -40,6 +40,11 @@ gm-x-printer 是新架构 erp 使用的打印库
 4. 可能断开连接不太好用，不好用的时候，删除 node_modeles，关闭 gm-x-printer，重新 yarn
 5. yarn link 不太稳定
 
+## 与 pnpm 进行连接测试
+1. 在 gm-x-printer 执行 `yarn build:watch`
+2. 在 gm-x-printer 中，执行 `pnpm link --global`
+3. 在需要连接的项目中执行 `pnpm link --global gm-x-printer`
+
 ## 版本命名规则
 
 1. GNU 风格的版本号命名格式：主版本号 . 子版本号 [. 修正版本号 [. 编译版本号 ]]，示例 : 1.2.1 （正式版本）, 1.2.1-beta.0(测试版本)

@@ -1,6 +1,6 @@
 // eslint-disable-next-line
-import editorCSS from './style.lesss'
+import editorCSS from '!!raw-loader!less-loader!./style.less'
 
-export default function getEditorCSS () {
+export default function getEditorCSS() {
   return editorCSS.toString()
 }

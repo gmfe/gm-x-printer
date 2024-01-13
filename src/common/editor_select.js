@@ -41,7 +41,6 @@ class EditorSelector extends React.Component {
   }
 
   handleSetTags = tags => {
-    console.log(tags)
     this.props.editStore.setTags(tags)
   }
 
@@ -54,7 +53,6 @@ class EditorSelector extends React.Component {
       templateTags,
       tags
     } = this.props.editStore
-    console.log(tags)
     const isDIY = page.type === 'DIY'
     return (
       <div>

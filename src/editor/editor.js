@@ -17,6 +17,7 @@ import EditorSpacialSetting from '../common/editor_spacial_setting'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
+import classNames from 'classnames'
 
 // ‼️‼️🚸🚸 注意: value的命名不要用下划线! 原因是 computedTableDataKeyOfSelectedRegion 会split('_')下划线做一些事情‼️
 // 📚hasSubtotalBtn 这种表格是否支持  双栏,分类,合计  功能
@@ -45,12 +46,13 @@ class Editor extends React.Component {
       onSave,
       showEditor,
       addFields,
+      className,
       showNewDate,
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
     return (
-      <div className='gm-printer-edit'>
+      <div className={classNames('gm-printer-edit', className)}>
         <Flex className='gm-printer-edit-title-fixed'>
           <Title
             title={i18next.t('模板预览')}

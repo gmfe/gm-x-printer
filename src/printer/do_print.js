@@ -23,7 +23,7 @@ function init({ isTest, isTipZoom = true }) {
     $printer.style.width = '100%' // 使移动端可滚动
     if (isTest) {
       // 模板编辑[测试打印],隐藏起来
-      $printer.style.left = '-2000px'
+      $printer.style.left = '-3000px'
     } else {
       $printer.style.left = '0px'
       $printer.style.height = '100vh'
