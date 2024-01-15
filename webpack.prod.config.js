@@ -1,7 +1,7 @@
 const webpack = require('webpack')
 const path = require('path')
-const  BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin
 
 module.exports = {
   mode: 'production',
@@ -15,9 +15,9 @@ module.exports = {
   externals: {
     react: 'react',
     'react-dom': 'react-dom',
-    'mobx': 'mobx',
+    mobx: 'mobx',
     'mobx-react': 'mobx-react',
-    'lodash': 'lodash',
+    lodash: 'lodash'
   },
   module: {
     rules: [
@@ -66,7 +66,7 @@ module.exports = {
     ]
   },
   plugins: [
-    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/),
+    new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /zh-cn/)
     // new BundleAnalyzerPlugin(),
   ],
   devServer: {
