@@ -51,7 +51,6 @@ class Editor extends React.Component {
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
-    console.log('啊实打实大所多', className, '22222')
     return (
       <div className={classNames('gm-printer-edit', className)}>
         <Flex className='gm-printer-edit-title-fixed'>
