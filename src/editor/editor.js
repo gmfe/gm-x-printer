@@ -127,7 +127,8 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   showNewDate: PropTypes.bool,
-  uploadQiniuImage: PropTypes.func
+  uploadQiniuImage: PropTypes.func,
+  templateTags: PropTypes.array
 }
 
 Editor.deaultProps = {

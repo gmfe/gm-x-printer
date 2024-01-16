@@ -1,7 +1,7 @@
 import i18next from '../../locales'
 import React from 'react'
-import { observer, inject } from 'mobx-react'
-import { Flex, Option, Select } from '../components'
+import { observer, inject, Observer } from 'mobx-react'
+import { Flex, Option, Select, TagSelect } from '../components'
 import { InputWithUnit } from '../common/component'
 import { pageTypeMap, printDirectionList } from '../config'
 import _ from 'lodash'
@@ -40,13 +40,21 @@ class EditorSelector extends React.Component {
     this.props.editStore.setTemplateType(type)
   }
 
+  handleSetTags = tags => {
+    console.log(tags)
+    this.props.editStore.setTags(tags)
+  }
+
   render() {
     const {
       config: { name, page, batchPrintConfig, templateType },
       computedRegionList,
       computedSelectedRegionTip,
-      selectedRegion
+      selectedRegion,
+      templateTags,
+      tags
     } = this.props.editStore
+    console.log(tags)
     const isDIY = page.type === 'DIY'
     return (
       <div>
@@ -128,7 +136,21 @@ class EditorSelector extends React.Component {
             ))}
           </Select>
         </Flex>
-
+        {templateTags && (
+          <Flex alignCenter className='gm-padding-top-5'>
+            <div>{i18next.t('编辑标签')}：</div>
+            <Observer>
+              {() => (
+                <TagSelect
+                  isMultiple={false}
+                  value={tags}
+                  onChange={this.handleSetTags}
+                  options={templateTags}
+                />
+              )}
+            </Observer>
+          </Flex>
+        )}
         {this.props.isPurchase ||
           (this.props.type === 'picking' && (
             <>
