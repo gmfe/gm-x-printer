@@ -174,7 +174,7 @@ class Fonter extends React.Component {
   }
 
   render() {
-    const { style } = this.props
+    const { style, type } = this.props
 
     return (
       <span className='gm-printer-edit-fonter'>
@@ -225,28 +225,42 @@ class Fonter extends React.Component {
         >
           U
         </span>
-        <span
-          className={classNames('gm-printer-edit-btn', {
-            active: style.border === '1px solid',
-            lineHeight: 20
-          })}
-          onClick={() =>
-            this.handleChange(
-              'border',
-              style.border === '1px solid' ? '' : '1px solid'
-            )
-          }
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              height: '100%'
-            }}
-          >
-            <MaterialSymbolsBorderOuter style={{ fontSize: 14 }} />
-          </div>
-        </span>
+        <Separator />
+        {(!type || type === 'text' || type === 'rise' || type === 'remark') && (
+          <>
+            <span
+              className={classNames({
+                lineHeight: 20
+              })}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%'
+                }}
+              >
+                边框宽度
+              </div>
+            </span>
+            <TextPX
+              onChange={e => {
+                const num = Number(e.replace('px', ''))
+                if (Number(num) > 0) {
+                  setTimeout(() => {
+                    this.handleChange('borderStyle', `solid`)
+                  })
+                } else {
+                  setTimeout(() => {
+                    this.handleChange('borderStyle', 'none')
+                  })
+                }
+                this.handleChange('borderWidth', e)
+              }}
+              value={style.borderWidth}
+            />
+          </>
+        )}
       </span>
     )
   }

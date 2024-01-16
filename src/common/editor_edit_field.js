@@ -85,6 +85,7 @@ class EditorField extends React.Component {
             <Fonter
               style={style}
               onChange={this.handleChangeBlock.bind(this, 'style')}
+              type={type}
             />
             {/* 非表格字段不显示左中右 */}
             {/* <Separator />
@@ -269,6 +270,7 @@ class EditorField extends React.Component {
               <Fonter
                 style={headStyle}
                 onChange={this.handleChangeTable.bind(this, 'headStyle')}
+                type='table'
               />
               <Separator />
               <TextAlign
@@ -287,6 +289,7 @@ class EditorField extends React.Component {
               <Fonter
                 style={style}
                 onChange={this.handleChangeTable.bind(this, 'style')}
+                type='table'
               />
               <Separator />
               <TextAlign

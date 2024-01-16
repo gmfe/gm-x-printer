@@ -7,6 +7,7 @@
     "precommit": "lint-staged",
     "start": "webpack-dev-server --hot",
     "build": "webpack --progress --colors --config ./webpack.prod.config.js",
+    "build:watch": "webpack --progress --colors --config ./webpack.prod.config.js --watch",
     "locale": "i18n-m sync src/",
     "release": "bumpp"
   },

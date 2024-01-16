@@ -98,10 +98,10 @@ const withStore = store => WrapComponent =>
     }
 
     handleKeyDown = e => {
-      if (e.target !== window.document.body) {
+      // 如果没有选中任何一个, 则不处理
+      if (!this.store.computedIsSelectBlock) {
         return
       }
-
       if (e.code.startsWith('Arrow')) {
         e.preventDefault()
 
