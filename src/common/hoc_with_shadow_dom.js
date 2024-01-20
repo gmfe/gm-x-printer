@@ -12,7 +12,6 @@ const withShadowDom = WrapCom => {
       const shadowRoot = this.ref.current.attachShadow({ mode: 'open' })
       // 在window下挂 shadow root
       window.shadowRoot = shadowRoot
-      console.log(this.props)
       ReactDOM.render(<WrapCom {...this.props} />, shadowRoot)
       insertCSS(getPrinterCSS() + getEditorCSS(), shadowRoot)
     }

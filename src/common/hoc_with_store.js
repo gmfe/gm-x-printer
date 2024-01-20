@@ -102,6 +102,16 @@ const withStore = store => WrapComponent =>
       if (!this.store.computedIsSelectBlock) {
         return
       }
+      // 阻止任何的input输入
+      const path = e.composedPath()
+      const actualTarget = path?.[0]
+      if (
+        actualTarget &&
+        (actualTarget.tagName === 'INPUT' ||
+          actualTarget.tagName === 'TEXTAREA')
+      ) {
+        return
+      }
       if (e.code.startsWith('Arrow')) {
         e.preventDefault()
 

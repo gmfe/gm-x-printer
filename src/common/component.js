@@ -132,6 +132,7 @@ Textarea.propTypes = {
 class TextPX extends React.Component {
   handleChange = value => {
     const { onChange } = this.props
+    console.log(value === '')
     if (value === '') {
       onChange('')
     } else if (value.endsWith('%')) {
@@ -170,6 +171,14 @@ class Fonter extends React.Component {
     onChange({
       ...style,
       [type]: value
+    })
+  }
+
+  handleChangeObj = obj => {
+    const { style, onChange } = this.props
+    onChange({
+      ...style,
+      ...obj
     })
   }
 
@@ -246,16 +255,17 @@ class Fonter extends React.Component {
             <TextPX
               onChange={e => {
                 const num = Number(e.replace('px', ''))
-                if (Number(num) > 0) {
-                  setTimeout(() => {
-                    this.handleChange('borderStyle', `solid`)
+                if (![null, undefined, ''].includes(e) && Number(num) > 0) {
+                  this.handleChangeObj({
+                    borderStyle: 'solid',
+                    borderWidth: e
                   })
                 } else {
-                  setTimeout(() => {
-                    this.handleChange('borderStyle', 'none')
+                  this.handleChangeObj({
+                    borderStyle: 'none',
+                    borderWidth: ''
                   })
                 }
-                this.handleChange('borderWidth', e)
               }}
               value={style.borderWidth}
             />
