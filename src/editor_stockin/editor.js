@@ -13,14 +13,23 @@ import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
 
-const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
+const defaultTableDataKeyList = [
+  { value: 'orders', text: i18next.t('全部商品') }
+]
 
 @withStore(editStore)
 @inject('editStore')
 @observer
 class Editor extends React.Component {
   render() {
-    const { onSave, showEditor, addFields, uploadQiniuImage, type } = this.props
+    const {
+      onSave,
+      showEditor,
+      addFields,
+      uploadQiniuImage,
+      type,
+      tableDataKeyList
+    } = this.props
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -45,7 +54,13 @@ class Editor extends React.Component {
             <Gap height='10px' />
             <EditorSelect type={type} />
             <Gap height='5px' />
-            <EditorField tableDataKeyList={tableDataKeyList} />
+            <EditorField
+              tableDataKeyList={
+                !_.isUndefined(tableDataKeyList)
+                  ? tableDataKeyList
+                  : defaultTableDataKeyList
+              }
+            />
             <Gap height='5px' />
             {typeof addFields === 'function' ? (
               <EditorAddField
@@ -77,7 +92,8 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   type: PropTypes.string,
-  editStore: PropTypes.object
+  editStore: PropTypes.object,
+  tableDataKeyList: PropTypes.oneOfType([PropTypes.array, PropTypes.any])
 }
 
 Editor.deaultProps = {
