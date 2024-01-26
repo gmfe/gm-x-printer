@@ -13,6 +13,9 @@ class EditorSubtotal extends React.Component {
     if (!editStore.computedRegionIsTable) {
       return null
     }
+    if (!editStore.selected) {
+      return null
+    }
     const arr = editStore.selected.split('.')
     const { dataKey } = config.contents[arr[2]]
     const keyArr = dataKey.split('_')
