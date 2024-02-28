@@ -1,9 +1,9 @@
 // eslint-disable-next-line
-import normalizeCSS from './normalize.csss'
+import normalizeCSS from '!!raw-loader!less-loader!./normalize.css'
 // eslint-disable-next-line
-import printerCSS from './style.lesss'
+import printerCSS from '!!raw-loader!less-loader!./style.less'
 
-function getCSS () {
+function getCSS() {
   return normalizeCSS.toString() + printerCSS.toString()
 }
 

@@ -33,6 +33,9 @@ jobs:
       - name: Install
         run: nci
 
+      - name: Build
+        run: npm run build
+
       - name: Release
         run: |
           if [[ ${{ github.ref }} == *refs/tags/*-beta* ]]; then

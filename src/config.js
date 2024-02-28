@@ -229,3 +229,8 @@ export const COM_STYLE = { color: '#848586', fontSize: 12 }
 export const PAGE_TEXT = '每页合计'
 
 export const MULTI_SUFFIX = '_MULTI_SUFFIX'
+
+export const SHEET_TITLE_MAP = {
+  23: '入库',
+  24: '出库'
+}

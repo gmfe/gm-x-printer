@@ -22,3 +22,5 @@ export {
   Radio,
   TagSelect
 }
+
+export * from './svg'

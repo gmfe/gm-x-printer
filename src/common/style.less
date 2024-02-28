@@ -67,10 +67,17 @@
     padding: 10px 20px;
     box-shadow: -2px 0 3px 0 hsla(0, 0%, 39%, 0.1);
 
+    .gm-printer-edit-fonter {
+      display: flex;
+      align-items: center;
+    }
+
     span.gm-printer-edit-btn {
       cursor: pointer;
       padding: 0 5px;
       border: 1px solid transparent;
+      display: inline-block;
+      height: 20px;
 
       &:hover {
         border: 1px solid rgba(51, 51, 51, 0.1);
@@ -344,3 +351,25 @@
   }
 }
 
+.custom-printer {
+  width: 100%;
+  position: relative;
+
+  .gm-printer-edit-title-fixed {
+    position: absolute;
+    top: 0;
+  }
+
+  &.gm-printer-edit {
+    height: 100%;
+    background-color: #fff;
+
+    .gm-printer-edit-wrap {
+      height: 100%;
+    }
+
+    .gm-printer-edit-zone {
+      height: 100%;
+    }
+  }
+}

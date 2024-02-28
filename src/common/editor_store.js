@@ -98,7 +98,6 @@ class EditorStore {
 
   @action
   init(config, data, templateTags) {
-    console.log(this.config)
     // batchPrintConfig: 1 不连续打印（一张采购单不出现多供应商）2 连续打印（一张采购单可能出现多个供应商）
     this.config = Object.assign(
       { batchPrintConfig: 1, templateType: 1 },
@@ -111,7 +110,6 @@ class EditorStore {
     this.mockData = data
     this.isAutoFilling = false
     this.templateTags = templateTags
-    console.log(this.config)
     if (this.config.tags) {
       this.tags = this.config.tags.split(',')
     } else {

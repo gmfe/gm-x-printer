@@ -4,7 +4,7 @@ import classNames from 'classnames'
 import _ from 'lodash'
 // eslint-disable-next-line import/named
 import { borderStyleList, TYPE_ENUM } from '../config'
-import { Flex, Tip, ToolTip } from '../components'
+import { Flex, Tip, ToolTip, MaterialSymbolsBorderOuter } from '../components'
 import { Request } from 'gm-util'
 import i18next from '../../locales'
 
@@ -132,6 +132,7 @@ Textarea.propTypes = {
 class TextPX extends React.Component {
   handleChange = value => {
     const { onChange } = this.props
+    console.log(value === '')
     if (value === '') {
       onChange('')
     } else if (value.endsWith('%')) {
@@ -173,8 +174,16 @@ class Fonter extends React.Component {
     })
   }
 
+  handleChangeObj = obj => {
+    const { style, onChange } = this.props
+    onChange({
+      ...style,
+      ...obj
+    })
+  }
+
   render() {
-    const { style } = this.props
+    const { style, type } = this.props
 
     return (
       <span className='gm-printer-edit-fonter'>
@@ -225,6 +234,43 @@ class Fonter extends React.Component {
         >
           U
         </span>
+        <Separator />
+        {(!type || type === 'text' || type === 'rise' || type === 'remark') && (
+          <>
+            <span
+              className={classNames({
+                lineHeight: 20
+              })}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%'
+                }}
+              >
+                边框宽度
+              </div>
+            </span>
+            <TextPX
+              onChange={e => {
+                const num = Number(e.replace('px', ''))
+                if (![null, undefined, ''].includes(e) && Number(num) > 0) {
+                  this.handleChangeObj({
+                    borderStyle: 'solid',
+                    borderWidth: e
+                  })
+                } else {
+                  this.handleChangeObj({
+                    borderStyle: 'none',
+                    borderWidth: ''
+                  })
+                }
+              }}
+              value={style.borderWidth}
+            />
+          </>
+        )}
       </span>
     )
   }
@@ -278,6 +324,15 @@ class TextAlign extends React.Component {
       </span>
     )
   }
+}
+
+// 边框
+const Border = () => {
+  return (
+    <span>
+      <div>123123</div>
+    </span>
+  )
 }
 
 TextAlign.propTypes = {
@@ -769,5 +824,6 @@ export {
   FieldBtn,
   TipInfo,
   IsShowCheckBox,
-  ShowInputText
+  ShowInputText,
+  Border
 }
