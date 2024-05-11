@@ -83,9 +83,12 @@ class Table extends React.Component {
       }
     })
     // 需要判断一下tableData是否为空
-    if (!tableData.length) {
+    // if (!tableData.length) {
+    /** table数据允许为空，如果遇到空的table 数据，导致printer 没有setReady  */
+    setTimeout(() => {
       this.props.printerStore.setTableReady(this.props.name, true)
-    }
+    }, 300)
+    // }
   }
 
   handleClick = e => {
