@@ -41,9 +41,7 @@ class Table extends React.Component {
   componentDidUpdate() {
     if (!this.props.printerStore.tableReady[this.props.name]) {
       this.getTableHeight()
-      setTimeout(() => {
-        this.props.printerStore.setTableReady(this.props.name, true)
-      }, 300)
+      this.props.printerStore.setTableReady(this.props.name, true)
     }
   }
 
