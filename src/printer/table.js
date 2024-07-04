@@ -402,6 +402,7 @@ class Table extends React.Component {
                           key={j}
                           data-name={getTableColumnName(name, col.index)}
                           style={{
+                            wordBreak: 'break-all',
                             ...getTdStyle(j, col.style),
                             ...col.style
                           }}
