@@ -175,7 +175,11 @@ class Block extends React.Component {
           )}
         </>
       )
-    } else if (type === 'qrcode' || type === 'qrcode_trace') {
+    } else if (
+      type === 'qrcode' ||
+      type === 'qrcode_trace' ||
+      type === 'qrcode_suzhou_trace'
+    ) {
       content = (
         <QrCode
           value={printerStore.template(text)}

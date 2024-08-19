@@ -595,6 +595,18 @@ class EditorStore {
           text: `{{qrcode_trace}}`
         })
         break
+      case 'qrcode_suzhou_trace':
+        blocks.push({
+          type: 'qrcode_trace',
+          style: {
+            left: '0px',
+            top: '5px',
+            width: '75px',
+            height: '75px'
+          },
+          text: `{{qrcode_suzhou_trace}}`
+        })
+        break
       // 备注单元格
       case 'remark':
         blocks.push({
