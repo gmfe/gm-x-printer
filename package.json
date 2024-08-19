@@ -1,6 +1,6 @@
 {
   "name": "gm-x-printer",
-  "version": "1.9.11-beta.2",
+  "version": "1.9.11-beta.3",
   "description": "diy printer",
   "main": "lib/main.js",
   "scripts": {
