@@ -117,8 +117,7 @@ class EditorField extends React.Component {
         )}
         {(type === 'image' ||
           type === 'qrcode' ||
-          type === 'qrcode_trace' ||
-          type === 'qrcode_suzhou_trace') && (
+          type === 'qrcode_trace' ) && (
           <div>
             <Size
               style={style}

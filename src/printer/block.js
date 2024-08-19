@@ -176,9 +176,7 @@ class Block extends React.Component {
         </>
       )
     } else if (
-      type === 'qrcode' ||
-      type === 'qrcode_trace' ||
-      type === 'qrcode_suzhou_trace'
+      type === 'qrcode' || type === 'qrcode_trace' 
     ) {
       content = (
         <QrCode

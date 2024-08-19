@@ -595,18 +595,7 @@ class EditorStore {
           text: `{{qrcode_trace}}`
         })
         break
-      case 'qrcode_suzhou_trace':
-        blocks.push({
-          type: 'qrcode_trace',
-          style: {
-            left: '0px',
-            top: '5px',
-            width: '75px',
-            height: '75px'
-          },
-          text: `{{qrcode_suzhou_trace}}`
-        })
-        break
+     
       // 备注单元格
       case 'remark':
         blocks.push({
@@ -786,6 +775,20 @@ class EditorStore {
       case 'image': {
         blocks.push({
           type: 'image',
+          text: value,
+          style: {
+            position: 'absolute',
+            left: '0px',
+            top: '0px',
+            width: '100px',
+            height: '100px'
+          }
+        })
+        break
+      }
+      case 'qrcode': {
+        blocks.push({
+          type: 'qrcode',
           text: value,
           style: {
             position: 'absolute',

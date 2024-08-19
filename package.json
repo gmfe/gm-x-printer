@@ -1,6 +1,10 @@
 {
   "name": "gm-x-printer",
+<<<<<<< Updated upstream
   "version": "1.9.11-beta.2",
+=======
+  "version": "1.9.11-beta.1",
+>>>>>>> Stashed changes
   "description": "diy printer",
   "main": "lib/main.js",
   "scripts": {
