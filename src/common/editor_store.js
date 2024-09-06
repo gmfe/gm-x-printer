@@ -476,6 +476,7 @@ class EditorStore {
     for (const [key, table] of Object.entries(tableData)) {
       tableData[key] = table.filter(x => !x._isEmptyData)
     }
+    console.log(tableData)
     // this.setAutoFillingConfig(false)
     set(this.mockData, {
       _table: tableData
