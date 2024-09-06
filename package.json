@@ -37,6 +37,7 @@
   "homepage": "https://github.com/gmfe/gm-printer#readme",
   "dependencies": {
     "big.js": "^5.2.2",
+    "changelogithub": "^0.13.10",
     "classnames": "^2.2.6",
     "gm-util": "^5.12.9",
     "jsbarcode": "^3.11.0",
