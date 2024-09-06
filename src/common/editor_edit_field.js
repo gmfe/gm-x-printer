@@ -115,7 +115,9 @@ class EditorField extends React.Component {
             onChange={this.handleChangeBlock.bind(this, 'style')}
           />
         )}
-        {(type === 'image' || type === 'qrcode' || type === 'qrcode_trace') && (
+        {(type === 'image' ||
+          type === 'qrcode' ||
+          type === 'qrcode_trace' ) && (
           <div>
             <Size
               style={style}

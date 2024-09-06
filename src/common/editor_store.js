@@ -595,6 +595,7 @@ class EditorStore {
           text: `{{qrcode_trace}}`
         })
         break
+     
       // 备注单元格
       case 'remark':
         blocks.push({
@@ -774,6 +775,20 @@ class EditorStore {
       case 'image': {
         blocks.push({
           type: 'image',
+          text: value,
+          style: {
+            position: 'absolute',
+            left: '0px',
+            top: '0px',
+            width: '100px',
+            height: '100px'
+          }
+        })
+        break
+      }
+      case 'qrcode': {
+        blocks.push({
+          type: 'qrcode',
           text: value,
           style: {
             position: 'absolute',
