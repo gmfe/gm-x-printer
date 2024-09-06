@@ -2,6 +2,12 @@ import EditorStore from '../common/editor_store'
 import i18next from '../../locales'
 import { action } from 'mobx'
 
+const Price = {
+  getUnit() {
+    return '元'
+  }
+}
+
 class Store extends EditorStore {
   // 复写父类方法
   setTableDataKeyEffect(target, dataKey) {
@@ -19,16 +25,6 @@ class Store extends EditorStore {
             text: i18next.t('{{列.序号}}')
           },
           {
-            head: i18next.t('商品名'),
-            headStyle: {
-              textAlign: 'center'
-            },
-            style: {
-              textAlign: 'center'
-            },
-            text: i18next.t('{{列.组合商品_名}}')
-          },
-          {
             head: i18next.t('商品编码'),
             headStyle: {
               textAlign: 'center'
@@ -36,17 +32,27 @@ class Store extends EditorStore {
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.组合商品_自定义编码}}')
+            text: i18next.t('{{列.商品自定义编码}}')
           },
           {
-            head: i18next.t('包装单位'),
+            head: i18next.t('商品名'),
             headStyle: {
               textAlign: 'center'
             },
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.组合商品_包装单位}}')
+            text: i18next.t('{{列.商品名}}')
+          },
+          {
+            head: i18next.t('下单单位'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.下单单位}}')
           },
           {
             head: i18next.t('下单数'),
@@ -56,27 +62,38 @@ class Store extends EditorStore {
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.组合商品_下单数}}')
+            text: i18next.t('{{列.下单数}}{{列.下单单位}}')
           },
           {
-            head: i18next.t('单价'),
+            head: i18next.t('出库数(基本单位)'),
             headStyle: {
               textAlign: 'center'
             },
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.组合商品_单价}}')
+            text: i18next.t('{{列.出库数_基本单位}}{{列.基本单位}}')
           },
           {
-            head: i18next.t('下单金额'),
+            head: i18next.t('单价(基本单位)'),
             headStyle: {
               textAlign: 'center'
             },
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.组合商品_下单金额}}')
+            // eslint-disable-next-line gmfe/i18n-check
+            text: i18next.t(`{{列.单价}}${Price.getUnit()}/{{列.定价单位}}`)
+          },
+          {
+            head: i18next.t('出库金额'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.出库金额}}')
           }
         ]
         break
@@ -92,16 +109,6 @@ class Store extends EditorStore {
               textAlign: 'center'
             },
             text: i18next.t('{{列.积分商品名}}')
-          },
-          {
-            head: i18next.t('规格'),
-            headStyle: {
-              textAlign: 'center'
-            },
-            style: {
-              textAlign: 'center'
-            },
-            text: i18next.t('{{列.规格}}')
           },
           {
             head: i18next.t('兑换数'),
@@ -204,16 +211,6 @@ class Store extends EditorStore {
             text: i18next.t('{{列.商品名}}')
           },
           {
-            head: i18next.t('规格'),
-            headStyle: {
-              textAlign: 'center'
-            },
-            style: {
-              textAlign: 'center'
-            },
-            text: i18next.t('{{列.规格}}')
-          },
-          {
             head: i18next.t('下单数'),
             headStyle: {
               textAlign: 'center'
@@ -241,7 +238,8 @@ class Store extends EditorStore {
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.单价_基本单位}}')
+            // eslint-disable-next-line gmfe/i18n-check
+            text: i18next.t(`{{列.单价}}${Price.getUnit()}/{{列.定价单位}}`)
           },
           {
             head: i18next.t('出库金额'),
@@ -269,14 +267,14 @@ class Store extends EditorStore {
             text: i18next.t('{{列.序号}}')
           },
           {
-            head: i18next.t('类别'),
+            head: i18next.t('商品编码'),
             headStyle: {
               textAlign: 'center'
             },
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.类别}}')
+            text: i18next.t('{{列.商品自定义编码}}')
           },
           {
             head: i18next.t('商品名'),
@@ -289,14 +287,14 @@ class Store extends EditorStore {
             text: i18next.t('{{列.商品名}}')
           },
           {
-            head: i18next.t('规格'),
+            head: i18next.t('下单单位'),
             headStyle: {
               textAlign: 'center'
             },
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.规格}}')
+            text: i18next.t('{{列.下单单位}}')
           },
           {
             head: i18next.t('下单数'),
@@ -306,7 +304,7 @@ class Store extends EditorStore {
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.下单数}}{{列.销售单位}}')
+            text: i18next.t('{{列.下单数}}{{列.下单单位}}')
           },
           {
             head: i18next.t('出库数(基本单位)'),
@@ -326,7 +324,8 @@ class Store extends EditorStore {
             style: {
               textAlign: 'center'
             },
-            text: i18next.t('{{列.单价_基本单位}}')
+            // eslint-disable-next-line gmfe/i18n-check
+            text: i18next.t(`{{列.单价}}${Price.getUnit()}/{{列.定价单位}}`)
           },
           {
             head: i18next.t('出库金额'),
