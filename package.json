@@ -6,7 +6,7 @@
   "scripts": {
     "precommit": "lint-staged",
     "start": "webpack-dev-server --hot",
-    "build": "webpack --progress --colors --config ./webpack.prod.config.js",
+    "build": "set NODE_OPTIONS=--openssl-legacy-provider vuepress build docs && webpack --progress --colors --config ./webpack.prod.config.js ",
     "build:watch": "webpack --progress --colors --config ./webpack.prod.config.js --watch",
     "locale": "i18n-m sync src/",
     "release": "bumpp"
@@ -57,7 +57,7 @@
     "@babel/preset-env": "^7.23.8",
     "@babel/runtime": "^7.23.8",
     "@babel/runtime-corejs3": "^7.23.8",
-    "@svgr/webpack": "^4.3.3",
+    "@svgr/webpack": "^4.3.2",
     "@types/react": "^16.14.55",
     "add-asset-html-webpack-plugin": "^3.2.2",
     "autoprefixer": "^9.8.8",
