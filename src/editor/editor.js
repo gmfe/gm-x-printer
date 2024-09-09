@@ -24,7 +24,7 @@ import classNames from 'classnames'
 const tableDataKeyList = [
   {
     value: 'orders',
-    text: i18next.t('全部商品（含子商品）'),
+    text: i18next.t('非组合/子商品'),
     hasSubtotalBtn: true
   },
   // { value: 'abnormal', text: i18next.t('异常商品'), hasSubtotalBtn: false },
@@ -36,7 +36,7 @@ const tableDataKeyList = [
 
   {
     value: 'combination',
-    text: i18next.t('组合商品（不含子商品）'),
+    text: i18next.t('组合/非组合商品'),
     hasSubtotalBtn: false
   },
 
