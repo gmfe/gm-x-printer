@@ -29,8 +29,8 @@ const AllOrderSummary = props => {
       list,
       (a, b) => {
         let result = a
-        // 组合商品不能计算合计
-        if (b['组合商品'] && isAllProduct) {
+        // 子商品不能计算合计
+        if (b['子商品'] && isAllProduct) {
           return a
         }
         result = a.plus(parseFloat(b[field]) || 0)
@@ -69,14 +69,13 @@ const AllOrderSummary = props => {
     let upperCaseFont = ''
 
     // 是否是打印全部商品
-    // 打印全部商品不需要计算组合商品
+    // 打印全部商品不需要计算子商品
     const isAllProduct = get(config, 'dataKey') === 'allprod'
-
     _.each(fields, v => {
       sum[v.name] = sumData(list, v.valueField, isAllProduct)
     })
     for (const name in sum) {
-      // 组合商品不能计算合计
+      // 子商品不能计算合计
       const price = sum[name]
       // 大写文案
       upperCaseFont = get(subtotal, SHOW_ORDER_CASE_ENUM.order_needUpperCase)

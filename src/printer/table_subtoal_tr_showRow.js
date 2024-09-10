@@ -37,8 +37,8 @@ const SubtotalTrShowRow = props => {
       (a, b) => {
         let result = a
 
-        // 组合商品不能计算合计
-        if (b['组合商品'] && isAllProduct) {
+        // 子商品不能计算合计
+        if (b['子商品'] && isAllProduct) {
           return a
         }
 
@@ -74,8 +74,9 @@ const SubtotalTrShowRow = props => {
   ) {
     const list = tableData.slice(range.begin, range.end)
     // 是否是打印全部商品
-    // 打印全部商品不需要计算组合商品
+    // 打印全部商品不需要计算子商品
     const isAllProduct = get(config, 'dataKey') === 'allprod'
+    console.log(4444, isAllProduct)
 
     const sum = {}
     let lowerCaseFont = ''
