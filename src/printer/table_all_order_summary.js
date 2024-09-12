@@ -24,12 +24,15 @@ const AllOrderSummary = props => {
 
   const tableData = printerStore.data._table[getDataKey(dataKey, arrange)] || []
   // 计算合计
-  const sumData = (list, field) => {
+  const sumData = (list, field, isAllProduct) => {
     return _.reduce(
       list,
       (a, b) => {
         let result = a
-
+        // 子商品不能计算合计
+        if (b['子商品'] && isAllProduct) {
+          return a
+        }
         result = a.plus(parseFloat(b[field]) || 0)
         if (b[field + MULTI_SUFFIX]) {
           result = result.plus(parseFloat(b[field + MULTI_SUFFIX]))
@@ -65,10 +68,14 @@ const AllOrderSummary = props => {
     let lowerCaseFont = ''
     let upperCaseFont = ''
 
+    // 是否是打印全部商品
+    // 打印全部商品不需要计算子商品
+    const isAllProduct = get(config, 'dataKey') === 'allprod'
     _.each(fields, v => {
-      sum[v.name] = sumData(list, v.valueField)
+      sum[v.name] = sumData(list, v.valueField, isAllProduct)
     })
     for (const name in sum) {
+      // 子商品不能计算合计
       const price = sum[name]
       // 大写文案
       upperCaseFont = get(subtotal, SHOW_ORDER_CASE_ENUM.order_needUpperCase)

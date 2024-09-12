@@ -19,12 +19,17 @@ import { SHOW_WAY_ENUM } from '../config'
  * @param dataList
  * @returns {*|string}
  */
-const sumCol = (key, dataList) => {
+const sumCol = (key, dataList, isAllProduct) => {
   let result
   const arr = []
   try {
     result = dataList.reduce((acc, item) => {
       arr.push(item[key])
+      if (isAllProduct) {
+        if (item['子商品']) {
+          return acc
+        }
+      }
       acc = acc.plus(parseFloat(item[key]) || 0)
       return acc
     }, Big(0))
@@ -57,6 +62,11 @@ const PageSummary = props => {
 
   const currentPageTableData = tableData.slice(range.begin, range.end)
 
+  // 是否是打印全部商品
+  // 打印全部商品不需要计算组合商品
+  const isAllProduct = get(config, 'dataKey') === 'allprod'
+  console.log(2424242424, isAllProduct)
+
   if (
     pageSummaryShow &&
     showPageType === SHOW_WAY_ENUM.bottom &&
@@ -74,7 +84,7 @@ const PageSummary = props => {
             const key = regExp(col.text)
             html =
               summaryColumns.map(text => regExp(text)).includes(key) && key
-                ? sumCol(key, currentPageTableData)
+                ? sumCol(key, currentPageTableData, isAllProduct)
                 : ' '
           }
           return (

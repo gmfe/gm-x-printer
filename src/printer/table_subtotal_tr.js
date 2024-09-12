@@ -63,6 +63,10 @@ const SubtotalTr = props => {
 
     const sum = {}
     let subtotalStr = ''
+    // 是否是打印全部商品
+    // 打印全部商品不需要计算组合商品
+    const isAllProduct = dataKey === 'allprod'
+    console.log(44242424, isAllProduct)
 
     _.each(fields, v => {
       sum[v.name] = sumData(list, v.valueField)
