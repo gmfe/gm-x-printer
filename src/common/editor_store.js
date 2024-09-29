@@ -180,7 +180,7 @@ class EditorStore {
           }
         }).join('/')
       } else {
-        return v.style ? v.style.height : ''
+        return v?.style ? v.style.height : ''
       }
     }).join('_')
   }
@@ -596,7 +596,7 @@ class EditorStore {
           text: `{{qrcode_trace}}`
         })
         break
-     
+
       // 备注单元格
       case 'remark':
         blocks.push({

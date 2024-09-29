@@ -115,9 +115,7 @@ class EditorField extends React.Component {
             onChange={this.handleChangeBlock.bind(this, 'style')}
           />
         )}
-        {(type === 'image' ||
-          type === 'qrcode' ||
-          type === 'qrcode_trace' ) && (
+        {(type === 'image' || type === 'qrcode' || type === 'qrcode_trace') && (
           <div>
             <Size
               style={style}
@@ -151,7 +149,14 @@ class EditorField extends React.Component {
   }
 
   renderTable() {
-    const { tableDataKeyList, editStore, type, showMergeOption } = this.props
+    const {
+      tableDataKeyList,
+      editStore,
+      type,
+      showMergeOption,
+      showProductPermutation = true,
+      renderExtra
+    } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
     return (
@@ -203,25 +208,27 @@ class EditorField extends React.Component {
           />
           px
         </Flex>
+        {showProductPermutation && (
+          <>
+            <Gap height='5px' />
+            <Flex alignCenter>
+              <Flex alignCenter>{i18next.t('商品排列')}：</Flex>
+              <Select
+                className='gm-printer-edit-select'
+                value={editStore.computedTableArrange}
+                onChange={editStore.setTableArrange}
+              >
+                <Option value='lateral'>{i18next.t('横向排列')}</Option>
+                <Option value='vertical'>{i18next.t('纵向排列')}</Option>
+              </Select>
+            </Flex>
 
-        <Gap height='5px' />
-
-        <Flex alignCenter>
-          <Flex alignCenter>{i18next.t('商品排列')}：</Flex>
-          <Select
-            className='gm-printer-edit-select'
-            value={editStore.computedTableArrange}
-            onChange={editStore.setTableArrange}
-          >
-            <Option value='lateral'>{i18next.t('横向排列')}</Option>
-            <Option value='vertical'>{i18next.t('纵向排列')}</Option>
-          </Select>
-        </Flex>
-
-        <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
-          {i18next.t('商品排列仅适用于双栏商品设置')}
-        </Flex>
-
+            <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+              {i18next.t('商品排列仅适用于双栏商品设置')}
+            </Flex>
+          </>
+        )}
+        {renderExtra && renderExtra()}
         <Gap height='5px' />
         {type === 'OUT_STOCK' && showMergeOption && (
           <Flex>
@@ -329,7 +336,10 @@ EditorField.propTypes = {
   editStore: PropTypes.object,
   tableDataKeyList: PropTypes.array,
   type: PropTypes.string,
-  showMergeOption: PropTypes.bool
+  showMergeOption: PropTypes.bool,
+  /** 是否显示商品排列 */
+  showProductPermutation: PropTypes.bool,
+  renderExtra: PropTypes.func
 }
 
 export default EditorField

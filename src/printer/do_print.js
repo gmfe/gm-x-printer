@@ -9,37 +9,16 @@ import ReactDOMServer from 'react-dom/server'
 
 const printerId = '_gm-printer_' + Math.random()
 let $printer = window.document.getElementById(printerId)
+let doc
 
-function init({ isTest, isPreview, isTipZoom = true }) {
+function init({ isTest, isPreview, isElectronPrint, isTipZoom = true }) {
   isTipZoom &&
     isZoom2() &&
     window.alert(
       '检测您的浏览器使用了缩放,为了避免影响打印布局,请使用快捷键 ctrl + 0 重置缩放到100%后再进行打印'
     )
-  if (!$printer) {
-    $printer = window.document.createElement('iframe')
-    $printer.id = printerId
-    $printer.style.position = 'fixed'
-    $printer.style.top = '0'
-    $printer.frameborder = '0'
-    $printer.style.border = 'none'
-    $printer.style.width = '100%' // 使移动端可滚动
-    if (isTest) {
-      // 模板编辑[测试打印],隐藏起来
-      $printer.style.left = '-3000px'
-    } else {
-      $printer.style.left = '0px'
-      $printer.style.height = '100vh'
-    }
-    window.document.body.appendChild($printer)
 
-    const idocument = $printer.contentDocument
-    idocument.open()
-    idocument.write('<!DOCTYPE html><html><head></head><body></body></html>')
-    idocument.close()
-
-    const doc = $printer.contentWindow.document
-
+  const createElement = () => {
     const style = doc.createElement('style')
     style.type = 'text/css'
     style.appendChild(doc.createTextNode(getCSS()))
@@ -53,11 +32,50 @@ function init({ isTest, isPreview, isTipZoom = true }) {
 
     doc.body.appendChild(div)
   }
+
+  // 如果是electron打印，不能创建 iframe，否则electron 打印时尺寸会不对
+  if (isElectronPrint) {
+    if (!doc) {
+      doc = document
+      createElement()
+    }
+  } else {
+    if (!$printer) {
+      $printer = window.document.createElement('iframe')
+      $printer.id = printerId
+      $printer.style.position = 'fixed'
+      $printer.style.top = '0'
+      $printer.frameborder = '0'
+      $printer.style.border = 'none'
+      $printer.style.width = '100%' // 使移动端可滚动
+      if (isTest) {
+        // 模板编辑[测试打印],隐藏起来
+        $printer.style.left = '-3000px'
+      } else {
+        $printer.style.left = '0px'
+        $printer.style.height = '100vh'
+      }
+      window.document.body.appendChild($printer)
+
+      const idocument = $printer.contentDocument
+      idocument.open()
+      idocument.write('<!DOCTYPE html><html><head></head><body></body></html>')
+      idocument.close()
+
+      doc = $printer.contentWindow.document
+      createElement()
+    }
+  }
 }
 
-function toDoPrint({ data, config }) {
+function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
   return new window.Promise(resolve => {
-    const $app = $printer.contentWindow.document.getElementById('appContainer')
+    let $app
+    if (isElectronPrint) {
+      $app = document.getElementById('appContainer')
+    } else {
+      $app = $printer.contentWindow.document.getElementById('appContainer')
+    }
     ReactDOM.unmountComponentAtNode($app)
     ReactDOM.render(
       <Printer
@@ -65,7 +83,10 @@ function toDoPrint({ data, config }) {
         data={data}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
-            $printer.contentWindow.print()
+            if (isPrint) {
+              $printer.contentWindow.print()
+            }
+            onReady && onReady()
             resolve()
           }, $app)
         }}
@@ -75,9 +96,14 @@ function toDoPrint({ data, config }) {
   })
 }
 
-function toDoPrintBatch(list, isPrint = true) {
+function toDoPrintBatch(list, isPrint = true, onReady, isElectronPrint) {
   return new window.Promise(resolve => {
-    const $app = $printer.contentWindow.document.getElementById('appContainer')
+    let $app
+    if (isElectronPrint) {
+      $app = document.getElementById('appContainer')
+    } else {
+      $app = $printer.contentWindow.document.getElementById('appContainer')
+    }
 
     ReactDOM.unmountComponentAtNode($app)
     ReactDOM.render(
@@ -88,6 +114,7 @@ function toDoPrintBatch(list, isPrint = true) {
             if (isPrint) {
               $printer.contentWindow.print()
             }
+            onReady && onReady()
             resolve()
           }, $app)
         }}
@@ -97,24 +124,47 @@ function toDoPrintBatch(list, isPrint = true) {
   })
 }
 
-function doPrint({ data, config }, isTest) {
-  init({ isTest })
+function doPrint({ data, config }, isTest, extraConfig, onReady) {
+  init({
+    isTest,
+    isElectronPrint: extraConfig?.isElectronPrint,
+    isPreview: extraConfig?.isPreview,
+    isTipZoom: extraConfig?.isTipZoom
+  })
 
-  return toDoPrint({ data, config })
+  return toDoPrint({
+    data,
+    config,
+    isPrint: extraConfig?.isPrint,
+    isElectronPrint: extraConfig?.isElectronPrint,
+    onReady
+  })
 }
 
 function doBatchPrint(
   list,
   isTest,
-  extraConfig = { isPreview: false, isTipZoom: true }
+  extraConfig = {
+    isPreview: false,
+    isTipZoom: true,
+    isPrint: true,
+    isElectronPrint: false
+  },
+  onReady
 ) {
   init({
     isTest,
+    isElectronPrint: extraConfig.isElectronPrint,
     isPreview: extraConfig.isPreview,
     isTipZoom: extraConfig.isTipZoom
   })
 
-  return toDoPrintBatch(list, !extraConfig.isPreview)
+  return toDoPrintBatch(
+    list,
+    extraConfig.isPrint && !extraConfig.isPreview,
+    onReady,
+    extraConfig.isElectronPrint
+  )
 }
 
 function renderBatchPrintToDom(list, container) {

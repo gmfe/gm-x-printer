@@ -1,0 +1,23 @@
+.checkbox {
+  margin-right: 8px;
+  .checkbox__inner {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+  }
+
+  .checkbox__inner--checked {
+    &::after {
+      content: '';
+      display: block;
+      width: 10px;
+      height: 10px;
+      background-color: #56a3f2;
+    }
+  }
+}

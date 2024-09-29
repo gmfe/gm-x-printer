@@ -17,6 +17,7 @@ import EditorMaterialRequisition from './editor_material_requisition'
 import EditorAfterSales from './editor_after_sales'
 import EditEshop from './editor_eshop'
 import EditorManage from './editor_manage'
+import EditorPurchaseDemand from './editor_purchase_demand'
 
 import {
   BatchPrinter,
@@ -50,6 +51,7 @@ export {
   EditorAfterSales,
   EditorManage,
   EditEshop,
+  EditorPurchaseDemand,
   Printer,
   BatchPrinter,
   doPrint,
