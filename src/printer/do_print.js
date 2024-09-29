@@ -5,11 +5,12 @@ import getCSS from './get_css'
 import BatchPrinter from './batch_printer'
 import { isZoom2 } from 'gm-util'
 import { afterImgAndSvgLoaded } from '../util'
+import ReactDOMServer from 'react-dom/server'
 
 const printerId = '_gm-printer_' + Math.random()
 let $printer = window.document.getElementById(printerId)
 
-function init({ isTest, isTipZoom = true }) {
+function init({ isTest, isPreview, isTipZoom = true }) {
   isTipZoom &&
     isZoom2() &&
     window.alert(
@@ -20,6 +21,8 @@ function init({ isTest, isTipZoom = true }) {
     $printer.id = printerId
     $printer.style.position = 'fixed'
     $printer.style.top = '0'
+    $printer.frameborder = '0'
+    $printer.style.border = 'none'
     $printer.style.width = '100%' // 使移动端可滚动
     if (isTest) {
       // 模板编辑[测试打印],隐藏起来
@@ -44,6 +47,9 @@ function init({ isTest, isTipZoom = true }) {
 
     const div = doc.createElement('div')
     div.id = 'appContainer'
+    if (isPreview) {
+      div.className = 'gm-preview'
+    }
 
     doc.body.appendChild(div)
   }
@@ -69,7 +75,7 @@ function toDoPrint({ data, config }) {
   })
 }
 
-function toDoPrintBatch(list) {
+function toDoPrintBatch(list, isPrint = true) {
   return new window.Promise(resolve => {
     const $app = $printer.contentWindow.document.getElementById('appContainer')
 
@@ -79,7 +85,9 @@ function toDoPrintBatch(list) {
         list={list}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
-            $printer.contentWindow.print()
+            if (isPrint) {
+              $printer.contentWindow.print()
+            }
             resolve()
           }, $app)
         }}
@@ -98,11 +106,24 @@ function doPrint({ data, config }, isTest) {
 function doBatchPrint(
   list,
   isTest,
-  extraCofnig = { isPrint: true, isTipZoom: true }
+  extraConfig = { isPreview: false, isTipZoom: true }
 ) {
-  init({ isTest, isTipZoom: extraCofnig.isTipZoom })
+  init({
+    isTest,
+    isPreview: extraConfig.isPreview,
+    isTipZoom: extraConfig.isTipZoom
+  })
 
-  return toDoPrintBatch(list)
+  return toDoPrintBatch(list, !extraConfig.isPreview)
 }
 
-export { doPrint, doBatchPrint }
+function renderBatchPrintToDom(list, container) {
+  // ReactDOM.unmountComponentAtNode(container)
+  ReactDOM.render(<BatchPrinter list={list} />, container)
+}
+
+function getHtml(list) {
+  return ReactDOMServer.renderToString(<BatchPrinter list={list} />)
+}
+
+export { doPrint, doBatchPrint, getHtml, renderBatchPrintToDom }

@@ -3,7 +3,7 @@
   // 全局样式
   background: whitesmoke;
   font-size: 12px;
-  font-family: "Segoe UI","Lucida Grande",Helvetica,Arial,"Microsoft YaHei",FreeSans,Arimo,"Droid Sans","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",FontAwesome,sans-serif;
+  font-family: "Segoe UI", "Lucida Grande", Helvetica, Arial, "Microsoft YaHei", FreeSans, Arimo, "Droid Sans", "wenquanyi micro hei", "Hiragino Sans GB", "Hiragino Sans GB W3", FontAwesome, sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -webkit-overflow-scrolling: touch;
@@ -41,9 +41,11 @@
 .gm-printer-block {
   position: relative;
   cursor: move;
+
   .gm-printer-block-text-edit {
     display: none;
   }
+
   img {
     display: inline-block;
     width: 100%;
@@ -72,6 +74,7 @@
   flex-direction: row;
   flex-wrap: wrap;
   overflow: hidden;
+
   .gm-printer-counter-item {
     border: 1px solid black;
     margin: 2px 0;
@@ -151,4 +154,29 @@
 
 @page {
   margin: 0;
+}
+
+// 预览模式
+@media screen {
+  .gm-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F5F5F5;
+
+    .gm-printer {
+      background-color: transparent;
+
+      &:last-child {
+        margin-bottom: 24px;
+      }
+    }
+
+    .gm-printer-page {
+      background-color: white;
+      page-break-after: auto;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      margin-top: 24px;
+    }
+  }
 }
