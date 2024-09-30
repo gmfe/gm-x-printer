@@ -75,7 +75,7 @@ function toDoPrint({ data, config }) {
   })
 }
 
-function toDoPrintBatch(list, isPrint = true) {
+function toDoPrintBatch(list, isPrint = true, onReady) {
   return new window.Promise(resolve => {
     const $app = $printer.contentWindow.document.getElementById('appContainer')
 
@@ -88,6 +88,7 @@ function toDoPrintBatch(list, isPrint = true) {
             if (isPrint) {
               $printer.contentWindow.print()
             }
+            onReady && onReady()
             resolve()
           }, $app)
         }}
@@ -106,7 +107,8 @@ function doPrint({ data, config }, isTest) {
 function doBatchPrint(
   list,
   isTest,
-  extraConfig = { isPreview: false, isTipZoom: true }
+  extraConfig = { isPreview: false, isTipZoom: true, isPrint: true },
+  onReady
 ) {
   init({
     isTest,
@@ -114,7 +116,11 @@ function doBatchPrint(
     isTipZoom: extraConfig.isTipZoom
   })
 
-  return toDoPrintBatch(list, !extraConfig.isPreview)
+  return toDoPrintBatch(
+    list,
+    extraConfig.isPrint && !extraConfig.isPreview,
+    onReady
+  )
 }
 
 function renderBatchPrintToDom(list, container) {
