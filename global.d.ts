@@ -76,7 +76,7 @@ declare module 'gm-x-printer' {
   function doBatchPrint(
     list: any[],
     isTest?: boolean,
-    extraConfig?: { isPreview: boolean; isTipZoom: boolean, isPrint: boolean },
+    extraConfig?: { isPreview: boolean; isTipZoom: boolean, isPrint: boolean, isElectronPrint?: boolean },
     onReady?: () => void
   ): (list: []) => Promise<any>
   export {
