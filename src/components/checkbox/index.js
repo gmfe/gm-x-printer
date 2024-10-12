@@ -25,7 +25,6 @@ const Checkbox = props => {
   }, [checked])
 
   const handleChange = isChecked => {
-    console.log(isChecked)
     if (checked === undefined) {
       setInnerChecked(isChecked)
     }
