@@ -68,9 +68,14 @@ function init({ isTest, isPreview, isElectronPrint, isTipZoom = true }) {
   }
 }
 
-function toDoPrint({ data, config }) {
+function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
   return new window.Promise(resolve => {
-    const $app = $printer.contentWindow.document.getElementById('appContainer')
+    let $app
+    if (isElectronPrint) {
+      $app = document.getElementById('appContainer')
+    } else {
+      $app = $printer.contentWindow.document.getElementById('appContainer')
+    }
     ReactDOM.unmountComponentAtNode($app)
     ReactDOM.render(
       <Printer
@@ -78,7 +83,10 @@ function toDoPrint({ data, config }) {
         data={data}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
-            $printer.contentWindow.print()
+            if (isPrint) {
+              $printer.contentWindow.print()
+            }
+            onReady && onReady()
             resolve()
           }, $app)
         }}
@@ -116,10 +124,21 @@ function toDoPrintBatch(list, isPrint = true, onReady, isElectronPrint) {
   })
 }
 
-function doPrint({ data, config }, isTest) {
-  init({ isTest })
+function doPrint({ data, config }, isTest, extraConfig, onReady) {
+  init({
+    isTest,
+    isElectronPrint: extraConfig?.isElectronPrint,
+    isPreview: extraConfig?.isPreview,
+    isTipZoom: extraConfig?.isTipZoom
+  })
 
-  return toDoPrint({ data, config })
+  return toDoPrint({
+    data,
+    config,
+    isPrint: extraConfig?.isPrint,
+    isElectronPrint: extraConfig?.isElectronPrint,
+    onReady
+  })
 }
 
 function doBatchPrint(
