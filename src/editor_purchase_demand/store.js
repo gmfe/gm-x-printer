@@ -9,6 +9,8 @@ export const StatisticsSettingEnum = {
 }
 
 class Store extends EditorStore {
+  defaultTableDataKey = 'purchase_demand_list'
+
   @action
   setStatisticsSetting(statisticsSetting) {
     this.config = {
