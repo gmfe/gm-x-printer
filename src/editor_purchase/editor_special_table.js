@@ -64,7 +64,10 @@ class TableDetailEditor extends React.Component {
         <Gap />
 
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('采购明细')}：</div>
+          <div>
+            {i18next.t('采购明细')}
+            {i18next.t('：')}
+          </div>
           <Select
             className='gm-printer-edit-select'
             value={dataKey}
@@ -81,7 +84,10 @@ class TableDetailEditor extends React.Component {
         {(dataKey === 'purchase_last_col' ||
           dataKey === 'purchase_last_col_noLineBreak') && (
           <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('按下单单位汇总')}：</div>
+            <div>
+              {i18next.t('按下单单位汇总')}
+              {i18next.t('：')}
+            </div>
             <Switch
               checked={isSheetUnitSummary}
               onChange={this.handleSheetUnitSummaryChange}
@@ -91,7 +97,10 @@ class TableDetailEditor extends React.Component {
         {dataKey !== 'purchase_no_detail' && (
           <>
             <div className='gm-padding-top-5'>
-              <div>{i18next.t('添加字段')}：</div>
+              <div>
+                {i18next.t('添加字段')}
+                {i18next.t('：')}
+              </div>
               <Flex wrap>
                 {_.map(detailFields, o => (
                   <FieldBtn
@@ -104,7 +113,10 @@ class TableDetailEditor extends React.Component {
             </div>
 
             <div className='gm-padding-top-5'>
-              <div>{i18next.t('字段设置')}：</div>
+              <div>
+                {i18next.t('字段设置')}
+                {i18next.t('：')}
+              </div>
               <Fonter style={style} onChange={this.handleSpecialStyleChange} />
               <Separator />
               <TextAlign

@@ -26,7 +26,10 @@ const DialogChildren = observer(props => {
 
   return (
     <Flex alignCenter>
-      <div>{i18next.t('模板名称')}：</div>
+      <div>
+        {i18next.t('模板名称')}
+        {i18next.t('：')}
+      </div>
       <input
         className='gm-printer-edit-input-custom'
         type='text'

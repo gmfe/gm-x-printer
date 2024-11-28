@@ -29,11 +29,13 @@ import {
 } from '../config'
 
 const desc_bottom = (
-  <div style={{ ...COM_STYLE }}>所选择的字段必须是在列表中有配置的才能显示</div>
+  <div style={{ ...COM_STYLE }}>
+    {i18next.t('所选择的字段必须是在列表中有配置的才能显示')}
+  </div>
 )
 const desc_row = (
   <div style={{ marginLeft: 84, ...COM_STYLE }}>
-    整行展现的情况下只能选择一个字段
+    {i18next.t('整行展现的情况下只能选择一个字段')}
   </div>
 )
 
@@ -147,7 +149,10 @@ class SummarySetting extends React.Component {
       <>
         <Title title={PAGE_TEXT} />
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{PAGE_TEXT}：</div>
+          <div>
+            {PAGE_TEXT}
+            {i18next.t('：')}
+          </div>
           <Switch
             checked={pageSummaryShow}
             onChange={this.handlePageSummaryShow}
@@ -157,7 +162,10 @@ class SummarySetting extends React.Component {
         {pageSummaryShow && (
           <>
             <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('展现样式')}：</div>
+              <div>
+                {i18next.t('展现样式')}
+                {i18next.t('：')}
+              </div>
               <Select
                 className='gm-printer-edit-select'
                 value={showPageType}
@@ -178,12 +186,14 @@ class SummarySetting extends React.Component {
                 value={pageSummaryText}
                 onChange={this.handleSumName}
                 type='page_total'
-                text='合计'
+                text={i18next.t('合计')}
               />
             ) : (
               <>
                 <Flex className='gm-padding-top-5'>
-                  <Flex alignCenter>选择汇总字段：</Flex>
+                  <Flex alignCenter>
+                    {i18next.t('选择汇总字段')} {i18next.t('：')}
+                  </Flex>
                   <Select
                     className='gm-printer-edit-select'
                     value={fields?.[0].name ?? '{{列.商品销售额}}'}
@@ -206,7 +216,9 @@ class SummarySetting extends React.Component {
             )}
 
             <Flex className='gm-padding-top-5'>
-              <Flex>样式设置：</Flex>
+              <Flex>
+                {i18next.t('样式设置')} {i18next.t('：')}
+              </Flex>
               <Fonter
                 style={summaryStyle}
                 onChange={style =>
@@ -233,7 +245,7 @@ class SummarySetting extends React.Component {
                   value={pageLowerCaseText}
                   onChange={this.handleSumName}
                   type='page_small'
-                  text='*小写*'
+                  text={i18next.t('*小写*')}
                 />
 
                 <IsShowCheckBox
@@ -245,7 +257,7 @@ class SummarySetting extends React.Component {
                   value={pageUpperCaseText}
                   onChange={this.handleSumName}
                   type='page_big'
-                  text='*大写*'
+                  text={i18next.t('*大写*')}
                 />
                 <ShowInputText
                   value={pageSummaryText}
@@ -254,7 +266,9 @@ class SummarySetting extends React.Component {
                   text={PAGE_TEXT}
                 />
                 <Flex className='gm-padding-top-5'>
-                  <Flex alignCenter>顺序：</Flex>
+                  <Flex alignCenter>
+                    {i18next.t('顺序')} {i18next.t('：')}
+                  </Flex>
                   <Select
                     className='gm-printer-edit-select'
                     value={pageFontSort}
@@ -274,7 +288,9 @@ class SummarySetting extends React.Component {
 
             {showPageType === SHOW_WAY_ENUM.bottom && (
               <div className='gm-padding-top-5'>
-                <Flex alignCenter>选择汇总字段：</Flex>
+                <Flex alignCenter>
+                  {i18next.t('选择汇总字段')} {i18next.t('：')}
+                </Flex>
                 {desc_bottom}
                 <Flex wrap>
                   {orderPerSummaryFields.map(o => (
@@ -346,9 +362,12 @@ class SummarySetting extends React.Component {
 
     return (
       <>
-        <Title title='整单合计' />
+        <Title title={i18next.t('整单合计')} />
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('整单合计')}：</div>
+          <div>
+            {i18next.t('整单合计')}
+            {i18next.t('：')}
+          </div>
           <Switch
             checked={orderSummaryShow}
             onChange={this.handleOrderPageSummaryShow}
@@ -358,14 +377,20 @@ class SummarySetting extends React.Component {
         {orderSummaryShow && (
           <>
             <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('是否每页显示整单合计')}：</div>
+              <div>
+                {i18next.t('是否每页显示整单合计')}
+                {i18next.t('：')}
+              </div>
               <Switch
                 checked={isShowOrderSummaryPer}
                 onChange={this.handleIsShowPerOrderSummary}
               />
             </Flex>
             <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('展现样式')}：</div>
+              <div>
+                {i18next.t('展现样式')}
+                {i18next.t('：')}
+              </div>
               <Select
                 className='gm-printer-edit-select'
                 value={showOrderType}
@@ -386,12 +411,15 @@ class SummarySetting extends React.Component {
                 value={orderSummaryText}
                 onChange={this.handleSumName}
                 type='order_total'
-                text='合计'
+                text={i18next.t('合计')}
               />
             ) : (
               <>
                 <Flex className='gm-padding-top-5'>
-                  <Flex alignCenter>选择汇总字段：</Flex>
+                  <Flex alignCenter>
+                    {i18next.t('选择汇总字段')}
+                    {i18next.t('：')}
+                  </Flex>
                   <Select
                     className='gm-printer-edit-select'
                     value={fields?.[0].name ?? '{{列.商品销售额}}'}
@@ -414,7 +442,10 @@ class SummarySetting extends React.Component {
             )}
 
             <Flex className='gm-padding-top-5'>
-              <Flex>样式设置：</Flex>
+              <Flex>
+                {i18next.t('样式设置')}
+                {i18next.t('：')}
+              </Flex>
               <Fonter
                 style={orderSummaryStyle}
                 onChange={style =>
@@ -443,7 +474,7 @@ class SummarySetting extends React.Component {
                   value={orderLowerCaseText}
                   onChange={this.handleSumName}
                   type='order_small'
-                  text='*小写*'
+                  text={i18next.t('*小写*')}
                 />
 
                 <IsShowCheckBox
@@ -457,16 +488,19 @@ class SummarySetting extends React.Component {
                   value={orderUpperCaseText}
                   onChange={this.handleSumName}
                   type='order_big'
-                  text='*大写*'
+                  text={i18next.t('*大写*')}
                 />
                 <ShowInputText
                   value={orderSummaryText}
                   onChange={this.handleSumName}
                   type='order_total'
-                  text='整单合计'
+                  text={i18next.t('整单合计')}
                 />
                 <Flex className='gm-padding-top-5'>
-                  <Flex alignCenter>顺序：</Flex>
+                  <Flex alignCenter>
+                    {i18next.t('顺序')}
+                    {i18next.t('：')}
+                  </Flex>
                   <Select
                     className='gm-printer-edit-select'
                     value={orderFontSort}
@@ -486,7 +520,10 @@ class SummarySetting extends React.Component {
 
             {showOrderType === SHOW_WAY_ENUM.bottom && (
               <div className='gm-padding-top-5'>
-                <Flex alignCenter>选择汇总字段：</Flex>
+                <Flex alignCenter>
+                  {i18next.t('选择汇总字段')}
+                  {i18next.t('：')}
+                </Flex>
                 {desc_bottom}
                 <Flex wrap>
                   {orderPerSummaryFields.map(o => (

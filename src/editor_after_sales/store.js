@@ -1,3 +1,4 @@
+import i18next from '../../locales'
 import EditorStore from '../common/editor_store'
 import { action } from 'mobx'
 
@@ -36,7 +37,7 @@ class Store extends EditorStore {
                 '{{列.实退数}}',
                 '{{列.可退数量}}'
               ],
-              pageSummaryText: '合计',
+              pageSummaryText: i18next.t('合计'),
               showPageType: 'bottom',
               showOrderType: 'row',
               chosePageSummaryField: '商品销售额',
@@ -46,8 +47,8 @@ class Store extends EditorStore {
                   valueField: '商品销售额'
                 }
               ],
-              pageUpperCaseText: '大写：',
-              pageLowerCaseText: '小写：',
+              pageUpperCaseText: i18next.t('大写') + i18next.t('：'),
+              pageLowerCaseText: i18next.t('小写') + i18next.t('：'),
               pageFontSort: 'big'
             },
             allOrderSummaryConfig: {
@@ -64,16 +65,16 @@ class Store extends EditorStore {
               orderSummaryShow: false,
               totalSummaryShow: false,
               summaryOrderColumns: [],
-              orderSummaryText: '整单合计',
+              orderSummaryText: i18next.t('整单合计'),
               showOrderType: 'row',
-              orderUpperCaseText: '大写：',
-              orderLowerCaseText: '小写：',
+              orderUpperCaseText: i18next.t('大写') + i18next.t('：'),
+              orderLowerCaseText: i18next.t('小写') + i18next.t('：'),
               orderFontSort: 'big',
               isShowOrderSummaryPer: false
             },
             columns: [
               {
-                head: '序号',
+                head: i18next.t('序号'),
                 headStyle: {
                   textAlign: 'center',
                   width: '44px',
@@ -86,7 +87,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '商品名',
+                head: i18next.t('商品名'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -99,7 +100,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '商品分类',
+                head: i18next.t('商品分类'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -112,7 +113,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '售后类型',
+                head: i18next.t('售后类型'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -125,7 +126,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '销售单价',
+                head: i18next.t('销售单价'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -138,7 +139,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '出库数',
+                head: i18next.t('出库数'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -151,7 +152,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '退款单价',
+                head: i18next.t('退款单价'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -164,7 +165,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '申请退款数',
+                head: i18next.t('申请退款数'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -177,7 +178,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '申请退款金额',
+                head: i18next.t('申请退款金额'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -190,7 +191,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '实退数',
+                head: i18next.t('实退数'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',
@@ -203,7 +204,7 @@ class Store extends EditorStore {
                 }
               },
               {
-                head: '实退金额',
+                head: i18next.t('实退金额'),
                 headStyle: {
                   textAlign: 'center',
                   width: '85px',

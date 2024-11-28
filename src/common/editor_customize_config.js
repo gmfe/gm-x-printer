@@ -22,7 +22,10 @@ class EditorCutomizedConfig extends React.Component {
       return (
         <>
           <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('行数是否自动填充')}：</div>
+            <div>
+              {i18next.t('行数是否自动填充')}
+              {i18next.t('：')}
+            </div>
             <Switch checked={isAutoFilling} onChange={this.handleAutoFilling} />
           </Flex>
           <Flex className='gm-padding-top-5 gm-text-red' column>

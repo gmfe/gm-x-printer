@@ -318,13 +318,13 @@ class Store extends EditorStore {
                 fontSize: '12px'
               },
               summaryColumns: [],
-              pageSummaryText: '合计',
+              pageSummaryText: i18next.t('合计'),
               showPageType: 'row',
               showOrderType: 'row',
               chosePageSummaryField: '商品销售额',
               fields: [{ name: '{{列.商品销售额}}', valueField: '商品销售额' }],
-              pageUpperCaseText: '大写：',
-              pageLowerCaseText: '小写：',
+              pageUpperCaseText: i18next.t('大写') + i18next.t('：'),
+              pageLowerCaseText: i18next.t('小写') + i18next.t('：'),
               pageFontSort: 'big'
             },
             allOrderSummaryConfig: {
@@ -336,10 +336,10 @@ class Store extends EditorStore {
               orderSummaryShow: false,
               totalSummaryShow: false,
               summaryOrderColumns: [],
-              orderSummaryText: '整单合计',
+              orderSummaryText: i18next.t('整单合计'),
               showOrderType: 'row',
-              orderUpperCaseText: '大写：',
-              orderLowerCaseText: '小写：',
+              orderUpperCaseText: i18next.t('大写') + i18next.t('：'),
+              orderLowerCaseText: i18next.t('小写') + i18next.t('：'),
               orderFontSort: 'big',
               isShowOrderSummaryPer: false
             },

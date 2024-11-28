@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import { Flex, Switch } from '../components'
 import { SHEET_TITLE_MAP } from '../config'
+import i18next from '../../locales'
 
 @inject('editStore')
 @observer
@@ -25,7 +26,11 @@ class EditorSubtotal extends React.Component {
     return (
       <>
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{`${SHEET_TITLE_MAP[templateType]}(业务单位)数小计`}：</div>
+          <div>
+            {`${SHEET_TITLE_MAP[templateType]}`}
+            {i18next.t('(业务单位)数小计')}
+            {i18next.t('：')}
+          </div>
           <Switch
             checked={isQuantityActive}
             onChange={checked => {
@@ -37,7 +42,11 @@ class EditorSubtotal extends React.Component {
           />
         </Flex>
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{`${SHEET_TITLE_MAP[templateType]}金额小计`}：</div>
+          <div>
+            {`${SHEET_TITLE_MAP[templateType]}`}
+            {i18next.t('金额小计')}
+            {i18next.t('：')}
+          </div>
           <Switch
             checked={isMoneyActive}
             onChange={checked => {

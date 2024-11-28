@@ -6,9 +6,9 @@ import { ToolTip } from '../components'
 const EditTemplateType = ({ tip, bill }) => {
   return (
     <>
-      <>{i18next.t('模版类型')}</>
+      <>{i18next.t('模板类型')}</>
       {tip && <ToolTip text={tip} />}
-      <span>{'：' + bill}</span>
+      <span>{i18next.t('：') + bill}</span>
     </>
   )
 }

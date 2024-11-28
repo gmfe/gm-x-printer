@@ -8,10 +8,16 @@ const moduleMap = {
   en: lng3,
   th: lng4
 }
-let _language = 'zh'
+const LOCALES_LNG = '_gm-x-printer_locales_lng_'
+let _language = window.localStorage.getItem(LOCALES_LNG) || 'zh'
 
 const setLocale = lng => {
   _language = lng
+}
+
+const setLocaleAndStorage = lng => {
+  setLocale(lng)
+  window.localStorage.setItem(LOCALES_LNG, lng)
 }
 
 const getLocale = key => {
@@ -28,5 +34,5 @@ const getLocale = key => {
 const i18next = {
   t: getLocale
 }
-export { getLocale, setLocale }
+export { getLocale, setLocale, setLocaleAndStorage }
 export default i18next

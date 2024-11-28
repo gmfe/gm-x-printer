@@ -52,7 +52,10 @@ class EditorSpecialSetting extends React.Component {
       <>
         <Title title={i18next.t('配送单特殊配置')} />
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('是否启用特殊配置')}：</div>
+          <div>
+            {i18next.t('是否启用特殊配置')}
+            {i18next.t('：')}
+          </div>
 
           <Switch
             checked={!!config.specialSettingType}

@@ -31,7 +31,7 @@ import {
 import { MULTI_SUFFIX, DiyTimeType } from './config'
 
 export * from './util'
-export { setLocale } from '../locales'
+export { setLocale, setLocaleAndStorage } from '../locales'
 
 export {
   Editor,

@@ -116,6 +116,7 @@ class EditorField extends React.Component {
           />
         )}
         {(type === 'image' || type === 'qrcode' || type === 'qrcode_trace') && (
+        {(type === 'image' || type === 'qrcode' || type === 'qrcode_trace') && (
           <div>
             <Size
               style={style}
@@ -167,7 +168,10 @@ class EditorField extends React.Component {
         {tableDataKeyList && !editStore.isSelectingCombine && (
           <>
             <Flex>
-              <Flex alignCenter>{i18next.t('数据展示')}：</Flex>
+              <Flex alignCenter>
+                {i18next.t('数据展示')}
+                {i18next.t('：')}
+              </Flex>
               <Select
                 className='gm-printer-edit-select'
                 value={editStore.computedTableDataKeyOfSelectedRegion}
@@ -185,7 +189,10 @@ class EditorField extends React.Component {
         )}
 
         <Flex alignCenter>
-          <Flex alignCenter>{i18next.t('设置列宽')}：</Flex>
+          <Flex alignCenter>
+            {i18next.t('设置列宽')}
+            {i18next.t('：')}
+          </Flex>
           <ColumnWidth
             style={headStyle}
             onChange={this.handleChangeTableColumn}
@@ -195,7 +202,10 @@ class EditorField extends React.Component {
         <Gap height='5px' />
 
         <Flex alignCenter>
-          <Flex alignCenter>{i18next.t('设置行高')}：</Flex>
+          <Flex alignCenter>
+            {i18next.t('设置行高')}
+            {i18next.t('：')}
+          </Flex>
           <input
             value={editStore.computedTableCustomerRowHeight}
             onChange={e => {
@@ -208,20 +218,23 @@ class EditorField extends React.Component {
           />
           px
         </Flex>
-        {showProductPermutation && (
-          <>
-            <Gap height='5px' />
-            <Flex alignCenter>
-              <Flex alignCenter>{i18next.t('商品排列')}：</Flex>
-              <Select
-                className='gm-printer-edit-select'
-                value={editStore.computedTableArrange}
-                onChange={editStore.setTableArrange}
-              >
-                <Option value='lateral'>{i18next.t('横向排列')}</Option>
-                <Option value='vertical'>{i18next.t('纵向排列')}</Option>
-              </Select>
-            </Flex>
+
+        <Gap height='5px' />
+
+        <Flex alignCenter>
+          <Flex alignCenter>
+            {i18next.t('商品排列')}
+            {i18next.t('：')}
+          </Flex>
+          <Select
+            className='gm-printer-edit-select'
+            value={editStore.computedTableArrange}
+            onChange={editStore.setTableArrange}
+          >
+            <Option value='lateral'>{i18next.t('横向排列')}</Option>
+            <Option value='vertical'>{i18next.t('纵向排列')}</Option>
+          </Select>
+        </Flex>
 
             <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
               {i18next.t('商品排列仅适用于双栏商品设置')}
@@ -257,7 +270,10 @@ class EditorField extends React.Component {
         <Gap height='5px' />
 
         <Flex alignCenter>
-          <Flex alignCenter>{i18next.t('表格样式')}：</Flex>
+          <Flex alignCenter>
+            {i18next.t('表格样式')}
+            {i18next.t('：')}
+          </Flex>
           <Select
             className='gm-printer-edit-select'
             value={editStore.tableCustomStyle}
@@ -273,7 +289,10 @@ class EditorField extends React.Component {
         <Gap height='5px' />
 
         <Flex>
-          <Flex>{i18next.t('字段设置')}：</Flex>
+          <Flex>
+            {i18next.t('字段设置')}
+            {i18next.t('：')}
+          </Flex>
           <div>
             <div>
               <Fonter

@@ -12,8 +12,8 @@ const blockTypeList = [
 ]
 
 const titleMap = {
-  23: '入库',
-  24: '出库'
+  23: i18next.t('入库'),
+  24: i18next.t('出库')
 }
 
 @inject(stores => ({
@@ -49,13 +49,15 @@ class ContextMenu extends React.Component {
           onClick={this.handleChangeTableDataKey.bind(this, 'quantity', name)}
           className={isQuantityActive ? 'active' : ''}
         >
-          {`${titleMap[this.props.templateType]}(业务单位)数小计`}
+          {`${titleMap[this.props.templateType]}`}
+          {i18next.t('(业务单位)数小计')}
         </div>
         <div
           onClick={this.handleChangeTableDataKey.bind(this, 'money', name)}
           className={isMoneyActive ? 'active' : ''}
         >
-          {`${titleMap[this.props.templateType]}金额小计`}
+          {`${titleMap[this.props.templateType]}`}
+          {i18next.t('金额小计')}
         </div>
       </>
     )
