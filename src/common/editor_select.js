@@ -56,8 +56,11 @@ class EditorSelector extends React.Component {
     const isDIY = page.type === 'DIY'
     return (
       <div>
-        <Flex alignCenter>
-          <div>{i18next.t('模板名称')}：</div>
+        <Flex alignCenter justifyEnd>
+          <div>
+            {i18next.t('模板名称')}
+            {i18next.t('：')}
+          </div>
           <input
             className='gm-printer-edit-input-custom'
             type='text'
@@ -66,8 +69,11 @@ class EditorSelector extends React.Component {
           />
         </Flex>
 
-        <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('打印规格')}：</div>
+        <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+          <div>
+            {i18next.t('打印规格')}
+            {i18next.t('：')}
+          </div>
           <Select
             className='gm-printer-edit-select'
             value={page.type}
@@ -82,8 +88,11 @@ class EditorSelector extends React.Component {
         </Flex>
 
         {isDIY && (
-          <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('纸张宽度')}：</div>
+          <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+            <div>
+              {i18next.t('纸张宽度')}
+              {i18next.t('：')}
+            </div>
             <InputWithUnit
               className='gm-printer-edit-input-custom'
               unit='mm'
@@ -94,8 +103,11 @@ class EditorSelector extends React.Component {
         )}
 
         {isDIY && (
-          <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('纸张高度')}：</div>
+          <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+            <div>
+              {i18next.t('纸张高度')}
+              {i18next.t('：')}
+            </div>
             <InputWithUnit
               className='gm-printer-edit-input-custom'
               unit='mm'
@@ -105,8 +117,11 @@ class EditorSelector extends React.Component {
           </Flex>
         )}
 
-        <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('打印布局')}：</div>
+        <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+          <div>
+            {i18next.t('打印布局')}
+            {i18next.t('：')}
+          </div>
           <Select
             className='gm-printer-edit-select'
             value={page.printDirection}
@@ -120,8 +135,11 @@ class EditorSelector extends React.Component {
           </Select>
         </Flex>
 
-        <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('选择区域')}：</div>
+        <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+          <div>
+            {i18next.t('选择区域')}
+            {i18next.t('：')}
+          </div>
           <Select
             className='gm-printer-edit-select'
             value={selectedRegion || 'all'}
@@ -135,8 +153,11 @@ class EditorSelector extends React.Component {
           </Select>
         </Flex>
         {templateTags && (
-          <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('编辑标签')}：</div>
+          <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+            <div>
+              {i18next.t('编辑标签')}
+              {i18next.t('：')}
+            </div>
             <Observer>
               {() => (
                 <TagSelect
@@ -152,15 +173,18 @@ class EditorSelector extends React.Component {
         {this.props.isPurchase ||
           (this.props.type === 'picking' && (
             <>
-              <Flex alignCenter className='gm-padding-top-5'>
-                <div>{i18next.t('批量打印设置')}：</div>
+              <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+                <div>
+                  {i18next.t('批量打印设置')}
+                  {i18next.t('：')}
+                </div>
                 <Select
                   className='gm-printer-edit-select'
                   value={batchPrintConfig}
                   onChange={this.handleSetBatchPrintConfig}
                 >
-                  <Option value={1}>不连续打印</Option>
-                  <Option value={2}>连续打印</Option>
+                  <Option value={1}>{i18next.t('不连续打印')}</Option>
+                  <Option value={2}>{i18next.t('连续打印')}</Option>
                 </Select>
               </Flex>
               <div>
@@ -176,20 +200,23 @@ class EditorSelector extends React.Component {
           ))}
 
         {this.props.type === 'picking' && (
-          <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('模板类型')}：</div>
+          <Flex alignCenter justifyEnd className='gm-padding-top-5'>
+            <div>
+              {i18next.t('模板类型')}
+              {i18next.t('：')}
+            </div>
             <Select
               className='gm-printer-edit-select'
               value={templateType}
               onChange={this.handleTemplateType}
             >
-              <Option value={1}>商品分拣单</Option>
-              <Option value={2}>客户分拣单</Option>
+              <Option value={1}>{i18next.t('商品分拣单')}</Option>
+              <Option value={2}>{i18next.t('客户分拣单')}</Option>
             </Select>
           </Flex>
         )}
 
-        <Flex alignCenter className='gm-padding-top-5 gm-text-red'>
+        <Flex alignCenter justifyEnd className='gm-padding-top-5 gm-text-red'>
           {computedSelectedRegionTip}
         </Flex>
       </div>

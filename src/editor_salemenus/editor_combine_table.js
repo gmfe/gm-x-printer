@@ -53,7 +53,10 @@ class TableDetailEditor extends React.Component {
               <Title title={i18next.t('组合商品设置')} />
               <Gap />
               <Flex alignCenter className='gm-padding-top-5'>
-                <div>{i18next.t('组合商品展示')}：</div>
+                <div>
+                  {i18next.t('组合商品展示')}
+                  {i18next.t('：')}
+                </div>
                 <Switch
                   checked={combineSkuDetail.show}
                   onChange={e => this.handleCombineShow(e)}
@@ -73,7 +76,10 @@ class TableDetailEditor extends React.Component {
                   </div>
                   {editStore.isSelectingCombine && (
                     <div className='gm-padding-top-5'>
-                      <div>{i18next.t('添加字段')}：</div>
+                      <div>
+                        {i18next.t('添加字段')}
+                        {i18next.t('：')}
+                      </div>
                       <Flex wrap>
                         {_.map(combineTableFields, o => (
                           <FieldBtn
@@ -95,7 +101,10 @@ class TableDetailEditor extends React.Component {
           <Title title={i18next.t('报价设置')} />
           <Gap />
           <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('只打印商品基本单位报价')}：</div>
+            <div>
+              {i18next.t('只打印商品基本单位报价')}
+              {i18next.t('：')}
+            </div>
             <Switch
               checked={!!printBaseUnitSkuOnly}
               onChange={e => this.handlePrintBaseUnitSkuOnly(e)}

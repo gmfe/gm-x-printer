@@ -249,7 +249,7 @@ class Fonter extends React.Component {
                   height: '100%'
                 }}
               >
-                边框宽度
+                {i18next.t('边框宽度')}
               </div>
             </span>
             <TextPX
@@ -785,7 +785,10 @@ const ShowInputText = props => {
   }
   return (
     <Flex className='gm-padding-top-5'>
-      <Flex alignCenter>{text}文案：</Flex>
+      <Flex alignCenter>
+        {text}
+        {i18next.t('文案：')}
+      </Flex>
       <Flex alignCenter>
         <input
           className='gm-printer-edit-input-custom'

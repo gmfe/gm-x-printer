@@ -27,7 +27,7 @@ export const pageTypeMap = {
     }
   },
   'A4/2': {
-    name: i18next.t('二分纸(210x140)'),
+    name: i18next.t('二分纸') + '(210x140)',
     size: {
       width: '210mm',
       height: '140mm'
@@ -40,7 +40,7 @@ export const pageTypeMap = {
     }
   },
   'A4/3': {
-    name: i18next.t('三分纸(210x93)'),
+    name: i18next.t('三分纸') + '(210x93)',
     size: {
       width: '210mm',
       height: '93mm'
@@ -140,60 +140,68 @@ export const blockTypeList = [
 export const DiyTimeType = [
   {
     type: '',
-    text: '格式“2022-01-01 19:00:00”，输入“单据日期：{{单据日期}}”；',
+    text: i18next.t(
+      '格式“2022-01-01 19:00:00”，输入“单据日期：{{单据日期}}”；'
+    ),
     format: 'YYYY-MM-DD HH:mm:ss'
   },
   {
     type: '时分',
-    text: '格式“2022-01-01 19:00”，输入“单据日期：{{单据日期_时分}}”；',
+    text: i18next.t(
+      '格式“2022-01-01 19:00”，输入“单据日期：{{单据日期_时分}}”；'
+    ),
     format: 'YYYY-MM-DD HH:mm'
   },
   {
     type: '日期',
-    text: '格式“2022-01-01”，输入“单据日期：{{单据日期_日期}}”；',
+    text: i18next.t('格式“2022-01-01”，输入“单据日期：{{单据日期_日期}}”；'),
     format: 'YYYY-MM-DD'
   },
   {
     type: '无年份',
-    text: '格式“01-01 19:00:00”，输入“单据日期：{{单据日期_无年份}}”；',
+    text: i18next.t(
+      '格式“01-01 19:00:00”，输入“单据日期：{{单据日期_无年份}}”；'
+    ),
     format: 'MM-DD HH:mm:ss'
   },
   {
     type: '日期_无年份',
-    text: '格式“01-01”，输入“单据日期：{{单据日期_日期_无年份}}"；',
+    text: i18next.t('格式“01-01”，输入“单据日期：{{单据日期_日期_无年份}}”；'),
     format: 'MM-DD'
   },
   {
     type: '时间',
-    text: '格式“19:00:00"，输入“单据日期：{{单据日期_时间}}"；',
+    text: i18next.t('格式“19:00:00”，输入“单据日期：{{单据日期_时间}}”；'),
     format: 'HH:mm:ss'
   },
   {
     type: '日期_星期',
-    text: '格式“2022-01-01 星期六”，输入“单据日期：{{单据日期_日期_星期}}”；',
+    text: i18next.t(
+      '格式“2022-01-01 星期六”，输入“单据日期：{{单据日期_日期_星期}}”；'
+    ),
     format: 'YYYY-MM-DD dddd'
   }
 ]
 
 export const TEMPLATE_SHOW_STYLE_LIST = [
   {
-    text: '在每列底部展现',
+    text: i18next.t('在每列底部展现'),
     value: 'bottom'
   },
   {
-    text: '整行展现',
+    text: i18next.t('整行展现'),
     value: 'row'
   }
 ]
 
 export const SORT_BY_BIG_OR_SMALL = [
-  { text: '小写在前', value: 'small' },
-  { text: '大写在前', value: 'big' }
+  { text: i18next.t('小写在前'), value: 'small' },
+  { text: i18next.t('大写在前'), value: 'big' }
 ]
 
 export const TYPE_ENUM = {
-  text_small: '展现小写',
-  text_big: '展现大写'
+  text_small: i18next.t('展现小写'),
+  text_big: i18next.t('展现大写')
 }
 
 export const STYLE_ENUM = {
@@ -226,11 +234,11 @@ export const PAGE_CHECKBOX = 'page_checkbox'
 
 export const COM_STYLE = { color: '#848586', fontSize: 12 }
 
-export const PAGE_TEXT = '每页合计'
+export const PAGE_TEXT = i18next.t('每页合计')
 
 export const MULTI_SUFFIX = '_MULTI_SUFFIX'
 
 export const SHEET_TITLE_MAP = {
-  23: '入库',
-  24: '出库'
+  23: i18next.t('入库'),
+  24: i18next.t('出库')
 }

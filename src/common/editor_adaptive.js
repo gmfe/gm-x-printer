@@ -23,7 +23,10 @@ class EditorAdaptive extends React.Component {
     return (
       <>
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('自适应页面内容')}：</div>
+          <div>
+            {i18next.t('自适应页面内容')}
+            {i18next.t('：')}
+          </div>
           <Switch
             checked={config?.sign?.isAdaptive}
             onChange={this.handleToggleAdaptive}

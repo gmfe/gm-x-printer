@@ -3,6 +3,7 @@ import classNames from 'classnames'
 import _ from 'lodash'
 
 import Option from '../select/option'
+import i18next from '../../../locales'
 
 const TagSelect = ({
   options = [],
@@ -134,7 +135,9 @@ const TagSelect = ({
           className='gm-select-list gm-animated gm-animated-fade-in-right'
         >
           {computedOptions.length === 0 && (
-            <div className='gm-select-list-empty'>无匹配选项</div>
+            <div className='gm-select-list-empty'>
+              {i18next.t('无匹配选项')}
+            </div>
           )}
           {computedOptions.map((option, index) => (
             <Option
