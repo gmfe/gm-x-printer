@@ -80,6 +80,8 @@ declare module 'gm-x-printer' {
 
   class EditorManage<T extends EditorProps> extends React.Component<T, any> {}
 
+  class EditorSupplierSettleSheet<T extends EditorProps> extends React.Component<T, any> {}
+
   class EditorBoxLabel<T extends EditorProps> extends React.Component<T, any> {}
 
   class EditEshopOrder<T extends EditorProps> extends React.Component<T, any> {}
@@ -150,6 +152,7 @@ declare module 'gm-x-printer' {
     insertCSS,
     getCSS,
     doPrint,
-    doBatchPrint
+    doBatchPrint,
+    EditorSupplierSettleSheet
   }
 }
