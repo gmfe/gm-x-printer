@@ -293,5 +293,8 @@
   "正在${slot1}，请稍后刷新查看": "${slot1}, please refresh and view later",
   "${slot1}任务创建失败": "Failed to create ${slot1} task",
   "已选条目：${slot1}": "Selected entry: ${slot1}",
-  "可用额度${slot1}${slot2}": "Available amount ${slot1}${slot2}"
+  "可用额度${slot1}${slot2}": "Available amount ${slot1}${slot2}",
+  "显示合计":"Show total",
+  "显示小计":"Show subtotal",
+  "统计设置":"Statistics settings"
 }

@@ -71,7 +71,7 @@ class Editor extends React.Component {
             {/* <SpecialField addFields={addFields} mockData={mockData} /> */}
             <Gap height='5px' />
             <Flex alignCenter>
-              <Flex alignCenter>{i18next.t('统计设置')}：</Flex>
+              <Flex alignCenter>{i18next.t('统计设置')}{i18next.t('：')}</Flex>
               <CheckboxGroup
                 value={editStore.config.statisticsSetting}
                 options={options}
