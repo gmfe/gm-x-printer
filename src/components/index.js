@@ -7,6 +7,8 @@ import Switch from './switch'
 import ToolTip from './tooltip'
 import Radio from './radio'
 import TagSelect from './tag_select'
+import Checkbox from './checkbox'
+import CheckboxGroup from './checkbox/group'
 
 export {
   Flex,
@@ -20,7 +22,9 @@ export {
   Switch,
   ToolTip,
   Radio,
-  TagSelect
+  TagSelect,
+  Checkbox,
+  CheckboxGroup
 }
 
 export * from './svg'

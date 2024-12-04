@@ -17,8 +17,17 @@ import EditorMaterialRequisition from './editor_material_requisition'
 import EditorAfterSales from './editor_after_sales'
 import EditEshop from './editor_eshop'
 import EditorManage from './editor_manage'
+import EditorPurchaseDemand from './editor_purchase_demand'
 
-import { BatchPrinter, doBatchPrint, doPrint, Printer, getCSS } from './printer'
+import {
+  BatchPrinter,
+  doBatchPrint,
+  renderBatchPrintToDom,
+  doPrint,
+  Printer,
+  getCSS,
+  getHtml
+} from './printer'
 import { MULTI_SUFFIX, DiyTimeType } from './config'
 
 export * from './util'
@@ -42,10 +51,13 @@ export {
   EditorAfterSales,
   EditorManage,
   EditEshop,
+  EditorPurchaseDemand,
   Printer,
   BatchPrinter,
   doPrint,
   doBatchPrint,
+  renderBatchPrintToDom,
+  getHtml,
   getCSS,
   MULTI_SUFFIX,
   DiyTimeType
