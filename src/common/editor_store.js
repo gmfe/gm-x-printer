@@ -401,6 +401,16 @@ class EditorStore {
     }
   }
 
+  /** 选中的表格数据DataKey  */
+  @computed
+  get selectedTableDataKey() {
+    if (this.computedRegionIsTable) {
+      const arr = this.selectedRegion.split('.')
+      return this.config.contents[arr[2]].dataKey
+    }
+    return null
+  }
+
   @computed
   get computedIsSelectBlock() {
     if (this.selected) {
