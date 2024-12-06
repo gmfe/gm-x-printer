@@ -164,7 +164,7 @@
   "大写": "Upper case",
   "*小写*": "*Lower case* ",
   "小写": "Lower case",
-  "样式设置：": "Style settings:",
+  "样式设置": "Style settings",
   "入库": "Inbound",
   "出库": "Outbound",
   "整行展现的情况下只能选择一个字段": "When the entire row is displayed, only one field can be selected",

@@ -1,5 +1,5 @@
 declare module 'gm-x-printer' {
-  import { CSSProperties } from 'react'
+  import  { CSSProperties } from 'react'
 
   interface EditorProps {
     config: any
@@ -64,6 +64,7 @@ declare module 'gm-x-printer' {
   class EditorManage<T extends EditorProps> extends React.Component<T, any> { }
   class EditorBoxLabel<T extends EditorProps> extends React.Component<T, any> { }
   class EditEshopOrder<T extends EditorProps> extends React.Component<T, any> { }
+  class EditorPurchaseDemand<T extends EditorProps> extends React.Component<T, any> { }
   class Printer<T extends PrinterProps> extends React.Component<T, any> { }
   class BatchPrinter<T extends BatchPrinterProps> extends React.Component<
     T,
