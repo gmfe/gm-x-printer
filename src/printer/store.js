@@ -734,8 +734,8 @@ class PrinterStore {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         ...this.data.common,
-        [i18next.t('当前页码')]: pageIndex + 1,
-        [i18next.t('页码总数')]: this.pages.length,
+        当前页码: pageIndex + 1,
+        页码总数: this.pages.length,
         price: price,
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun
@@ -753,9 +753,9 @@ class PrinterStore {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         ...this.data.common,
-        [i18next.t('列')]: list[index],
-        [i18next.t('当前页码')]: pageIndex + 1,
-        [i18next.t('页码总数')]: this.pages.length,
+        列: list[index],
+        当前页码: pageIndex + 1,
+        页码总数: this.pages.length,
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun
@@ -782,7 +782,7 @@ class PrinterStore {
       return _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
-        [i18next.t('列')]: item,
+        列: item,
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom // 提供一个计算随机数的函数
       })
