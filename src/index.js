@@ -18,6 +18,7 @@ import EditorAfterSales from './editor_after_sales'
 import EditEshop from './editor_eshop'
 import EditorManage from './editor_manage'
 import EditorPurchaseDemand from './editor_purchase_demand'
+import EditorSupplierSettleSheet from './editor_manage_supplier_settle_sheet'
 
 import {
   BatchPrinter,
@@ -60,5 +61,6 @@ export {
   getHtml,
   getCSS,
   MULTI_SUFFIX,
-  DiyTimeType
+  DiyTimeType,
+  EditorSupplierSettleSheet
 }

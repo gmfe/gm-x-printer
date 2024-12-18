@@ -45,7 +45,7 @@ FieldList.propTypes = {
 class EditorAddField extends React.Component {
   render() {
     const {
-      addFields: { tableFields, commonFields },
+      addFields: { tableFields, commonFields, ...rest },
       editStore
     } = this.props
 
@@ -53,9 +53,10 @@ class EditorAddField extends React.Component {
     if (editStore.selectedRegion === null || editStore.isSelectingCombine) {
       content = null
     } else if (editStore.computedRegionIsTable) {
+      const dataKey = editStore.selectedTableDataKey
       content = (
         <FieldList
-          fields={tableFields}
+          fields={rest?.[dataKey] ?? tableFields}
           handleAddField={editStore.addFieldToTable}
         />
       )
