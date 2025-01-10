@@ -28,6 +28,7 @@ class Editor extends React.Component {
       isPurchase,
       uploadQiniuImage,
       batchPrintSettingKey,
+      showPurchaseDetailSetting = true,
       config: { templateType }
     } = this.props
 
@@ -62,8 +63,10 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
             <Gap height='5px' />
-            <EditorSpecialTable addFields={addFields} />
-
+            <EditorSpecialTable
+              showPurchaseDetailSetting={showPurchaseDetailSetting}
+              addFields={addFields}
+            />
             <div id='gm-printer-tip' />
 
             <div id='gm-printer-modal' />
@@ -86,7 +89,9 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   isPurchase: PropTypes.bool,
-  batchPrintSettingKey: PropTypes.string
+  batchPrintSettingKey: PropTypes.string,
+  // 是否显示采购明细设置
+  showPurchaseDetailSetting: PropTypes.bool
 }
 
 Editor.deaultProps = {
