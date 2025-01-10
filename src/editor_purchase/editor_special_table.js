@@ -134,7 +134,7 @@ class TableDetailEditor extends React.Component {
 @observer
 class EditorSpecialTable extends React.Component {
   render() {
-    const { editStore } = this.props
+    const { editStore, showPurchaseDetailSetting } = this.props
     if (!editStore.computedRegionIsTable) return null
     const arr = editStore.selectedRegion.split('.')
     const tableConfig = editStore.config.contents[arr[2]]
@@ -143,6 +143,7 @@ class EditorSpecialTable extends React.Component {
     const keyArr = dataKey.split('_')
     const isMultiActive = keyArr.includes('multi')
     if (!specialConfig || isMultiActive) return null
+    if (!showPurchaseDetailSetting) return null
     // 可以编辑明细的table
     return (
       <TableDetailEditor
