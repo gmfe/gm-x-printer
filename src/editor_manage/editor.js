@@ -14,6 +14,7 @@ import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
 import classNames from 'classnames'
+import EditorAdaptive from '../common/editor_adaptive'
 
 const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
 
@@ -64,6 +65,8 @@ class Editor extends React.Component {
             ) : (
               <EditorAddField addFields={addFields} />
             )}
+            {/* 自适应页面内容开关 */}
+            <EditorAdaptive />
             <EditorSubtotal templateType={templateType} />
 
             <div id='gm-printer-tip' />
