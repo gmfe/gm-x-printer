@@ -44,7 +44,7 @@ class Table extends React.Component {
       setTimeout(() => {
         this.getTableHeight()
         this.props.printerStore.setTableReady(this.props.name, true)
-      }, 1000)
+      }, 3000)
     }
   }
 
