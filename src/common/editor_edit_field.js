@@ -15,7 +15,8 @@ import {
   ChangeCapCheckbox,
   Title,
   Border,
-  TipInfo
+  TipInfo,
+  TextWidth
 } from '../common/component'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -86,6 +87,10 @@ class EditorField extends React.Component {
               style={style}
               onChange={this.handleChangeBlock.bind(this, 'style')}
               type={type}
+            />
+            <TextWidth
+              style={style}
+              onChange={this.handleChangeBlock.bind(this, 'style')}
             />
             {/* 非表格字段不显示左中右 */}
             {/* <Separator />
@@ -299,6 +304,7 @@ class EditorField extends React.Component {
                 onChange={this.handleChangeTable.bind(this, 'headStyle')}
                 type='table'
               />
+
               <Separator />
               <TextAlign
                 style={headStyle}

@@ -327,11 +327,40 @@ class TextAlign extends React.Component {
 }
 
 // 边框
-const Border = () => {
+const TextWidth = ({ style, onChange }) => {
   return (
-    <span>
-      <div>123123</div>
-    </span>
+    <div className='gm-printer-edit-text-width'>
+      <span
+        className={classNames({
+          lineHeight: 20
+        })}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            height: '100%'
+          }}
+        >
+          {i18next.t('文本框宽度')}
+        </div>
+      </span>
+      <TextPX
+        onChange={e => {
+          const num = Number(e.replace('px', ''))
+          if (![null, undefined, ''].includes(e) && Number(num) > 0) {
+            onChange({
+              width: num + 'px'
+            })
+          } else {
+            onChange({
+              width: undefined
+            })
+          }
+        }}
+        value={style.width}
+      />
+    </div>
   )
 }
 
@@ -828,5 +857,5 @@ export {
   TipInfo,
   IsShowCheckBox,
   ShowInputText,
-  Border
+  TextWidth
 }
