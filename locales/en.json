@@ -296,5 +296,6 @@
   "可用额度${slot1}${slot2}": "Available amount ${slot1}${slot2}",
   "显示合计":"Show total",
   "显示小计":"Show subtotal",
-  "统计设置":"Statistics settings"
+  "统计设置":"Statistics settings",
+  "文本框宽度":"Textbox Width"
 }

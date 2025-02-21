@@ -350,10 +350,12 @@ const TextWidth = ({ style, onChange }) => {
           const num = Number(e.replace('px', ''))
           if (![null, undefined, ''].includes(e) && Number(num) > 0) {
             onChange({
+              ...style,
               width: num + 'px'
             })
           } else {
             onChange({
+              ...style,
               width: undefined
             })
           }
