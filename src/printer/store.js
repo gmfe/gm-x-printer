@@ -730,7 +730,7 @@ class PrinterStore {
   template(text, pageIndex) {
     // 做好保护，出错就返回 text
     try {
-      return _.template(text, {
+      let result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         ...this.data.common,
@@ -740,6 +740,9 @@ class PrinterStore {
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun
       })
+      // 将 \n 替换为换行符
+      result = result.replace(/\\n/g, '\n')
+      return result
     } catch (err) {
       return text
     }

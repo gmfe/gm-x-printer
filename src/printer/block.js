@@ -125,7 +125,16 @@ class Block extends React.Component {
     let content = null
     let specialStyle = null
     if (!type || type === 'text' || type === 'rise') {
-      content = printerStore.template(text, pageIndex)
+      const contentList = (printerStore.template(text, pageIndex) || '').split(
+        '\n'
+      )
+      content = contentList.map((line, index) => (
+        // 使用数组索引作为 key
+        <React.Fragment key={index}>
+          {line}
+          {index + 1 < contentList.length && <br />}
+        </React.Fragment>
+      ))
     } else if (type === 'line') {
       content = null
     } else if (type === 'image') {
