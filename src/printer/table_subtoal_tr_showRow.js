@@ -23,9 +23,12 @@ import { get } from 'mobx'
  */
 const SubtotalTrShowRow = props => {
   const {
+    name,
     config,
     config: { dataKey, arrange, subtotal },
     range,
+    begin,
+    end,
     printerStore
   } = props
 
@@ -67,16 +70,23 @@ const SubtotalTrShowRow = props => {
   } = summaryConfig
 
   // 每页小计
-  if (
-    pageSummaryShow &&
-    showPageType === SHOW_WAY_ENUM.row &&
-    printerStore.ready
-  ) {
-    const list = tableData.slice(range.begin, range.end)
+  if (pageSummaryShow && showPageType === SHOW_WAY_ENUM.row) {
+    let list = tableData.slice(range.begin, range.end)
+    if (arrange === 'vertical') {
+      // list = tableData.splice(begin, end)
+      const verticalData = [...tableData.slice(begin, end)]
+      _.forEach(_.range(begin, end), i => {
+        const index = printerStore.lastTableCellCount[name] + i
+        if (tableData.length > index) {
+          verticalData.push(tableData[index])
+        }
+      })
+      list = verticalData
+      // 第二列数据
+    }
     // 是否是打印全部商品
     // 打印全部商品不需要计算子商品
     const isAllProduct = get(config, 'dataKey') === 'allprod'
-    console.log(4444, isAllProduct)
 
     const sum = {}
     let lowerCaseFont = ''
