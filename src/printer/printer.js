@@ -1,6 +1,7 @@
+import { getDataKey } from '../../src/util'
 import i18next from '../../locales'
 import React from 'react'
-import { reaction } from 'mobx'
+import { reaction, toJS } from 'mobx'
 import classNames from 'classnames'
 import { inject, observer, Provider } from 'mobx-react'
 import PropTypes from 'prop-types'
@@ -94,6 +95,7 @@ class Printer extends React.Component {
     }
     /** @decscription 空白行填充补充 */
     if (nextProps.isAutoFilling !== this.props.isAutoFilling) {
+      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       await this.props.printerStore.setData(nextProps.data)
       await this.props.printerStore.setReady(true)
@@ -125,6 +127,7 @@ class Printer extends React.Component {
           : printerStore.computedPages()
         /** @decscription 空白行填充补充 */
         printerStore.computedPages()
+        this.props.printerStore.setLinesPerPage(config.linesPerPage)
         if (config.autoFillConfig?.checked) {
           this.props.printerStore.setAutofillConfig(
             config.autoFillConfig?.checked || false
@@ -176,9 +179,11 @@ class Printer extends React.Component {
 
         {_.map(config.contents, (content, index) => {
           switch (content.type) {
-            case 'table':
+            case 'table': {
+              const dataKey = getDataKey(content.dataKey, content.arrange)
               // eslint-disable-next-line no-case-declarations
-              const list = printerStore.data._table[content.dataKey]
+              const list = printerStore.data._table[dataKey]
+              console.log('list', list, dataKey, toJS(printerStore.data))
               return (
                 <Table
                   key={`contents.table.${index}`}
@@ -190,6 +195,7 @@ class Printer extends React.Component {
                   isDeliverType={isDeliverType}
                 />
               )
+            }
 
             default:
               return (
@@ -210,7 +216,7 @@ class Printer extends React.Component {
   }
 
   renderPage() {
-    const { printerStore, isSomeSubtotalTr } = this.props
+    const { printerStore, isSomeSubtotalTr, onReady } = this.props
     const isDeliverType = this.props?.config?.isDeliverType
 
     const {
@@ -246,12 +252,34 @@ class Printer extends React.Component {
                   panel.end &&
                   content?.dataKey === autoFillConfig?.dataKey
 
-                const end = isAutofillConfig
+                // 如果设置了linesPerPage，则只填充linesPerPage行
+                let end = isAutofillConfig
                   ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                   : panel.end
 
                 switch (panel.type) {
                   case 'table': {
+                    console.log(
+                      'isAutofillConfig',
+                      isAutofillConfig,
+                      printerStore.ready,
+                      printerStore.tableReady[`contents.table.${panel.index}`]
+                    )
+
+                    if (
+                      isAutofillConfig &&
+                      config.linesPerPage &&
+                      end - panel.end > Number(config?.linesPerPage)
+                    ) {
+                      end = panel.begin + Number(config?.linesPerPage)
+                    }
+                    console.log(
+                      'panel.type',
+                      end,
+                      end - panel.end,
+                      config?.linesPerPage,
+                      panel.end
+                    )
                     if (config.contents[panel.index]?.id === 'combine') {
                       // 需不需要展示组合商品table
                       if (!showCombineSkuDetail) {
@@ -433,6 +461,7 @@ Printer.propTypes = {
   selected: PropTypes.string,
   selectedRegion: PropTypes.string,
   isAutoFilling: PropTypes.bool,
+  linesPerPage: PropTypes.string,
   lineheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   data: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,

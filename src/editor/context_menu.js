@@ -24,10 +24,11 @@ class ContextMenu extends React.Component {
     const {
       editStore,
       editStore: {
-        config: { autoFillConfig }
+        config: { autoFillConfig, linesPerPage }
       }
     } = this.props
 
+    editStore.setLinesPerPage(linesPerPage)
     if (autoFillConfig?.checked) {
       editStore.handleChangeTableData(
         autoFillConfig?.checked,
@@ -132,6 +133,7 @@ class ContextMenu extends React.Component {
         <Printer
           key={editStore.computedPrinterKey}
           selected={editStore.selected}
+          linesPerPage={editStore.linesPerPage}
           selectedRegion={editStore.selectedRegion}
           isAutoFilling={editStore.isAutoFilling}
           lineheight={editStore.computedTableCustomerRowHeight}

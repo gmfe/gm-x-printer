@@ -1,5 +1,5 @@
 import i18next from '../../locales'
-import { action, observable, computed } from 'mobx'
+import { action, observable, computed, toJS } from 'mobx'
 import {
   getSumTrHeight,
   isMultiTable,
@@ -98,6 +98,11 @@ class PrinterStore {
   @action
   setAutofillConfig(bol) {
     this.isAutoFilling = bol
+  }
+
+  @action
+  setLinesPerPage(linesPerPage) {
+    this.linesPerPage = linesPerPage
   }
 
   @action
@@ -300,7 +305,8 @@ class PrinterStore {
         /**
          * 判断组合商品表格,
          * 因为写死了两个固定的content，页码计算要处理一下
-         */ if (content.id === 'combine' && !this.showCombineSkuDetail) {
+         */
+        if (content.id === 'combine' && !this.showCombineSkuDetail) {
           index++
           continue
         }
@@ -372,8 +378,17 @@ class PrinterStore {
             currentTableHeight += heights[end]
             // 用于计算最后一页有footer情况的高度
             currentPageHeight += heights[end]
+            // 如果设置了linesPerPage，则只填充linesPerPage行
+            const linesPerPage = this.config.linesPerPage
+              ? Number(this.config.linesPerPage)
+              : undefined
+            // 当前行数
+            const currentLine = end - begin
             // 当前页没有多余空间
-            if (currentTableHeight > pageAccomodateTableHeight) {
+            if (
+              currentTableHeight > pageAccomodateTableHeight ||
+              (linesPerPage && currentLine >= linesPerPage)
+            ) {
               const overHeight = heights[end]
               // 双栏合计
               if (dataKey?.includes('multi')) {
@@ -836,6 +851,10 @@ class PrinterStore {
     _.map(tableData[0], (val, key) => {
       filledData[key] = ''
     })
+    const linesPerPage = Number(this.linesPerPage) || 99999
+    if (linesPerPage < tr_count) {
+      return Array(linesPerPage).fill(filledData)
+    }
     return Array(tr_count).fill(filledData)
   }
 

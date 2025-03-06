@@ -51,6 +51,10 @@ class EditorStore {
   @observable
   isAutoFilling = false
 
+  // 每页行数
+  @observable
+  linesPerPage = undefined
+
   defaultTableDataKey = 'orders'
 
   // 大小写顺序
@@ -109,6 +113,7 @@ class EditorStore {
     this.insertPanel = 'header'
     this.mockData = data
     this.isAutoFilling = false
+    this.linesPerPage = undefined
     this.templateTags = templateTags
     if (this.config.tags) {
       this.tags = this.config.tags.split(',')
@@ -120,6 +125,17 @@ class EditorStore {
   @action
   setAutoFillingConfig(bol) {
     this.isAutoFilling = bol
+  }
+
+  @action
+  setLinesPerPage(linesPerPage, isChange = false) {
+    this.linesPerPage = linesPerPage
+    set(this.config, {
+      linesPerPage
+    })
+    if (isChange) {
+      this.handleChangeTableData(this.isAutoFilling)
+    }
   }
 
   @action
@@ -215,6 +231,10 @@ class EditorStore {
     _.map(tableData[0], (val, key) => {
       filledData[key] = ''
     })
+    const linesPerPage = Number(this.linesPerPage) || 99999
+    if (linesPerPage < tr_count) {
+      return Array(linesPerPage).fill(filledData)
+    }
     return Array(tr_count).fill(filledData)
   }
 

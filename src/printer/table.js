@@ -1,3 +1,4 @@
+import { toJS } from 'mobx'
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -147,6 +148,9 @@ class Table extends React.Component {
       // 多栏商品的第二列有点特殊,都带 _MULTI_SUFFIX 后缀
       let res = _.slice(newColumns)
       const colNumber = getMultiNumber(dataKey)
+      if (this.props.config.arrange === 'vertical') {
+        return newColumns
+      }
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
         const columnsI = newColumns.map((val, index) => {
@@ -236,7 +240,6 @@ class Table extends React.Component {
       }
       return tdStyle
     }
-
     return (
       <table>
         <thead>

@@ -15,12 +15,21 @@ class EditorCutomizedConfig extends React.Component {
   render() {
     const {
       editStore,
-      editStore: { isAutoFilling }
+      editStore: { isAutoFilling, linesPerPage }
     } = this.props
     // 是table
     if (editStore.computedRegionIsTable) {
       return (
         <>
+          <Flex alignCenter className='gm-padding-top-5'>
+            <div>{i18next.t('每页行数')}：</div>
+            <input
+              value={linesPerPage}
+              onChange={e => editStore.setLinesPerPage(e.target.value, true)}
+              className='gm-printer-edit-input-custom'
+              type='number'
+            />
+          </Flex>
           <Flex alignCenter className='gm-padding-top-5'>
             <div>{i18next.t('行数是否自动填充')}：</div>
             <Switch checked={isAutoFilling} onChange={this.handleAutoFilling} />
