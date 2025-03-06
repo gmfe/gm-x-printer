@@ -1,13 +1,13 @@
 {
   "name": "gm-x-printer",
-  "version": "1.9.28",
+  "version": "1.10.1",
   "description": "diy printer",
   "main": "lib/main.js",
   "scripts": {
     "precommit": "lint-staged",
     "start": "webpack-dev-server --hot",
     "build": "webpack --progress --colors --config ./webpack.prod.config.js ",
-    "build:watch": "webpack --progress --colors --config ./webpack.prod.config.js --watch",
+    "build:watch": "cross-env WATCH=true webpack --progress --colors --config ./webpack.prod.config.js --watch",
     "locale": "i18n-m sync src/",
     "release": "bumpp"
   },
@@ -68,6 +68,7 @@
     "bumpp": "8.2.0",
     "classnames": "^2.2.6",
     "clipboard": "^2.0.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^3.6.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.15.0",
