@@ -191,6 +191,7 @@ class Printer extends React.Component {
                   config={content}
                   range={{ begin: 0, end: list?.length || 0 }}
                   pageIndex={0}
+                  isRenderBefore
                   placeholder={`${i18next.t('区域')} ${index}`}
                   isDeliverType={isDeliverType}
                 />
@@ -240,6 +241,7 @@ class Printer extends React.Component {
           isLastPageHasTable = hasTable(pages?.[pagesLength])
             ? isLastPage
             : lastSecond && hasTable(pages?.[pagesLength - 1])
+          console.log('pages', toJS(pages))
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
@@ -253,33 +255,12 @@ class Printer extends React.Component {
                   content?.dataKey === autoFillConfig?.dataKey
 
                 // 如果设置了linesPerPage，则只填充linesPerPage行
-                let end = isAutofillConfig
+                const end = isAutofillConfig
                   ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                   : panel.end
 
                 switch (panel.type) {
                   case 'table': {
-                    console.log(
-                      'isAutofillConfig',
-                      isAutofillConfig,
-                      printerStore.ready,
-                      printerStore.tableReady[`contents.table.${panel.index}`]
-                    )
-
-                    if (
-                      isAutofillConfig &&
-                      config.linesPerPage &&
-                      end - panel.end > Number(config?.linesPerPage)
-                    ) {
-                      end = panel.begin + Number(config?.linesPerPage)
-                    }
-                    console.log(
-                      'panel.type',
-                      end,
-                      end - panel.end,
-                      config?.linesPerPage,
-                      panel.end
-                    )
                     if (config.contents[panel.index]?.id === 'combine') {
                       // 需不需要展示组合商品table
                       if (!showCombineSkuDetail) {
@@ -310,7 +291,9 @@ class Printer extends React.Component {
                             )}
                             range={{
                               begin: panel.begin,
-                              end: end
+                              end: end,
+                              size: panel.pageSize,
+                              linesPerPage: panel.linesPerPage
                             }}
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
@@ -328,7 +311,8 @@ class Printer extends React.Component {
                           config={config.contents[panel.index]}
                           range={{
                             begin: panel.begin,
-                            end: end
+                            end: end,
+                            size: panel.pageSize
                           }}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
