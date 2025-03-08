@@ -92,6 +92,8 @@ class Printer extends React.Component {
           nextProps.showIngredientDetail
         )
       }
+      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
+      await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       this.props.printerStore.computedPages()
     }
     /** @decscription 空白行填充补充 */
@@ -125,10 +127,6 @@ class Printer extends React.Component {
       // 连续打印不需要计算
       if (batchPrintConfig !== 2) {
         printerStore.setReady(true)
-        // 开始计算，获取各种数据
-        config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
-          ? printerStore.computedRowTablePages()
-          : printerStore.computedPages()
         /** @decscription 空白行填充补充 */
         printerStore.computedPages()
         this.props.printerStore.setLinesPerPage(config.linesPerPage)
@@ -136,6 +134,12 @@ class Printer extends React.Component {
           this.props.printerStore.setAutofillConfig(
             config.autoFillConfig?.checked || false
           )
+        }
+        // 开始计算，获取各种数据
+        config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
+          ? printerStore.computedRowTablePages()
+          : printerStore.computedPages()
+        if (config.autoFillConfig?.checked) {
           this.props.printerStore.changeTableData()
         }
         // 获取剩余空白高度，传到editor
@@ -189,26 +193,19 @@ class Printer extends React.Component {
               const list = printerStore.data._table[dataKey]
               // 如果设置了linesPerPage，则只填充linesPerPage行
               return (
-                <Observer>
-                  {() => (
-                    <Table
-                      key={`contents.table.${index}`}
-                      name={`contents.table.${index}`}
-                      config={content}
-                      range={{
-                        begin: 0,
-                        end: list?.length || 0
-                      }}
-                      pageIndex={0}
-                      isRenderBefore
-                      isAutoFilling={getAutoFillingConfig(
-                        printerStore.isAutoFilling
-                      )}
-                      placeholder={`${i18next.t('区域')} ${index}`}
-                      isDeliverType={isDeliverType}
-                    />
-                  )}
-                </Observer>
+                <Table
+                  key={`contents.table.${index}`}
+                  name={`contents.table.${index}`}
+                  config={content}
+                  range={{
+                    begin: 0,
+                    end: list?.length || 0
+                  }}
+                  pageIndex={0}
+                  isRenderBefore
+                  placeholder={`${i18next.t('区域')} ${index}`}
+                  isDeliverType={isDeliverType}
+                />
               )
             }
 

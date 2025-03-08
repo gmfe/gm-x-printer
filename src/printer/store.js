@@ -446,6 +446,7 @@ class PrinterStore {
               // 模拟创建双列表格，计算出总高度和能容纳的行数
               const table = createVerticalTwoColumnTable(
                 currentPageHeights,
+                // 预留一定的空间，防止出现溢出
                 remainingTableHeight - TR_BASE_HEIGHT
               )
               // 计算当前表格的总高度
@@ -468,7 +469,7 @@ class PrinterStore {
 
               // 计算最后可填充的行数，即渲染完成后的空白行数
               const remainingRowCount = Math.floor(
-                (remainingHeight - TR_BASE_HEIGHT) / TR_BASE_HEIGHT
+                (remainingHeight - TR_BASE_HEIGHT * 2) / TR_BASE_HEIGHT
               )
               // 计算当前页面最大可容纳的有效数据行数，不包括空白行
               let maxRowsPerPage = linesPerPage ? linesPerPage / 2 : 999
@@ -493,8 +494,16 @@ class PrinterStore {
                   if (table.maxRows < linesPerPage) {
                     maxRowsPerPage = table.maxRows
                   }
+                } else {
+                  // maxRowsPerPage = linesPerPage
                 }
               }
+              console.log(
+                'isAutoFillingAuto',
+                isAutoFillingAuto,
+                linesPerPage,
+                maxRowsPerPage
+              )
 
               // if (table.maxRows < maxRowsPerPage) {
               //   maxRowsPerPage = table.maxRows

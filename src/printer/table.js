@@ -29,8 +29,7 @@ class Table extends React.Component {
     super(props)
     this.ref = React.createRef()
     this.state = {
-      index: null,
-      isAutoFilling: false
+      index: null
     }
   }
 
@@ -214,13 +213,13 @@ class Table extends React.Component {
     }
   }
 
-  getTableData = (i, isAutoFilling) => {
+  getTableData = i => {
     const {
       printerStore,
       config: { dataKey, arrange },
       range
     } = this.props
-    const isAutoFillingText = getAutoFillingConfig(isAutoFilling)
+    const isAutoFillingText = getAutoFillingConfig(printerStore.isAutoFilling)
     const tableData =
       printerStore.data._table[getDataKey(dataKey, arrange)] || []
     const isMultiPage = dataKey?.includes('multi')
@@ -257,7 +256,7 @@ class Table extends React.Component {
     }
   }
 
-  renderDefault(isAutoFilling) {
+  renderDefault() {
     let {
       config,
       config: { dataKey, arrange, customerRowHeight = 23 },
@@ -347,7 +346,7 @@ class Table extends React.Component {
         </thead>
         <tbody>
           {_.map(_.range(begin, end), i => {
-            const data = this.getTableData(i, isAutoFilling)
+            const data = this.getTableData(i)
             const _special = data && data._special
 
             if (_special)
@@ -552,8 +551,7 @@ class Table extends React.Component {
       config: { className, dataKey, arrange },
       name,
       placeholder,
-      printerStore,
-      isAutoFilling
+      printerStore
     } = this.props
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
@@ -574,9 +572,7 @@ class Table extends React.Component {
         data-placeholder={placeholder}
         onClick={this.handleSelectedRegion}
       >
-        {tableData.length
-          ? this.renderDefault(isAutoFilling)
-          : this.renderEmptyTable()}
+        {tableData.length ? this.renderDefault() : this.renderEmptyTable()}
       </div>
     )
   }
