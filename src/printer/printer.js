@@ -201,7 +201,9 @@ class Printer extends React.Component {
                       }}
                       pageIndex={0}
                       isRenderBefore
-                      isAutoFilling={printerStore.isAutoFilling}
+                      isAutoFilling={getAutoFillingConfig(
+                        printerStore.isAutoFilling
+                      )}
                       placeholder={`${i18next.t('区域')} ${index}`}
                       isDeliverType={isDeliverType}
                     />

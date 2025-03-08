@@ -2,8 +2,9 @@ import i18next from '../../locales'
 import React from 'react'
 import { getAutoFillingConfig } from '../util'
 
-export default class ContextMenuAutoFilling {
+export default class ContextMenuAutoFilling extends React.Component {
   constructor(props) {
+    super(props)
     this.props = props
   }
 

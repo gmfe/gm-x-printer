@@ -29,7 +29,8 @@ class Table extends React.Component {
     super(props)
     this.ref = React.createRef()
     this.state = {
-      index: null
+      index: null,
+      isAutoFilling: false
     }
   }
 
@@ -39,7 +40,7 @@ class Table extends React.Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (!this.props.printerStore.tableReady[this.props.name]) {
       // TODO 增加定时器，页面渲染完成后再获取高度 因为如果不设置定时器，页面渲染完成后，table的高度还没有计算出来
       setTimeout(async () => {
@@ -216,7 +217,7 @@ class Table extends React.Component {
   getTableData = (i, isAutoFilling) => {
     const {
       printerStore,
-      config: { dataKey, arrange, autoFillConfig },
+      config: { dataKey, arrange },
       range
     } = this.props
     const isAutoFillingText = getAutoFillingConfig(isAutoFilling)
@@ -227,8 +228,7 @@ class Table extends React.Component {
     if (!(data && !data?.['序号']) && isAutoFillingText === 'number') {
       return {
         ...data,
-        序号: i + 1,
-        ['序号' + MULTI_SUFFIX]: i + 1
+        序号: i + 1
       }
     }
     // 双栏数据比较特殊，需要特殊处理
