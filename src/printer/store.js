@@ -653,7 +653,6 @@ class PrinterStore {
         /* 非表格内容处理 */
       } else {
         const panelHeight = this.height[`contents.panel.${index}`]
-        console.log('panelHeight', currentPageHeight, panelHeight)
         currentPageHeight += panelHeight
 
         // 当 panel + allPagesHaveThisHeight > 页高度, 停止. 避免死循环

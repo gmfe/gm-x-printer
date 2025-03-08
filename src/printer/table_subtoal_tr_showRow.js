@@ -76,7 +76,6 @@ const SubtotalTrShowRow = props => {
     // 是否是打印全部商品
     // 打印全部商品不需要计算子商品
     const isAllProduct = get(config, 'dataKey') === 'allprod'
-    console.log(4444, isAllProduct)
 
     const sum = {}
     let lowerCaseFont = ''

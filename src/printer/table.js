@@ -237,7 +237,6 @@ class Table extends React.Component {
             序号: i + 1
           }
         } else {
-          console.log('data', data)
           data = { 序号: i + 1 }
         }
       }
@@ -310,7 +309,6 @@ class Table extends React.Component {
     const begin = range.begin
     let end = range.end
     if (isMultiPage && arrange === 'vertical' && !isRenderBefore) {
-      console.log('size', range)
       end = begin + range.size
       // if (range.linesPerPage) {
       //   if (end < begin + range.linesPerPage / 2) {
@@ -562,7 +560,6 @@ class Table extends React.Component {
     const active = printerStore.selectedRegion === name
     // 是否是纵向双列
     // const isDoubleColumn = arrange === 'vertical' && isMultiTable(dataKey)
-    console.log('isAutoFilling', isAutoFilling)
     return (
       <div
         ref={this.ref}
