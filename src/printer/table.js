@@ -224,11 +224,22 @@ class Table extends React.Component {
     const tableData =
       printerStore.data._table[getDataKey(dataKey, arrange)] || []
     const isMultiPage = dataKey?.includes('multi')
-    const data = tableData[i]
+    let data = tableData[i]
     if (!(data && !data?.['序号']) && isAutoFillingText === 'number') {
-      return {
-        ...data,
-        序号: i + 1
+      if (_.isArray(data)) {
+        data.forEach((item, index) => {
+          item['序号'] = i + index + 1
+        })
+      } else {
+        if (data) {
+          data = {
+            ...data,
+            序号: i + 1
+          }
+        } else {
+          console.log('data', data)
+          data = { 序号: i + 1 }
+        }
       }
     }
     // 双栏数据比较特殊，需要特殊处理
@@ -551,6 +562,7 @@ class Table extends React.Component {
     const active = printerStore.selectedRegion === name
     // 是否是纵向双列
     // const isDoubleColumn = arrange === 'vertical' && isMultiTable(dataKey)
+    console.log('isAutoFilling', isAutoFilling)
     return (
       <div
         ref={this.ref}
