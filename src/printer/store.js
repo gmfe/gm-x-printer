@@ -7,7 +7,8 @@ import {
   caclRowSpanTdPageHeight,
   caclSingleDetailsPageHeight,
   getOverallOrderTrHeight,
-  getDataKey
+  getDataKey,
+  getAutoFillingConfig
 } from '../util'
 import _ from 'lodash'
 import Big from 'big.js'
@@ -249,10 +250,13 @@ class PrinterStore {
     const isOrderCategroy = dataKey === this.config?.autoFillConfig?.dataKey
     const { customerRowHeight = TR_BASE_HEIGHT } = this.tableConfig
 
-    if (hasEmptyData && !this.isAutoFilling && isOrderCategroy) {
+    const isAutoFillingBool =
+      getAutoFillingConfig(this.isAutoFilling) !== 'manual'
+
+    if (hasEmptyData && !isAutoFillingBool && isOrderCategroy) {
       // 如果tableData有填充的空数据， 则去掉
       return heights.slice(0, -this.filledTableLen)
-    } else if (this.isAutoFilling && isOrderCategroy) {
+    } else if (isAutoFillingBool && isOrderCategroy) {
       // 如果没有空数据，且isAutofilling是true,即选择了要填充数据
       return [
         ...heights,
@@ -318,6 +322,8 @@ class PrinterStore {
     // debugger
     // 每次先初始化置空
     this.pages = []
+    const isAutoFillingAuto =
+      getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
     // 退出计算! 因为页眉 + 页脚 > currentPageHeight,页面装不下其他东西
@@ -417,9 +423,6 @@ class PrinterStore {
 
           /* 遍历表格每一行，填充表格内容 */
           while (end < heights.length) {
-            currentTableHeight += heights[end]
-            // 用于计算最后一页有footer情况的高度
-            currentPageHeight += heights[end]
             // 如果设置了linesPerPage，则只填充linesPerPage行
             let linesPerPage = this.config.linesPerPage
               ? Number(this.config.linesPerPage)
@@ -427,89 +430,130 @@ class PrinterStore {
             // 当前行数
             const currentLine = end - begin
 
-            if (isMultiPage && linesPerPage) {
+            if (isMultiPage && arrange === 'vertical' && linesPerPage) {
               linesPerPage = linesPerPage * 2
             }
             // 当前页没有多余空间
             // 双栏 & 垂直的话，只判断一次就好了，不需要每次都判断
             if (isMultiPage && arrange === 'vertical') {
-              // 当前剩余高度
-              const maxTableHeight = Big(pageAccomodateTableHeight)
+              // 计算当前剩余的表格高度
+              const remainingTableHeight = Big(pageAccomodateTableHeight)
                 .minus(currentTableHeight)
                 .toString()
-              // 当前页面的 heights
-              const pageHeights = [...heights].splice(begin, heights.length)
+
+              // 计算当前表格的总高度
+              const currentPageHeights = [...heights].splice(begin)
+              // 模拟创建双列表格，计算出总高度和能容纳的行数
               const table = createVerticalTwoColumnTable(
-                pageHeights,
-                maxTableHeight
+                currentPageHeights,
+                remainingTableHeight - TR_BASE_HEIGHT
               )
-              console.log('table', table)
-              currentTableHeight = _.reduce(
-                table.table?.[0] || [],
-                (pre, cur) => {
-                  return Big(pre)
-                    .plus(cur || '0')
+              // 计算当前表格的总高度
+              const nowTableHeight = (table.table?.[0] || []).reduce(
+                (acc, height) => {
+                  return Big(acc)
+                    .plus(height || '0')
                     .toString()
                 },
                 Big('0')
               )
+
+              currentTableHeight = +Big(currentTableHeight).plus(nowTableHeight)
+              currentPageHeight = +Big(currentPageHeight).plus(nowTableHeight)
+
               // 剩余高度
-              const remainHeight = Big(pageAccomodateTableHeight)
+              const remainingHeight = Big(pageAccomodateTableHeight)
                 .minus(currentTableHeight)
                 .toString()
-              console.log(
-                'remainHeight',
-                remainHeight,
-                currentTableHeight,
-                pageAccomodateTableHeight
+
+              // 计算最后可填充的行数，即渲染完成后的空白行数
+              const remainingRowCount = Math.floor(
+                (remainingHeight - TR_BASE_HEIGHT) / TR_BASE_HEIGHT
               )
+              // 计算当前页面最大可容纳的有效数据行数，不包括空白行
+              let maxRowsPerPage = linesPerPage ? linesPerPage / 2 : 999
 
-              // 最后可填充的行数
-              const lll = remainHeight / TR_BASE_HEIGHT
-              console.log('lll', lll)
-
-              // 当前页面可容纳多少行
-              let allPagesHaveRow = linesPerPage ? linesPerPage / 2 : 999
-              if (table.maxRows < allPagesHaveRow) {
-                allPagesHaveRow = table.maxRows
+              // 如果没有设置 linesPerPage，则计算出最大可容纳的行数
+              if (!linesPerPage) {
+                if (isAutoFillingAuto) {
+                  maxRowsPerPage = table.maxRows + remainingRowCount
+                } else {
+                  maxRowsPerPage = table.maxRows
+                }
+                //   console.log(
+                //     'remainingRowCount',
+                //     currentPageMinimumHeight,
+                //     currentTableHeight,
+                //     currentPageHeight
+                //   )
+                linesPerPage = maxRowsPerPage + remainingRowCount
+              } else {
+                // 无需自动填充时，如果表格最大行数小于linesPerPage，则设置linesPerPage为表格最大行数
+                if (!isAutoFillingAuto) {
+                  if (table.maxRows < linesPerPage) {
+                    maxRowsPerPage = table.maxRows
+                  }
+                }
               }
 
-              const maxRowsEnd = (linesPerPage || table.maxRows) + begin
-              // 当前页数的 rows
-              let currentPageRows = table.maxRows * 2 + begin
-              if (currentPageRows > maxRowsEnd) {
-                currentPageRows = maxRowsEnd
-              }
+              // if (table.maxRows < maxRowsPerPage) {
+              //   maxRowsPerPage = table.maxRows
+              // }
+
+              // 计算当前页的结束行索引
+              const currentEndIndex =
+                (linesPerPage || table.maxRows * 2) + begin
               end =
-                currentPageRows > heights.length
+                currentEndIndex > heights.length
                   ? heights.length
-                  : currentPageRows
+                  : currentEndIndex
               page.push({
                 type: 'table',
                 index,
                 begin,
+                end,
                 // 当前页面的行数
-                pageSize: allPagesHaveRow,
-                linesPerPage,
-                end
+                pageSize: maxRowsPerPage,
+                linesPerPage
               })
+              // 更新起始索引
               begin = end
-              // 开启新一页,重置页面高度
-              pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
-                allPagesHaveThisHeight
-              )
-              currentTableHeight = allTableHaveThisHeight
-              currentPageHeight = currentPageMinimumHeight
-              // 此页完成任务
-              this.pages.push(page)
-              page = []
-              // 此 table 完成
+
+              // 如果当前页面的行数大于当前页面的高度，则开启新一页
+              // 是否完成此 table
               if (end >= heights.length) {
-                return
+                // 如果当前页面的行数大于当前页面的高度，则开启新一页
+                if (currentTableHeight > pageAccomodateTableHeight) {
+                  // 此页完成任务
+                  this.pages.push(page)
+                  page = []
+                  // console.log('重新开始', begin, end)
+                  // 开启新一页,重置页面高度
+                  pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
+                    allPagesHaveThisHeight
+                  )
+                  currentTableHeight = allTableHaveThisHeight
+                  currentPageHeight = currentPageMinimumHeight
+                } else {
+                  index++
+                }
+              } else {
+                console.log('当前页面的 table 结束了，但是还有数据')
+                // 当前的 table 没完成，则开启新一页
+                // 此页完成任务
+                this.pages.push(page)
+                page = []
+                // 开启下一页，重置页面高度
+                pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
+                  allPagesHaveThisHeight
+                )
+                currentTableHeight = allTableHaveThisHeight
+                currentPageHeight = currentPageMinimumHeight
               }
-              // break
-              // return
             } else {
+              currentTableHeight += heights[end]
+              // 用于计算最后一页有footer情况的高度
+              currentPageHeight += heights[end]
               // 如果 currentTableHeight > pageAccomodateTableHeight 或者 linesPerPage && currentLine >= linesPerPage，则表示超出了当前页面的高度，需要分页
               if (
                 currentTableHeight > pageAccomodateTableHeight ||
@@ -556,15 +600,6 @@ class PrinterStore {
                       end++
                     }
                   }
-                }
-                // 在最后一行时，如果时双栏 & 垂直，我们在这里需要处理当前页面 table 的第二栏的高度
-                if (isMultiPage && arrange === 'vertical') {
-                  // 那 begin 需要加上当前行数
-                  // end += currentLine
-                  // if (end >= heights.length) {
-                  //   end = heights.length
-                  // }
-                  // console.log('currentLine', end, currentLine)
                 }
                 // 第一条极端会有问题
                 if (end !== 0) {
@@ -618,6 +653,7 @@ class PrinterStore {
         /* 非表格内容处理 */
       } else {
         const panelHeight = this.height[`contents.panel.${index}`]
+        console.log('panelHeight', currentPageHeight, panelHeight)
         currentPageHeight += panelHeight
 
         // 当 panel + allPagesHaveThisHeight > 页高度, 停止. 避免死循环
@@ -629,6 +665,11 @@ class PrinterStore {
         if (index === this.config.contents.length - 1) {
           currentPageHeight += this.height?.sign
         }
+        console.log(
+          '当前页面可以放得下这一个吗',
+          page,
+          currentPageHeight <= this.pageHeight
+        )
         if (currentPageHeight <= this.pageHeight) {
           // 空间充足，把信息加入 page，并轮下一个contents
           page.push({
@@ -1003,11 +1044,12 @@ class PrinterStore {
   @action.bound
   changeTableData() {
     const { autoFillConfig } = this.config
-    if (!this.isAutoFilling) return
+    const isAutoFilling = getAutoFillingConfig(this.isAutoFilling) !== 'manual'
+    if (!isAutoFilling) return
     const dataKey = autoFillConfig?.dataKey
     const table = this.data._table[dataKey]
 
-    table.push(...this.getFilledTableData(table))
+    // table.push(...this.getFilledTableData(table))
     this.data._table[dataKey] = table
   }
 }

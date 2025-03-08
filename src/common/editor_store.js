@@ -2,7 +2,13 @@ import i18next from '../../locales'
 import { action, computed, observable, set, toJS } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
-import { dispatchMsg, getBlockName, exchange, regExp } from '../util'
+import {
+  dispatchMsg,
+  getBlockName,
+  exchange,
+  regExp,
+  getAutoFillingConfig
+} from '../util'
 
 class EditorStore {
   @observable
@@ -254,7 +260,9 @@ class EditorStore {
         checked: isAutoFilling
       }
     })
-    if (isAutoFilling) {
+    const isAutoFillingBool =
+      getAutoFillingConfig(this.isAutoFilling) !== 'manual'
+    if (isAutoFillingBool) {
       table.push(...this.getFilledTableData(table))
     } else {
       this.clearExtraTableData(dataKey)
@@ -664,7 +672,7 @@ class EditorStore {
     // 切换的时候，要把对应table的多余空数据清掉
     this.clearExtraTableData(table.dataKey)
     table.subtotal.show = !table.subtotal.show
-    this.setAutoFillingConfig(!this.isAutoFilling)
+    this.setAutoFillingConfig('manual')
     set(table.subtotal, {
       isSsuQuantity: false,
       isSsuOtQuantity: false
@@ -871,7 +879,7 @@ class EditorStore {
       })
 
       this.clearExtraTableData(dataKey)
-      this.setAutoFillingConfig(false)
+      this.setAutoFillingConfig('manual')
     }
   }
 
@@ -1052,7 +1060,7 @@ class EditorStore {
         }
         // // 用于触发printer更新最新的剩余高度
         // this.setLineHeight(val)
-        this.setAutoFillingConfig(false)
+        this.setAutoFillingConfig('manual')
       }
     }
   }

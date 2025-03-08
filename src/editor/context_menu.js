@@ -1,3 +1,4 @@
+import ContextMenuAutoFilling from '../common/context_menu_auto_filling'
 import i18next from '../../locales'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -112,12 +113,10 @@ class ContextMenu extends React.Component {
             </div>
           </>
         )}
-        <div
-          onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}
-          className={isAutoFilling ? 'active' : ''}
-        >
-          {i18next.t('行数填充')}
-        </div>
+        <ContextMenuAutoFilling
+          isAutoFilling={isAutoFilling}
+          onChangeTableData={this.handleChangeTableData}
+        />
       </>
     )
   }

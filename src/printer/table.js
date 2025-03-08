@@ -1,4 +1,3 @@
-import { toJS } from 'mobx'
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
@@ -11,7 +10,8 @@ import {
   getHeadThWidth,
   isMultiTable,
   isRowSpanTable,
-  getTableRowColumnName
+  getTableRowColumnName,
+  getAutoFillingConfig
 } from '../util'
 import { inject, observer } from 'mobx-react'
 import classNames from 'classnames'
@@ -216,21 +216,33 @@ class Table extends React.Component {
   getTableData = i => {
     const {
       printerStore,
-      config: { dataKey, arrange },
-      range
+      config: { dataKey, arrange, autoFillConfig },
+      range,
+      isAutoFilling
     } = this.props
+    const isAutoFillingText = getAutoFillingConfig(isAutoFilling)
     const tableData =
       printerStore.data._table[getDataKey(dataKey, arrange)] || []
     const isMultiPage = dataKey?.includes('multi')
+    const data = tableData[i]
+    if (!data && isAutoFillingText === 'number') {
+      return {
+        ...data,
+        序号: i + 1
+      }
+    }
     // 双栏数据比较特殊，需要特殊处理
     if (isMultiPage && arrange === 'vertical') {
       const sku2 = {}
       _.each(tableData[i + range.size], (val, key) => {
         sku2[key + MULTI_SUFFIX] = val
       })
-      return { ...tableData[i], ...sku2 }
+      if (!tableData[i + range.size] && isAutoFillingText === 'number') {
+        sku2['序号' + MULTI_SUFFIX] = i + 1 + range.size
+      }
+      return { ...data, ...sku2 }
     } else {
-      return tableData[i]
+      return data
     }
   }
 
@@ -286,12 +298,13 @@ class Table extends React.Component {
     const begin = range.begin
     let end = range.end
     if (isMultiPage && arrange === 'vertical' && !isRenderBefore) {
+      console.log('size', range)
       end = begin + range.size
-      if (range.linesPerPage) {
-        if (end < begin + range.linesPerPage / 2) {
-          end = begin + range.linesPerPage / 2
-        }
-      }
+      // if (range.linesPerPage) {
+      //   if (end < begin + range.linesPerPage / 2) {
+      //     end = begin + range.linesPerPage / 2
+      //   }
+      // }
     }
     return (
       <table>

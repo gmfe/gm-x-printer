@@ -1,7 +1,8 @@
-import { getDataKey } from '../../src/util'
+import Big from 'big.js'
+import { getAutoFillingConfig, getDataKey } from '../../src/util'
 import i18next from '../../locales'
 import React from 'react'
-import { reaction, toJS } from 'mobx'
+import { reaction } from 'mobx'
 import classNames from 'classnames'
 import { inject, observer, Provider } from 'mobx-react'
 import PropTypes from 'prop-types'
@@ -94,7 +95,11 @@ class Printer extends React.Component {
       this.props.printerStore.computedPages()
     }
     /** @decscription 空白行填充补充 */
-    if (nextProps.isAutoFilling !== this.props.isAutoFilling) {
+    if (
+      getAutoFillingConfig(nextProps.isAutoFilling) !==
+        getAutoFillingConfig(this.props.isAutoFilling) ||
+      nextProps.linesPerPage !== this.props.linesPerPage
+    ) {
       await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       await this.props.printerStore.setData(nextProps.data)
@@ -183,13 +188,16 @@ class Printer extends React.Component {
               const dataKey = getDataKey(content.dataKey, content.arrange)
               // eslint-disable-next-line no-case-declarations
               const list = printerStore.data._table[dataKey]
-              console.log('list', list, dataKey, toJS(printerStore.data))
+              // 如果设置了linesPerPage，则只填充linesPerPage行
               return (
                 <Table
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
                   config={content}
-                  range={{ begin: 0, end: list?.length || 0 }}
+                  range={{
+                    begin: 0,
+                    end: list?.length || 0
+                  }}
                   pageIndex={0}
                   isRenderBefore
                   placeholder={`${i18next.t('区域')} ${index}`}
@@ -228,6 +236,7 @@ class Printer extends React.Component {
       showIngredientDetail,
       pages
     } = printerStore
+    const isAutoFillingBool = getAutoFillingConfig(isAutoFilling) !== 'manual'
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
@@ -241,7 +250,6 @@ class Printer extends React.Component {
           isLastPageHasTable = hasTable(pages?.[pagesLength])
             ? isLastPage
             : lastSecond && hasTable(pages?.[pagesLength - 1])
-          console.log('pages', toJS(pages))
           return (
             <Page key={i}>
               <Header config={config.header} pageIndex={i} />
@@ -250,14 +258,26 @@ class Printer extends React.Component {
                 const autoFillConfig = config?.autoFillConfig || {}
                 const isAutofillConfig =
                   isLastPage &&
-                  isAutoFilling &&
+                  isAutoFillingBool &&
                   panel.end &&
                   content?.dataKey === autoFillConfig?.dataKey
 
                 // 如果设置了linesPerPage，则只填充linesPerPage行
-                const end = isAutofillConfig
+                let end = isAutofillConfig
                   ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                   : panel.end
+                if (isAutofillConfig) {
+                  const autoRows =
+                    panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                  if (
+                    printerStore.linesPerPage &&
+                    autoRows > Big(printerStore.linesPerPage).plus(panel.begin)
+                  ) {
+                    end = Big(printerStore.linesPerPage).plus(panel.begin)
+                  } else {
+                    end = autoRows
+                  }
+                }
 
                 switch (panel.type) {
                   case 'table': {
@@ -314,6 +334,7 @@ class Printer extends React.Component {
                             end: end,
                             size: panel.pageSize
                           }}
+                          isAutoFilling={isAutoFilling}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
                           isSomeSubtotalTr={isSomeSubtotalTr}
