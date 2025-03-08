@@ -4,7 +4,7 @@ import i18next from '../../locales'
 import React from 'react'
 import { reaction } from 'mobx'
 import classNames from 'classnames'
-import { inject, observer, Provider } from 'mobx-react'
+import { inject, Observer, observer, Provider } from 'mobx-react'
 import PropTypes from 'prop-types'
 import PrinterStore, { TR_BASE_HEIGHT } from './store'
 import Page from './page'
@@ -96,8 +96,7 @@ class Printer extends React.Component {
     }
     /** @decscription 空白行填充补充 */
     if (
-      getAutoFillingConfig(nextProps.isAutoFilling) !==
-        getAutoFillingConfig(this.props.isAutoFilling) ||
+      nextProps.isAutoFilling !== this.props.isAutoFilling ||
       nextProps.linesPerPage !== this.props.linesPerPage
     ) {
       await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
@@ -190,19 +189,24 @@ class Printer extends React.Component {
               const list = printerStore.data._table[dataKey]
               // 如果设置了linesPerPage，则只填充linesPerPage行
               return (
-                <Table
-                  key={`contents.table.${index}`}
-                  name={`contents.table.${index}`}
-                  config={content}
-                  range={{
-                    begin: 0,
-                    end: list?.length || 0
-                  }}
-                  pageIndex={0}
-                  isRenderBefore
-                  placeholder={`${i18next.t('区域')} ${index}`}
-                  isDeliverType={isDeliverType}
-                />
+                <Observer>
+                  {() => (
+                    <Table
+                      key={`contents.table.${index}`}
+                      name={`contents.table.${index}`}
+                      config={content}
+                      range={{
+                        begin: 0,
+                        end: list?.length || 0
+                      }}
+                      pageIndex={0}
+                      isRenderBefore
+                      isAutoFilling={printerStore.isAutoFilling}
+                      placeholder={`${i18next.t('区域')} ${index}`}
+                      isDeliverType={isDeliverType}
+                    />
+                  )}
+                </Observer>
               )
             }
 

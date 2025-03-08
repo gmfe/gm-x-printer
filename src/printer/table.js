@@ -213,31 +213,32 @@ class Table extends React.Component {
     }
   }
 
-  getTableData = i => {
+  getTableData = (i, isAutoFilling) => {
     const {
       printerStore,
       config: { dataKey, arrange, autoFillConfig },
-      range,
-      isAutoFilling
+      range
     } = this.props
     const isAutoFillingText = getAutoFillingConfig(isAutoFilling)
     const tableData =
       printerStore.data._table[getDataKey(dataKey, arrange)] || []
     const isMultiPage = dataKey?.includes('multi')
     const data = tableData[i]
-    if (!data && isAutoFillingText === 'number') {
+    if (!(data && !data?.['序号']) && isAutoFillingText === 'number') {
       return {
         ...data,
-        序号: i + 1
+        序号: i + 1,
+        ['序号' + MULTI_SUFFIX]: i + 1
       }
     }
     // 双栏数据比较特殊，需要特殊处理
     if (isMultiPage && arrange === 'vertical') {
       const sku2 = {}
-      _.each(tableData[i + range.size], (val, key) => {
+      const data2 = tableData[i + range.size]
+      _.each(data2, (val, key) => {
         sku2[key + MULTI_SUFFIX] = val
       })
-      if (!tableData[i + range.size] && isAutoFillingText === 'number') {
+      if (!(data2 && !data2?.['序号']) && isAutoFillingText === 'number') {
         sku2['序号' + MULTI_SUFFIX] = i + 1 + range.size
       }
       return { ...data, ...sku2 }
@@ -246,7 +247,7 @@ class Table extends React.Component {
     }
   }
 
-  renderDefault() {
+  renderDefault(isAutoFilling) {
     let {
       config,
       config: { dataKey, arrange, customerRowHeight = 23 },
@@ -337,7 +338,7 @@ class Table extends React.Component {
         </thead>
         <tbody>
           {_.map(_.range(begin, end), i => {
-            const data = this.getTableData(i)
+            const data = this.getTableData(i, isAutoFilling)
             const _special = data && data._special
 
             if (_special)
@@ -543,7 +544,7 @@ class Table extends React.Component {
       name,
       placeholder,
       printerStore,
-      isRenderBefore
+      isAutoFilling
     } = this.props
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
@@ -564,7 +565,9 @@ class Table extends React.Component {
         data-placeholder={placeholder}
         onClick={this.handleSelectedRegion}
       >
-        {tableData.length ? this.renderDefault() : this.renderEmptyTable()}
+        {tableData.length
+          ? this.renderDefault(isAutoFilling)
+          : this.renderEmptyTable()}
       </div>
     )
   }
