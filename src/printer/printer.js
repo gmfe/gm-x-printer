@@ -274,9 +274,9 @@ class Printer extends React.Component {
                     panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                   if (
                     printerStore.linesPerPage &&
-                    autoRows > Big(printerStore.linesPerPage).plus(panel.begin)
+                    autoRows > Big(panel.linesPerPage).plus(panel.begin)
                   ) {
-                    end = Big(printerStore.linesPerPage).plus(panel.begin)
+                    end = Big(panel.linesPerPage).plus(panel.begin)
                   } else {
                     end = autoRows
                   }

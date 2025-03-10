@@ -474,6 +474,9 @@ class PrinterStore {
               // 计算当前页面最大可容纳的有效数据行数，不包括空白行
               let maxRowsPerPage = linesPerPage ? linesPerPage / 2 : 999
 
+              // 当前页面最大可容纳的行数，包括空白行
+              const maxAllRowsPerPage = table.maxRows + remainingRowCount
+
               // 如果没有设置 linesPerPage，则计算出最大可容纳的行数
               if (!linesPerPage) {
                 if (isAutoFillingAuto) {
@@ -494,9 +497,12 @@ class PrinterStore {
                   if (table.maxRows < linesPerPage) {
                     maxRowsPerPage = table.maxRows
                   }
-                } else {
-                  // maxRowsPerPage = linesPerPage
                 }
+              }
+
+              if (maxRowsPerPage > maxAllRowsPerPage) {
+                maxRowsPerPage = maxAllRowsPerPage
+                linesPerPage = maxAllRowsPerPage
               }
               console.log(
                 'isAutoFillingAuto',

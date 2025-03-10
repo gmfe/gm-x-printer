@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import i18next from '../../locales'
 import { action, computed, observable, set, toJS } from 'mobx'
 import { pageTypeMap } from '../config'
@@ -135,9 +136,21 @@ class EditorStore {
 
   @action
   setLinesPerPage(linesPerPage, isChange = false) {
-    this.linesPerPage = linesPerPage
+    let value = linesPerPage
+    if (!isNaN(Number(value))) {
+      if (Big(value).gt(99999)) {
+        value = 99999
+      } else if (Big(value).lt(1)) {
+        value = 1
+      }
+    }
+    // if (_.isNumber(value)) {
+    //   this.linesPerPage = value
+    // }
+
+    this.linesPerPage = value
     set(this.config, {
-      linesPerPage
+      linesPerPage: value
     })
     if (isChange) {
       this.handleChangeTableData(this.isAutoFilling)

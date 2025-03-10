@@ -223,31 +223,37 @@ class Table extends React.Component {
     const tableData =
       printerStore.data._table[getDataKey(dataKey, arrange)] || []
     const isMultiPage = dataKey?.includes('multi')
-    let data = tableData[i]
-    if (!(data && !data?.['序号']) && isAutoFillingText === 'number') {
+    let data = {}
+    if (tableData.length > i) {
+      data = tableData[i]
+    }
+    if (isAutoFillingText === 'number') {
       if (_.isArray(data)) {
-        data.forEach((item, index) => {
-          item['序号'] = i + index + 1
-        })
+        if (_.flatten(data).length > 0) {
+          data.forEach((item, index) => {
+            item['序号'] = i + index + 1
+          })
+        }
       } else {
-        if (data) {
+        if (!data || !data['序号']) {
           data = {
             ...data,
             序号: i + 1
           }
-        } else {
-          data = { 序号: i + 1 }
         }
       }
     }
     // 双栏数据比较特殊，需要特殊处理
     if (isMultiPage && arrange === 'vertical') {
       const sku2 = {}
-      const data2 = tableData[i + range.size]
+      let data2 = {}
+      if (tableData.length > i + range.size) {
+        data2 = tableData[i + range.size]
+      }
       _.each(data2, (val, key) => {
         sku2[key + MULTI_SUFFIX] = val
       })
-      if (!(data2 && !data2?.['序号']) && isAutoFillingText === 'number') {
+      if (!data2?.['序号'] && isAutoFillingText === 'number') {
         sku2['序号' + MULTI_SUFFIX] = i + 1 + range.size
       }
       return { ...data, ...sku2 }
