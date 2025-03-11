@@ -2,7 +2,6 @@ import i18next from '../../locales'
 import { action, observable, computed, toJS } from 'mobx'
 import {
   getSumTrHeight,
-  isMultiTable,
   getArrayMid,
   caclRowSpanTdPageHeight,
   caclSingleDetailsPageHeight,
@@ -242,7 +241,6 @@ class PrinterStore {
     if (!this.tableConfig) return heights
 
     const len = this.data._table[dataKey].length
-    console.log('_.gt(heights.length, len)', _.gt(heights.length, len))
     // 如果是已经开了填充配置，回显的heights包括了填充的表格部分，关闭配置时，这种情况就要去掉填充的
     if (_.gt(heights.length, len)) return heights.slice(0, len)
 
@@ -339,7 +337,6 @@ class PrinterStore {
     let page = []
     /** 处理配送单有多个表格的情况 */
     let tableCount = 0
-    console.log('----------------------开始处理contents')
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
@@ -370,6 +367,7 @@ class PrinterStore {
         const {
           arrange,
           subtotal,
+          allOrderSummaryConfig,
           dataKey,
           /** 本页小计 or 每页合计 */
           summaryConfig,
@@ -522,6 +520,18 @@ class PrinterStore {
                 currentEndIndex > heights.length
                   ? heights.length
                   : currentEndIndex
+
+              // 如果开启了整单合计，并且是当前 table 的最后一页，则-1
+              console.log('subtotal.show', toJS(content), end, heights.length)
+              if (
+                (subtotal.show ||
+                  allOrderSummaryConfig?.isShowOrderSummaryPer) &&
+                end >= heights.length
+              ) {
+                maxRowsPerPage = maxRowsPerPage - 2
+                maxRowsPerPage = linesPerPage - 2
+              }
+
               page.push({
                 type: 'table',
                 index,
@@ -553,7 +563,6 @@ class PrinterStore {
                   index++
                 }
               } else {
-                console.log('当前页面的 table 结束了，但是还有数据')
                 // 当前的 table 没完成，则开启新一页
                 // 此页完成任务
                 this.pages.push(page)
@@ -625,7 +634,6 @@ class PrinterStore {
                     linesPerPage,
                     end
                   })
-                  console.log('此页面任务完成了')
                   // 此页完成任务
                   this.pages.push(page)
                   page = []
@@ -639,7 +647,6 @@ class PrinterStore {
 
                 // 重新开始
                 begin = end
-                // console.log('重新开始', begin, end)
                 // 开启新一页,重置页面高度
                 pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
                   allPagesHaveThisHeight
@@ -649,7 +656,6 @@ class PrinterStore {
               } else {
                 // 有空间，继续做下行
                 end++
-                // console.log('这是', begin, end, heights.length)
                 // 最后一行，把信息加入 page，并轮下一个contents
                 if (end >= heights.length) {
                   page.push({
@@ -679,11 +685,6 @@ class PrinterStore {
         if (index === this.config.contents.length - 1) {
           currentPageHeight += this.height?.sign
         }
-        console.log(
-          '当前页面可以放得下这一个吗',
-          page,
-          currentPageHeight <= this.pageHeight
-        )
         if (currentPageHeight <= this.pageHeight) {
           // 空间充足，把信息加入 page，并轮下一个contents
           page.push({
@@ -702,7 +703,6 @@ class PrinterStore {
         }
       }
     }
-    console.log('----------------------开始处理contents结束', page)
     this.pages.push(page)
 
     const safeCurrentPageHeight = Number.isNaN(currentPageHeight)
@@ -749,10 +749,9 @@ class PrinterStore {
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
         // 如果每页合计(新的),那么table高度多预留一行高度
-        const pageSummaryTrHeight =
-          summaryConfig?.pageSummaryShow && !isMultiTable(dataKey) // 双栏table没有每页合计
-            ? getSumTrHeight(summaryConfig)
-            : 0
+        const pageSummaryTrHeight = summaryConfig?.pageSummaryShow // 双栏table没有每页合计
+          ? getSumTrHeight(summaryConfig)
+          : 0
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
           table.head.height + subtotalTrHeight + pageSummaryTrHeight

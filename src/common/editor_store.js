@@ -137,7 +137,7 @@ class EditorStore {
   @action
   setLinesPerPage(linesPerPage, isChange = false) {
     let value = linesPerPage
-    if (!isNaN(Number(value))) {
+    if (!isNaN(Number(value)) && ![undefined, null, ''].includes(value)) {
       if (Big(value).gt(99999)) {
         value = 99999
       } else if (Big(value).lt(1)) {
