@@ -114,6 +114,7 @@ class Printer extends React.Component {
     }
     if (nextProps.updateData !== this.props.updateData) {
       this.props.printerStore.setOverallOrder(nextProps.config)
+      await this.props.printerStore.computedPages()
     }
   }
 

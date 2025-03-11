@@ -58,6 +58,9 @@ class EditorStore {
   @observable
   isAutoFilling = false
 
+  @observable
+  arrange = 'vertical'
+
   // 每页行数
   @observable
   linesPerPage = undefined
@@ -138,11 +141,15 @@ class EditorStore {
   setLinesPerPage(linesPerPage, isChange = false) {
     let value = linesPerPage
     if (!isNaN(Number(value)) && ![undefined, null, ''].includes(value)) {
-      if (Big(value).gt(99999)) {
-        value = 99999
+      if (Big(value).gt(999)) {
+        value = 999
       } else if (Big(value).lt(1)) {
         value = 1
       }
+    }
+    // 不允许填写小数
+    if (value?.toString().includes('.')) {
+      value = value.toString().split('.')[0]
     }
     // if (_.isNumber(value)) {
     //   this.linesPerPage = value
@@ -240,21 +247,10 @@ class EditorStore {
   getFilledTableData(tableData) {
     const { autoFillConfig } = this.config
     if (!this.selectedRegion && !autoFillConfig?.checked) return []
-    const tr_count = Math.floor(
-      this.remainPageHeihgt / this.computedTableCustomerRowHeight
-    )
-
-    const filledData = {
-      _isEmptyData: true // 表示是填充的空白数据
-    }
-    _.map(tableData[0], (val, key) => {
-      filledData[key] = ''
-    })
-    const linesPerPage = Number(this.linesPerPage) || 99999
-    if (linesPerPage < tr_count) {
-      return Array(linesPerPage).fill(filledData)
-    }
-    return Array(tr_count).fill(filledData)
+    // if (linesPerPage) {
+    //   return Array(linesPerPage).fill(filledData)
+    // }
+    return []
   }
 
   @action.bound
@@ -1088,6 +1084,11 @@ class EditorStore {
     }
   }
 
+  // 只是用来触发 render，没有任何作用
+  setArrange(val) {
+    this.arrange = val
+  }
+
   @action.bound
   setTableArrange(val) {
     if (this.selectedRegion) {
@@ -1097,6 +1098,7 @@ class EditorStore {
           ...this.config.contents[arr[2]],
           arrange: val
         }
+        this.changeUpdateData()
       }
     }
   }

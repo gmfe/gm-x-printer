@@ -235,26 +235,38 @@ class Table extends React.Component {
           })
         }
       } else {
+        let num = i + 1
+        // 只有双栏才会用到
+        if (isMultiPage && arrange !== 'vertical') {
+          num = i + 1 + i
+        }
         if (!data || !data['序号']) {
           data = {
             ...data,
-            序号: i + 1
+            序号: num
           }
         }
       }
     }
     // 双栏数据比较特殊，需要特殊处理
-    if (isMultiPage && arrange === 'vertical') {
+    if (isMultiPage) {
       const sku2 = {}
       let data2 = {}
-      if (tableData.length > i + range.size) {
-        data2 = tableData[i + range.size]
+      if (arrange === 'vertical') {
+        if (tableData.length > i + range.size) {
+          data2 = tableData[i + range.size]
+        }
+        _.each(data2, (val, key) => {
+          sku2[key + MULTI_SUFFIX] = val
+        })
       }
-      _.each(data2, (val, key) => {
-        sku2[key + MULTI_SUFFIX] = val
-      })
       if (!data2?.['序号'] && isAutoFillingText === 'number') {
-        sku2['序号' + MULTI_SUFFIX] = i + 1 + range.size
+        // 只有编辑的时候才会用到
+        if (arrange === 'vertical') {
+          sku2['序号' + MULTI_SUFFIX] = i + 1 + range.size
+        } else {
+          sku2['序号' + MULTI_SUFFIX] = i + i + 2
+        }
       }
       return { ...data, ...sku2 }
     } else {

@@ -241,6 +241,7 @@ class PrinterStore {
     if (!this.tableConfig) return heights
 
     const len = this.data._table[dataKey].length
+    console.log('_.gt(heights.length, len)', _.gt(heights.length, len))
     // 如果是已经开了填充配置，回显的heights包括了填充的表格部分，关闭配置时，这种情况就要去掉填充的
     if (_.gt(heights.length, len)) return heights.slice(0, len)
 
@@ -337,6 +338,7 @@ class PrinterStore {
     let page = []
     /** 处理配送单有多个表格的情况 */
     let tableCount = 0
+    console.log('----------------------开始处理contents')
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
@@ -502,12 +504,6 @@ class PrinterStore {
                 maxRowsPerPage = maxAllRowsPerPage
                 linesPerPage = maxAllRowsPerPage
               }
-              console.log(
-                'isAutoFillingAuto',
-                isAutoFillingAuto,
-                linesPerPage,
-                maxRowsPerPage
-              )
 
               // if (table.maxRows < maxRowsPerPage) {
               //   maxRowsPerPage = table.maxRows
@@ -575,6 +571,7 @@ class PrinterStore {
                 currentPageHeight = currentPageMinimumHeight
               }
             } else {
+              console.log(heights)
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
@@ -703,6 +700,7 @@ class PrinterStore {
         }
       }
     }
+    console.log('----------------------开始处理contents结束', page)
     this.pages.push(page)
 
     const safeCurrentPageHeight = Number.isNaN(currentPageHeight)
