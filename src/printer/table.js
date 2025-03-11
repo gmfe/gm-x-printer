@@ -253,8 +253,10 @@ class Table extends React.Component {
       const sku2 = {}
       let data2 = {}
       if (arrange === 'vertical') {
-        if (tableData.length > i + range.size) {
-          data2 = tableData[i + range.size]
+        // 当前页数 * 当前行数
+        const index = range.size + i
+        if (tableData.length > index) {
+          data2 = tableData[index]
         }
         _.each(data2, (val, key) => {
           sku2[key + MULTI_SUFFIX] = val
@@ -263,7 +265,8 @@ class Table extends React.Component {
       if (!data2?.['序号'] && isAutoFillingText === 'number') {
         // 只有编辑的时候才会用到
         if (arrange === 'vertical') {
-          sku2['序号' + MULTI_SUFFIX] = i + 1 + range.size
+          const index = range.pageIndex + 1 * range.size + i
+          sku2['序号' + MULTI_SUFFIX] = index
         } else {
           sku2['序号' + MULTI_SUFFIX] = i + i + 2
         }
@@ -282,7 +285,7 @@ class Table extends React.Component {
       range,
       pageIndex,
       printerStore,
-      isRenderBefore,
+      isSetting,
       isLastPage
     } = this.props
     // 数据
@@ -325,13 +328,9 @@ class Table extends React.Component {
 
     const begin = range.begin
     let end = range.end
-    if (isMultiPage && arrange === 'vertical' && !isRenderBefore) {
-      end = begin + range.size
-      // if (range.linesPerPage) {
-      //   if (end < begin + range.linesPerPage / 2) {
-      //     end = begin + range.linesPerPage / 2
-      //   }
-      // }
+    // 设置的时候显示
+    if (isSetting && printerStore.linesPerPage) {
+      end = printerStore.linesPerPage
     }
     return (
       <table>
@@ -605,7 +604,8 @@ Table.propTypes = {
   printerStore: PropTypes.object,
   isLastPage: PropTypes.bool,
   isDeliverType: PropTypes.bool,
-  isRenderBefore: PropTypes.bool
+  isRenderBefore: PropTypes.bool,
+  isSetting: PropTypes.bool
 }
 
 export default Table

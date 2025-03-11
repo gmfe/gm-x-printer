@@ -200,7 +200,9 @@ class Printer extends React.Component {
                   config={content}
                   range={{
                     begin: 0,
-                    end: list?.length || 0
+                    end: printerStore.linesPerPage || list?.length || 0,
+                    size: printerStore.linesPerPage || list?.length || 0,
+                    linesPerPage: printerStore.linesPerPage
                   }}
                   pageIndex={0}
                   isRenderBefore
@@ -267,21 +269,13 @@ class Printer extends React.Component {
                   content?.dataKey === autoFillConfig?.dataKey
 
                 // 如果设置了linesPerPage，则只填充linesPerPage行
-                let end = isAutofillConfig
+                const end = isAutofillConfig
                   ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                   : panel.end
-                if (isAutofillConfig) {
-                  const autoRows =
-                    panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                  if (
-                    panel.linesPerPage &&
-                    autoRows > Big(panel.linesPerPage).plus(panel.begin)
-                  ) {
-                    end = Big(panel.linesPerPage).plus(panel.begin)
-                  } else {
-                    end = autoRows
-                  }
-                }
+
+                const size = isAutofillConfig
+                  ? panel.size + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                  : panel.size
 
                 switch (panel.type) {
                   case 'table': {
@@ -317,6 +311,7 @@ class Printer extends React.Component {
                               begin: panel.begin,
                               end: end,
                               size: panel.pageSize,
+                              page: panel.page,
                               linesPerPage: panel.linesPerPage
                             }}
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
@@ -336,8 +331,11 @@ class Printer extends React.Component {
                           range={{
                             begin: panel.begin,
                             end: end,
-                            size: panel.pageSize
+                            size,
+                            pageIndex: panel.pageIndex,
+                            linesPerPage: panel.linesPerPage
                           }}
+                          isSetting
                           isAutoFilling={isAutoFilling}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
