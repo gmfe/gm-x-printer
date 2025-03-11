@@ -468,9 +468,13 @@ class PrinterStore {
                 .toString()
 
               // 计算最后可填充的行数，即渲染完成后的空白行数
-              const remainingRowCount = Math.floor(
+              let remainingRowCount = Math.floor(
                 (remainingHeight - TR_BASE_HEIGHT * 2) / TR_BASE_HEIGHT
               )
+              if (remainingRowCount < 0) {
+                remainingRowCount = 0
+              }
+
               // 计算当前页面最大可容纳的有效数据行数，不包括空白行
               let maxRowsPerPage = linesPerPage ? linesPerPage / 2 : 999
 
@@ -518,7 +522,6 @@ class PrinterStore {
                   : currentEndIndex
 
               // 如果开启了整单合计，并且是当前 table 的最后一页，则-1
-              console.log('subtotal.show', toJS(content), end, heights.length)
               if (
                 (subtotal.show ||
                   allOrderSummaryConfig?.isShowOrderSummaryPer) &&
@@ -555,9 +558,8 @@ class PrinterStore {
                   )
                   currentTableHeight = allTableHaveThisHeight
                   currentPageHeight = currentPageMinimumHeight
-                } else {
-                  index++
                 }
+                index++
               } else {
                 // 当前的 table 没完成，则开启新一页
                 // 此页完成任务
@@ -571,7 +573,6 @@ class PrinterStore {
                 currentPageHeight = currentPageMinimumHeight
               }
             } else {
-              console.log(heights)
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
