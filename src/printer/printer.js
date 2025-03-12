@@ -151,7 +151,7 @@ class Printer extends React.Component {
       this.setState({}, () => {
         // 渲染成功了吗
         console.log('渲染成功了吗')
-        // this.props.onReady()
+        this.props.onReady()
       })
     }
 
