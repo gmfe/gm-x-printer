@@ -401,11 +401,20 @@ class PrinterStore {
           // 上一页的 table 渲染了几行
           let lastPageTableCellCount = 0
           let trueBegin = 0
-          const dataIndex = heights.length
+          let dataIndex = heights.length
           if (isAutoFillingAuto && linesPerPage) {
+            // 如果填写了linesPerPage && isAutoFillingAuto
+            // 那要把 dataIndex 给填满到 linesPerPage
+            const maxPageIndex = Math.ceil(dataIndex / linesPerPage)
+            dataIndex = +maxPageIndex * +linesPerPage
+            if (isMultiPage && arrange === 'vertical') {
+              dataIndex =
+                Math.ceil(dataIndex / (linesPerPage * 2)) * +(linesPerPage * 2)
+            }
             // const maxPageIndex = Math.ceil(heights.length / linesPerPage)
             // dataIndex = +maxPageIndex * +linesPerPage
           }
+          console.log('maxPageIndex', dataIndex, linesPerPage)
 
           /* 遍历表格每一行，填充表格内容 */
           while (dataIndex > end) {
@@ -414,7 +423,7 @@ class PrinterStore {
             }
             tableCellCount++
 
-            const trHeight = heights[end]
+            const trHeight = heights[end] || 24
 
             // 当前页没有多余空间
             // 双栏 & 垂直的话，只判断一次就好了，不需要每次都判断
@@ -423,7 +432,7 @@ class PrinterStore {
             currentPageHeight += trHeight
             // 如果 currentTableHeight > pageAccomodateTableHeight 或者 linesPerPage && currentLine >= linesPerPage，则表示超出了当前页面的高度，需要分页
             // 当前页数
-            let pageSize = end - begin
+            const pageSize = end - begin
             let currentPageTableCellCount = pageSize
 
             if (isAutoFillingAuto) {
@@ -436,10 +445,10 @@ class PrinterStore {
               currentPageTableCellCount =
                 pageSize > linesPerPage ? linesPerPage - 1 : pageSize
             }
-            pageSize = end - begin
 
             if (currentTableHeight > pageAccomodateTableHeight) {
-              const overHeight = heights[end]
+              console.log('是否超出了')
+              const overHeight = heights[end] || 24
               // 双栏合计
               if (isMultiPage && subtotal.show) {
                 /** 正是因为添加了这一行，所以超过了 */
@@ -481,20 +490,22 @@ class PrinterStore {
                   }
                 }
               }
+              const nowPage = {
+                type: 'table',
+                index,
+                begin,
+                trueBegin,
+                pageIndex,
+                size: currentPageTableCellCount,
+                linesPerPage,
+                end
+              }
               // 第一条极端会有问题
               if (end !== 0) {
-                page.push({
-                  type: 'table',
-                  index,
-                  begin,
-                  trueBegin,
-                  pageIndex,
-                  size: currentPageTableCellCount,
-                  linesPerPage,
-                  end
-                })
+                page.push(nowPage)
                 lastPageTableCellCount =
                   pageSize > linesPerPage ? linesPerPage : pageSize
+                console.log(lastPageTableCellCount)
                 // 此页完成任务
                 this.pages.push(page)
                 page = []
@@ -510,10 +521,19 @@ class PrinterStore {
               trueBegin = trueBegin + currentPageTableCellCount
               if (isVertical) {
                 end = end + pageSize
+                if (linesPerPage) {
+                  end++
+                }
                 if (end > dataIndex) {
-                  end = heights.length
+                  end = dataIndex
                 }
                 begin = end
+                console.log('enddd', end, begin, dataIndex)
+                if (end >= dataIndex) {
+                  this.lastTableCellCount[`contents.table.${index}`] =
+                    Number(nowPage.size) + Number(nowPage.trueBegin)
+                  index++
+                }
               }
 
               // 重新开始
@@ -526,12 +546,13 @@ class PrinterStore {
               currentPageHeight = currentPageMinimumHeight
             } else {
               end++
-              const isEnd = end >= heights.length
+              const isEnd = end >= dataIndex
               if (isVertical) {
                 // isEnd = (end - begin) * 2 >= heights.length
               }
               // 最后一行，把信息加入 page，并轮下一个contents
               if (isEnd) {
+                console.log('最后一行', begin, end)
                 let nowPageSize = currentPageTableCellCount
                 if (isMultiPage && arrange === 'vertical') {
                   nowPageSize = currentPageTableCellCount + 1
@@ -552,10 +573,14 @@ class PrinterStore {
                   Number(nowPage.size) + Number(nowPage.trueBegin)
                 index++
               } else {
+                console.log('linesPerPage', tableCellCount, linesPerPage)
                 if (linesPerPage && tableCellCount > linesPerPage) {
-                  let nowPageSize = currentPageTableCellCount
+                  let nowPageSize = currentPageTableCellCount + 1
+                  console.log(isMultiPage && arrange === 'vertical')
                   if (isMultiPage && arrange === 'vertical') {
-                    nowPageSize = currentPageTableCellCount + 1
+                    if (!linesPerPage) {
+                      nowPageSize = currentPageTableCellCount + 1
+                    }
                   }
                   const nowPage = {
                     type: 'table',
@@ -572,8 +597,13 @@ class PrinterStore {
                   // 重新开始
                   begin = end
                   trueBegin = trueBegin + currentPageTableCellCount + 1
+                  if (isMultiPage && arrange === 'vertical') {
+                    if (!linesPerPage) {
+                      trueBegin++
+                    }
+                  }
                   if (isVertical) {
-                    end = end + lastPageTableCellCount
+                    end = end + lastPageTableCellCount + 1
                     if (end > dataIndex) {
                       end = dataIndex
                     }

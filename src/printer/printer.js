@@ -113,6 +113,8 @@ class Printer extends React.Component {
       )
     }
     if (nextProps.updateData !== this.props.updateData) {
+      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
+      await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       this.props.printerStore.setOverallOrder(nextProps.config)
       await this.props.printerStore.computedPages()
     }
@@ -128,14 +130,12 @@ class Printer extends React.Component {
       // 连续打印不需要计算
       if (batchPrintConfig !== 2) {
         printerStore.setReady(true)
+        this.props.printerStore.setLinesPerPage(config.linesPerPage)
+        this.props.printerStore.setAutofillConfig(
+          config.autoFillConfig?.checked || false
+        )
         /** @decscription 空白行填充补充 */
         printerStore.computedPages()
-        this.props.printerStore.setLinesPerPage(config.linesPerPage)
-        if (config.autoFillConfig?.checked) {
-          this.props.printerStore.setAutofillConfig(
-            config.autoFillConfig?.checked || false
-          )
-        }
         // 开始计算，获取各种数据
         config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
           ? printerStore.computedRowTablePages()
@@ -277,12 +277,13 @@ class Printer extends React.Component {
 
                 let size = panel.size
                 if (!(isMultiPage && content.arrange === 'vertical')) {
-                  size = isAutofillConfig
-                    ? panel.size + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                    : panel.size
-                  if (printerStore.linesPerPage) {
+                  if (!printerStore.linesPerPage) {
+                    size = isAutofillConfig
+                      ? panel.size +
+                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      : panel.size
                     end = isAutofillConfig
-                      ? Number(printerStore.linesPerPage)
+                      ? Number(panel.end) + Number(printerStore.linesPerPage)
                       : panel.end
                   }
                 }
