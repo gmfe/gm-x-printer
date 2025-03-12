@@ -75,13 +75,6 @@ const SubtotalTrShowRow = props => {
     if (arrange === 'vertical') {
       // list = tableData.splice(begin, end)
       const verticalData = [...tableData.slice(begin, end)]
-      console.log(
-        begin,
-        end,
-        tableData.slice(begin, end),
-        printerStore.lastTableCellCount[name],
-        name
-      )
       _.forEach(_.range(begin, end), i => {
         const index = printerStore.lastTableCellCount[name] + i
         if (tableData.length > index) {

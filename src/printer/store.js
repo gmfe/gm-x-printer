@@ -429,7 +429,6 @@ class PrinterStore {
           // 完成页面后
           const tablePageComplete = () => {
             cellIndex = 0
-            console.log('lastPageTableCellCount', lastPageTableCellCount)
             pageCellCounts.push(lastPageTableCellCount)
 
             // 开启新一页,重置页面高度
@@ -462,12 +461,6 @@ class PrinterStore {
             currentTableHeight += trHeight
             // 用于计算最后一页有footer情况的高度
             currentPageHeight += trHeight
-            console.log(
-              currentPageHeight,
-              currentTableHeight,
-              pageAccomodateTableHeight,
-              `${begin}-${end}`
-            )
             // 当前页数，5-0,11-5
             const pageSize = end - begin
             // 当前页 table 的 cell 数
@@ -484,7 +477,8 @@ class PrinterStore {
             if (currentTableHeight > pageAccomodateTableHeight) {
               const overHeight = dataHeights[end] || 24
               // 双栏合计
-              if (isMultiPage && subtotal.show) {
+              if (isMultiPage && !isVertical && subtotal.show) {
+                console.log('双栏合计')
                 /** 正是因为添加了这一行，所以超过了 */
                 // 因为超过，所以要退回上一个
                 end--
@@ -524,6 +518,9 @@ class PrinterStore {
                   }
                 }
               }
+              // if (isVertical) {
+              //   end++
+              // }
               const nowPage = {
                 type: 'table',
                 index,
@@ -560,13 +557,6 @@ class PrinterStore {
               } else {
                 tableCellCount--
               }
-              console.log(
-                '是否超出了',
-                trHeight,
-                begin,
-                end,
-                lastPageTableCellCount
-              )
               if (isVertical) {
                 end = end + lastPageTableCellCount
                 // if (linesPerPage) {
@@ -576,7 +566,7 @@ class PrinterStore {
                   end = dataIndex
                 }
                 begin = end
-                console.log('enddd', end, begin, dataIndex)
+                console.log('超过限制了', begin, end, dataIndex, nowPage)
                 if (end >= dataIndex) {
                   runInAction(() => {
                     this.lastTableCellCount[`contents.table.${index}`] =
@@ -674,12 +664,20 @@ class PrinterStore {
                       trueBegin++
                     }
                   }
-                  if (isVertical) {
-                    end = end + lastPageTableCellCount + 1
+                  if (isMultiPage && isVertical) {
+                    lastPageTableCellCount = nowPage.size
+                    end = end + lastPageTableCellCount
                     if (end > dataIndex) {
                       end = dataIndex
                     }
                     begin = end
+                    console.log(
+                      'lastPageTableCellCount',
+                      nowPage,
+                      lastPageTableCellCount,
+                      end,
+                      begin
+                    )
                   }
                   if (end >= dataIndex) {
                     console.log(
