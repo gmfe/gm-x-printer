@@ -200,8 +200,11 @@ class Printer extends React.Component {
                   config={content}
                   range={{
                     begin: 0,
-                    end: printerStore.linesPerPage || list?.length || 0,
-                    size: printerStore.linesPerPage || list?.length || 0,
+                    end: Number(printerStore.linesPerPage || list?.length || 0),
+                    size: Number(
+                      printerStore.linesPerPage || list?.length || 1
+                    ),
+                    trueBegin: 0,
                     linesPerPage: printerStore.linesPerPage
                   }}
                   pageIndex={0}
@@ -267,15 +270,22 @@ class Printer extends React.Component {
                   isAutoFillingBool &&
                   panel.end &&
                   content?.dataKey === autoFillConfig?.dataKey
+                const isMultiPage = content?.dataKey?.includes('multi')
 
                 // 如果设置了linesPerPage，则只填充linesPerPage行
-                const end = isAutofillConfig
-                  ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                  : panel.end
+                let end = panel.end
 
-                const size = isAutofillConfig
-                  ? panel.size + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                  : panel.size
+                let size = panel.size
+                if (!(isMultiPage && content.arrange === 'vertical')) {
+                  size = isAutofillConfig
+                    ? panel.size + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                    : panel.size
+                  if (printerStore.linesPerPage) {
+                    end = isAutofillConfig
+                      ? Number(printerStore.linesPerPage)
+                      : panel.end
+                  }
+                }
 
                 switch (panel.type) {
                   case 'table': {
@@ -331,11 +341,12 @@ class Printer extends React.Component {
                           range={{
                             begin: panel.begin,
                             end: end,
-                            size,
+                            size: size || printerStore.linesPerPage,
+                            trueBegin: panel.trueBegin,
                             pageIndex: panel.pageIndex,
-                            linesPerPage: panel.linesPerPage
+                            linesPerPage:
+                              panel.linesPerPage || printerStore.linesPerPage
                           }}
-                          isSetting
                           isAutoFilling={isAutoFilling}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}

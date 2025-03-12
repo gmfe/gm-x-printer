@@ -216,6 +216,7 @@ class Table extends React.Component {
   getTableData = i => {
     const {
       printerStore,
+      name,
       config: { dataKey, arrange },
       range
     } = this.props
@@ -254,7 +255,7 @@ class Table extends React.Component {
       let data2 = {}
       if (arrange === 'vertical') {
         // 当前页数 * 当前行数
-        const index = range.size + i
+        const index = printerStore.lastTableCellCount[name] + i
         if (tableData.length > index) {
           data2 = tableData[index]
         }
@@ -265,7 +266,7 @@ class Table extends React.Component {
       if (!data2?.['序号'] && isAutoFillingText === 'number') {
         // 只有编辑的时候才会用到
         if (arrange === 'vertical') {
-          const index = range.pageIndex + 1 * range.size + i
+          const index = printerStore.lastTableCellCount[name] + i + 1
           sku2['序号' + MULTI_SUFFIX] = index
         } else {
           sku2['序号' + MULTI_SUFFIX] = i + i + 2
@@ -326,12 +327,20 @@ class Table extends React.Component {
       return tdStyle
     }
 
-    const begin = range.begin
+    let begin = range.begin
     let end = range.end
     // 设置的时候显示
-    if (isSetting && printerStore.linesPerPage) {
-      end = printerStore.linesPerPage
+    // if (isSetting === true) {
+    //   console.log('isSetting', isSetting)
+    //   if (printerStore.linesPerPage) {
+    //     end = printerStore.linesPerPage
+    //   }
+    // }
+    if (arrange === 'vertical') {
+      begin = range.trueBegin
+      end = Number(begin) + Number(range.size)
     }
+    console.log('begin', range, begin, end)
     return (
       <table>
         <thead>
