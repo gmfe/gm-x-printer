@@ -552,10 +552,38 @@ class PrinterStore {
               }
               // 最后一行，把信息加入 page，并轮下一个contents
               if (isEnd) {
-                console.log('最后一行', begin, end)
                 let nowPageSize = currentPageTableCellCount
                 if (isMultiPage && arrange === 'vertical') {
                   nowPageSize = currentPageTableCellCount + 1
+                }
+                // 这里需要判断一下最后一页是否能填充
+                if (isAutoFillingAuto && !linesPerPage) {
+                  // 当前剩余内容
+                  const emptyCellHeight =
+                    pageAccomodateTableHeight - currentTableHeight
+                  let emptyCellCount = Math.floor(
+                    emptyCellHeight / TR_BASE_HEIGHT
+                  )
+                  if (arrange === 'vertical') {
+                    // 这个直接用最大的单元格高度
+                    const maxHeight = heights.reduce((pre, cur) => {
+                      return Math.max(
+                        Number(pre),
+                        Number(cur || TR_BASE_HEIGHT)
+                      )
+                    }, 0)
+                    emptyCellCount = Math.floor(emptyCellHeight / maxHeight)
+                  }
+                  console.log(
+                    'pageAccomodateTableHeight',
+                    currentTableHeight,
+                    pageAccomodateTableHeight,
+                    pageAccomodateTableHeight - currentTableHeight,
+                    emptyCellCount
+                  )
+                  end += emptyCellCount || 0
+                  nowPageSize += emptyCellCount || 0
+                  // const emptyCellCount
                 }
                 const nowPage = {
                   type: 'table',
@@ -573,10 +601,8 @@ class PrinterStore {
                   Number(nowPage.size) + Number(nowPage.trueBegin)
                 index++
               } else {
-                console.log('linesPerPage', tableCellCount, linesPerPage)
-                if (linesPerPage && tableCellCount > linesPerPage) {
+                if (linesPerPage && tableCellCount >= linesPerPage) {
                   let nowPageSize = currentPageTableCellCount + 1
-                  console.log(isMultiPage && arrange === 'vertical')
                   if (isMultiPage && arrange === 'vertical') {
                     if (!linesPerPage) {
                       nowPageSize = currentPageTableCellCount + 1
