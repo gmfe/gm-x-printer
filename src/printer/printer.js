@@ -149,7 +149,9 @@ class Printer extends React.Component {
       }
       // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
       this.setState({}, () => {
-        this.props.onReady()
+        // 渲染成功了吗
+        console.log('渲染成功了吗')
+        // this.props.onReady()
       })
     }
 

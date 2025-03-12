@@ -1,5 +1,5 @@
 import i18next from '../../locales'
-import { action, observable, computed, toJS } from 'mobx'
+import { action, observable, computed, toJS, runInAction } from 'mobx'
 import {
   getSumTrHeight,
   getArrayMid,
@@ -393,7 +393,12 @@ class PrinterStore {
             ? Number(this.config.linesPerPage)
             : undefined
 
+          // 页面 cell 数
+          const pageCellCounts = []
+          const tableCellCounts = []
           const isVertical = isMultiPage && arrange === 'vertical'
+          // 当前真实的 cell index
+          let cellIndex = 0
           // 当前 table 渲染了多少行
           let tableCellCount = 0
           // 当前 table 分了几页
@@ -402,19 +407,40 @@ class PrinterStore {
           let lastPageTableCellCount = 0
           // 截止到上一页的总行数
           let lastPageTableCellCountAll = 0
+          // 正确的 begin, 用于双栏纵向情况
           let trueBegin = 0
           let dataIndex = heights.length
+          // 如果需要自动填充的话，需要计算一下填充行数
+          let dataHeights = [...heights]
           if (isAutoFillingAuto && linesPerPage) {
             // 如果填写了linesPerPage && isAutoFillingAuto
             // 那要把 dataIndex 给填满到 linesPerPage
             const maxPageIndex = Math.ceil(dataIndex / linesPerPage)
             dataIndex = +maxPageIndex * +linesPerPage
-            if (isMultiPage && arrange === 'vertical') {
+            if (isVertical) {
               dataIndex =
                 Math.ceil(dataIndex / (linesPerPage * 2)) * +(linesPerPage * 2)
+              dataHeights = [...heights]
             }
             // const maxPageIndex = Math.ceil(heights.length / linesPerPage)
             // dataIndex = +maxPageIndex * +linesPerPage
+          }
+
+          // 完成页面后
+          const tablePageComplete = () => {
+            cellIndex = 0
+            console.log('lastPageTableCellCount', lastPageTableCellCount)
+            pageCellCounts.push(lastPageTableCellCount)
+
+            // 开启新一页,重置页面高度
+            pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
+              allPagesHaveThisHeight
+            )
+            currentTableHeight = allTableHaveThisHeight
+            currentPageHeight = currentPageMinimumHeight
+          }
+          const onLinePerPageComplete = () => {
+            tableCellCounts.push(tableCellCount)
           }
 
           /* 遍历表格每一行，填充表格内容 */
@@ -422,34 +448,41 @@ class PrinterStore {
             if (end > dataIndex) {
               break
             }
-            tableCellCount++
 
-            const trHeight = heights[end] || 24
+            const trueIndex = end - trueBegin
+            let trHeight = heights[end] || 24
+            if (isVertical) {
+              trHeight = heights[trueIndex] || 24
+            }
+
+            // 真实的 end 值
 
             // 当前页没有多余空间
             // 双栏 & 垂直的话，只判断一次就好了，不需要每次都判断
             currentTableHeight += trHeight
             // 用于计算最后一页有footer情况的高度
             currentPageHeight += trHeight
-            // 如果 currentTableHeight > pageAccomodateTableHeight 或者 linesPerPage && currentLine >= linesPerPage，则表示超出了当前页面的高度，需要分页
-            // 当前页数
+            console.log(
+              currentPageHeight,
+              currentTableHeight,
+              pageAccomodateTableHeight,
+              `${begin}-${end}`
+            )
+            // 当前页数，5-0,11-5
             const pageSize = end - begin
+            // 当前页 table 的 cell 数
             let currentPageTableCellCount = pageSize
 
-            if (isAutoFillingAuto) {
-              // 先填满当前行
-              // currentPageTableCellCount = Math.floor(
-              //   remainPageHeight / TR_BASE_HEIGHT
-              // )
-            }
+            // 如果设置了linesPerPage，那么不允许一页的 cell 超过linesPerPage
             if (linesPerPage) {
               currentPageTableCellCount =
-                pageSize > linesPerPage ? linesPerPage - 1 : pageSize
+                pageSize > linesPerPage ? linesPerPage : pageSize
             }
+            // 渲染一行
+            tableCellCount++
 
             if (currentTableHeight > pageAccomodateTableHeight) {
-              console.log('是否超出了')
-              const overHeight = heights[end] || 24
+              const overHeight = dataHeights[end] || 24
               // 双栏合计
               if (isMultiPage && subtotal.show) {
                 /** 正是因为添加了这一行，所以超过了 */
@@ -504,13 +537,13 @@ class PrinterStore {
               // 第一条极端会有问题
               if (end !== 0) {
                 page.push(nowPage)
-                lastPageTableCellCount =
-                  pageSize > linesPerPage ? linesPerPage : pageSize
+                lastPageTableCellCount = nowPage.size
                 lastPageTableCellCountAll += lastPageTableCellCount
                 // 此页完成任务
                 this.pages.push(page)
                 page = []
                 pageIndex++
+                tablePageComplete()
               }
               // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
               // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
@@ -518,35 +551,45 @@ class PrinterStore {
                 this.pages.push(page)
                 page = []
                 pageIndex++
+                tablePageComplete()
               }
               trueBegin = trueBegin + currentPageTableCellCount
+              // 这里如果已经超限了，重置一下行数
+              if (linesPerPage && tableCellCount - 1 > linesPerPage) {
+                tableCellCount = 0
+              } else {
+                tableCellCount--
+              }
+              console.log(
+                '是否超出了',
+                trHeight,
+                begin,
+                end,
+                lastPageTableCellCount
+              )
               if (isVertical) {
-                end = end + pageSize
-                if (linesPerPage) {
-                  end++
-                }
+                end = end + lastPageTableCellCount
+                // if (linesPerPage) {
+                //   end++
+                // }
                 if (end > dataIndex) {
                   end = dataIndex
                 }
                 begin = end
                 console.log('enddd', end, begin, dataIndex)
                 if (end >= dataIndex) {
-                  this.lastTableCellCount[`contents.table.${index}`] =
-                    Number(nowPage.size) + Number(nowPage.trueBegin)
+                  runInAction(() => {
+                    this.lastTableCellCount[`contents.table.${index}`] =
+                      Number(nowPage.size) + Number(nowPage.trueBegin)
+                  })
                   index++
                 }
+              } else {
+                begin = end
               }
-
-              // 重新开始
-              begin = end
-              // 开启新一页,重置页面高度
-              pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
-                allPagesHaveThisHeight
-              )
-              currentTableHeight = allTableHaveThisHeight
-              currentPageHeight = currentPageMinimumHeight
             } else {
               end++
+              cellIndex++
               const isEnd = end >= dataIndex
               if (isVertical) {
                 // isEnd = (end - begin) * 2 >= heights.length
@@ -554,25 +597,25 @@ class PrinterStore {
               // 最后一行，把信息加入 page，并轮下一个contents
               if (isEnd) {
                 console.log(
-                  '最后了吗',
-                  linesPerPage && tableCellCount >= linesPerPage,
+                  'isEnd',
+                  currentPageTableCellCount,
+                  begin,
                   end,
-                  tableCellCount,
-                  linesPerPage,
                   dataIndex
                 )
-                let nowPageSize = currentPageTableCellCount
-                if (isMultiPage && arrange === 'vertical') {
+                let nowPageSize =
+                  end - begin > linesPerPage ? linesPerPage : end - begin
+                if (isVertical) {
                   nowPageSize = currentPageTableCellCount + 1
                 }
+                let emptyCellCount = 0
                 // 这里需要判断一下最后一页是否能填充
-                if (isAutoFillingAuto && !linesPerPage) {
+                if (isAutoFillingAuto && !linesPerPage && isVertical) {
                   // 当前剩余内容
                   const emptyCellHeight =
                     pageAccomodateTableHeight - currentTableHeight
-                  let emptyCellCount = Math.floor(
-                    emptyCellHeight / TR_BASE_HEIGHT
-                  )
+                  emptyCellCount =
+                    Math.floor(emptyCellHeight / TR_BASE_HEIGHT) || 0
                   if (arrange === 'vertical') {
                     // 这个直接用最大的单元格高度
                     const maxHeight = heights.reduce((pre, cur) => {
@@ -583,16 +626,6 @@ class PrinterStore {
                     }, 0)
                     emptyCellCount = Math.floor(emptyCellHeight / maxHeight)
                   }
-                  console.log(
-                    'pageAccomodateTableHeight',
-                    currentTableHeight,
-                    pageAccomodateTableHeight,
-                    pageAccomodateTableHeight - currentTableHeight,
-                    emptyCellCount
-                  )
-                  end += emptyCellCount || 0
-                  nowPageSize += emptyCellCount || 0
-                  // const emptyCellCount
                 }
                 const nowPage = {
                   type: 'table',
@@ -600,36 +633,32 @@ class PrinterStore {
                   begin,
                   trueBegin,
                   pageIndex,
-                  size: nowPageSize,
-                  end
+                  size: nowPageSize + emptyCellCount,
+                  // 最后一页的 end 要+1
+                  end: end + emptyCellCount
                 }
                 page.push(nowPage)
-                lastPageTableCellCount =
-                  pageSize > linesPerPage ? linesPerPage : pageSize
+                lastPageTableCellCount = nowPage.size
                 lastPageTableCellCountAll += lastPageTableCellCount
                 this.lastTableCellCount[`contents.table.${index}`] =
                   Number(nowPage.size) + Number(nowPage.trueBegin)
                 index++
               } else {
-                console.log(
-                  'linesPerPage && tableCellCount >= linesPerPage',
-                  linesPerPage && tableCellCount >= linesPerPage,
-                  end,
-                  tableCellCount,
-                  linesPerPage,
-                  dataIndex
-                )
-                if (linesPerPage && tableCellCount > linesPerPage) {
-                  let nowPageSize = currentPageTableCellCount + 1
-                  if (isMultiPage && arrange === 'vertical') {
-                    if (!linesPerPage) {
-                      nowPageSize = currentPageTableCellCount + 1
-                    }
-                  }
+                // 只需要在超过了linesPerPage的情况下，就创建一个新的page，并且将当前的page的数据拼接到新的page中
+                if (linesPerPage && tableCellCount === linesPerPage) {
+                  // 当前的 page 和 linesPerPage 应该都等于 linesPerPage
+                  const nowPageSize =
+                    end - begin > linesPerPage ? linesPerPage : end - begin
+                  // if (begin !== 0) {
+                  //   nowPageSize++
+                  // }
                   console.log(
                     'nowPageSize',
-                    currentPageTableCellCount,
-                    nowPageSize
+                    nowPageSize,
+                    lastPageTableCellCount,
+                    tableCellCount,
+                    begin,
+                    end
                   )
                   const nowPage = {
                     type: 'table',
@@ -638,9 +667,9 @@ class PrinterStore {
                     trueBegin,
                     pageIndex,
                     size: nowPageSize,
-                    end
+                    end: end
                   }
-                  if (isMultiPage && arrange === 'vertical') {
+                  if (isVertical) {
                     if (!linesPerPage) {
                       trueBegin++
                     }
@@ -656,12 +685,19 @@ class PrinterStore {
                     console.log(
                       '最后一页',
                       nowPage,
+                      nowPageSize,
+                      pageSize,
                       tableCellCount,
-                      lastPageTableCellCountAll
+                      lastPageTableCellCount,
+                      lastPageTableCellCountAll,
+                      `${begin}-${end}`
                     )
                     if (isVertical) {
                       nowPage.end = dataIndex
-                      nowPage.size = tableCellCount - lastPageTableCellCountAll
+                      if (linesPerPage) {
+                        nowPage.size = nowPageSize
+                        console.log('nowPage.size', nowPage.size)
+                      }
                     }
                     page.push(nowPage)
                     // nowPage.size = trueBegin - nowPage.trueBegin
@@ -669,23 +705,22 @@ class PrinterStore {
                       Number(nowPage.size) + Number(nowPage.trueBegin)
                     index++
                   } else {
+                    // 超限之后新建一页
                     page.push(nowPage)
-                    lastPageTableCellCount =
-                      pageSize > linesPerPage ? linesPerPage : pageSize
+                    lastPageTableCellCount = nowPage.size
                     // 重新开始
-                    begin = end
-                    trueBegin = trueBegin + currentPageTableCellCount + 1
+                    if (!isVertical) {
+                      begin = nowPage.end
+                    }
+                    trueBegin = trueBegin + nowPageSize
                     // 此页完成任务
                     this.pages.push(page)
                     page = []
                     pageIndex++
-                    // 开启新一页,重置页面高度
-                    pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
-                      allPagesHaveThisHeight
-                    )
-                    currentTableHeight = allTableHaveThisHeight
-                    currentPageHeight = currentPageMinimumHeight
+                    tablePageComplete()
                   }
+                  // 分页完成
+                  onLinePerPageComplete()
                   tableCellCount = 0
                   // return
                 }

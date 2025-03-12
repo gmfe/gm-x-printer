@@ -54,6 +54,9 @@ class Table extends React.Component {
       printerStore,
       config: { dataKey, arrange }
     } = this.props
+    // 整单合计，如果设置了整单合计，那么需要给第一个单元格增加宽度
+    const isShowOrderSummaryPer = !!this.props.config?.allOrderSummaryConfig
+      ?.isShowOrderSummaryPer
     // 数据
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
@@ -78,8 +81,13 @@ class Table extends React.Component {
     printerStore.setTable(name, {
       head: {
         height: getHeight(tHead),
-        widths: _.map(ths, th => {
-          const width = getHeadThWidth(th)
+        widths: _.map(ths, (th, index) => {
+          let width = getHeadThWidth(th)
+          if (isShowOrderSummaryPer) {
+            if (index === 0) {
+              width = 50
+            }
+          }
           if (!headThWidthMap[th.dataset.name]) {
             headThWidthMap[th.dataset.name] = width
           } else {
@@ -102,7 +110,7 @@ class Table extends React.Component {
 
     if (isInit) {
       // 重新计算一下tableHeight
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise(resolve => setTimeout(resolve, 0))
       await this.getTableHeight(false)
     } else {
       // 需要判断一下tableData是否为空
@@ -286,7 +294,6 @@ class Table extends React.Component {
       range,
       pageIndex,
       printerStore,
-      isSetting,
       isLastPage
     } = this.props
     // 数据
@@ -304,7 +311,6 @@ class Table extends React.Component {
         printerStore?.config?.productionMergeType
       ] ||
       []
-    const isMultiPage = dataKey?.includes('multi')
 
     const getTdStyle = (index, style = {}) => {
       const width = thWidths[index]
@@ -340,7 +346,6 @@ class Table extends React.Component {
       begin = range.trueBegin
       end = Number(begin) + Number(range.size)
     }
-    console.log('begin', range, begin, end)
     return (
       <table>
         <thead>
@@ -542,7 +547,7 @@ class Table extends React.Component {
           {/* 区域2 */}
           {this.props?.isDeliverType && (
             <>
-              <SubtotalTrShowRow {...this.props} />
+              <SubtotalTrShowRow {...this.props} begin={begin} end={end} />
               <PageSummary {...this.props} />
               <PageOrderSummary {...this.props} />
               {config?.allOrderSummaryConfig?.orderSummaryShow &&
