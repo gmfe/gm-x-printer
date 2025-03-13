@@ -384,7 +384,7 @@ class Table extends React.Component {
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
             // 如果项为空对象展现一个占满一行的td
-            const isItemNone = !_.keys(data).length
+            const isItemNone = false
             // 将数据根据process_task_command_id进行分组
             const tableDataGroupBy = _.groupBy(data, 'process_task_command_id')
             // 处理数据是数组的情况(生产单据)
