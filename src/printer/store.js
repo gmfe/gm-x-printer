@@ -209,7 +209,6 @@ class PrinterStore {
     if (!this.tableConfig) return heights
 
     const len = this.data._table[dataKey].length
-    console.log('_.gt(heights.length, len)', _.gt(heights.length, len))
     // 如果是已经开了填充配置，回显的heights包括了填充的表格部分，关闭配置时，这种情况就要去掉填充的
     if (_.gt(heights.length, len)) return heights.slice(0, len)
 
@@ -306,7 +305,6 @@ class PrinterStore {
     let page = []
     /** 处理配送单有多个表格的情况 */
     let tableCount = 0
-    console.log('----------------------开始处理contents')
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
@@ -478,7 +476,6 @@ class PrinterStore {
               const overHeight = dataHeights[end] || 24
               // 双栏合计
               if (isMultiPage && !isVertical && subtotal.show) {
-                console.log('双栏合计')
                 /** 正是因为添加了这一行，所以超过了 */
                 // 因为超过，所以要退回上一个
                 end--
@@ -566,7 +563,6 @@ class PrinterStore {
                   end = dataIndex
                 }
                 begin = end
-                console.log('超过限制了', begin, end, dataIndex, nowPage)
                 if (end >= dataIndex) {
                   runInAction(() => {
                     this.lastTableCellCount[`contents.table.${index}`] =
@@ -586,13 +582,6 @@ class PrinterStore {
               }
               // 最后一行，把信息加入 page，并轮下一个contents
               if (isEnd) {
-                console.log(
-                  'isEnd',
-                  currentPageTableCellCount,
-                  begin,
-                  end,
-                  dataIndex
-                )
                 let nowPageSize =
                   end - begin > linesPerPage ? linesPerPage : end - begin
                 if (isVertical) {
@@ -642,14 +631,6 @@ class PrinterStore {
                   // if (begin !== 0) {
                   //   nowPageSize++
                   // }
-                  console.log(
-                    'nowPageSize',
-                    nowPageSize,
-                    lastPageTableCellCount,
-                    tableCellCount,
-                    begin,
-                    end
-                  )
                   const nowPage = {
                     type: 'table',
                     index,
@@ -671,30 +652,12 @@ class PrinterStore {
                       end = dataIndex
                     }
                     begin = end
-                    console.log(
-                      'lastPageTableCellCount',
-                      nowPage,
-                      lastPageTableCellCount,
-                      end,
-                      begin
-                    )
                   }
                   if (end >= dataIndex) {
-                    console.log(
-                      '最后一页',
-                      nowPage,
-                      nowPageSize,
-                      pageSize,
-                      tableCellCount,
-                      lastPageTableCellCount,
-                      lastPageTableCellCountAll,
-                      `${begin}-${end}`
-                    )
                     if (isVertical) {
                       nowPage.end = dataIndex
                       if (linesPerPage) {
                         nowPage.size = nowPageSize
-                        console.log('nowPage.size', nowPage.size)
                       }
                     }
                     page.push(nowPage)
@@ -758,11 +721,6 @@ class PrinterStore {
         }
       }
     }
-    console.log(
-      '----------------------开始处理contents结束',
-      page,
-      this.lastTableCellCount
-    )
     this.pages.push(page)
 
     const safeCurrentPageHeight = Number.isNaN(currentPageHeight)

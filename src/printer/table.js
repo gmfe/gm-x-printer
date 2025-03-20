@@ -346,7 +346,6 @@ class Table extends React.Component {
       begin = range.trueBegin
       end = Number(begin) + Number(range.size)
     }
-    console.log('range', range, begin, end)
     return (
       <table>
         <thead>
