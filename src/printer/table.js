@@ -10,7 +10,8 @@ import {
   getHeadThWidth,
   isMultiTable,
   isRowSpanTable,
-  getTableRowColumnName
+  getTableRowColumnName,
+  getAutoFillingConfig
 } from '../util'
 import { inject, observer } from 'mobx-react'
 import classNames from 'classnames'
@@ -38,22 +39,24 @@ class Table extends React.Component {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (!this.props.printerStore.tableReady[this.props.name]) {
       // TODO 增加定时器，页面渲染完成后再获取高度 因为如果不设置定时器，页面渲染完成后，table的高度还没有计算出来
-      setTimeout(() => {
-        this.getTableHeight()
-        this.props.printerStore.setTableReady(this.props.name, true)
+      setTimeout(async () => {
+        await this.getTableHeight()
       }, 3000)
     }
   }
 
-  getTableHeight = () => {
+  getTableHeight = async (isInit = true) => {
     let {
       name,
       printerStore,
       config: { dataKey, arrange }
     } = this.props
+    // 整单合计，如果设置了整单合计，那么需要给第一个单元格增加宽度
+    const isShowOrderSummaryPer = !!this.props.config?.allOrderSummaryConfig
+      ?.isShowOrderSummaryPer
     // 数据
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
@@ -72,10 +75,29 @@ class Table extends React.Component {
     const detailsDiv = $table.querySelectorAll('tr td .b-table-details')
     printerStore.setHeight(name, getHeight($table))
 
+    // 多列表格的宽度一定要一样，所以这里用 map 存储 dataname 的 width
+    const headThWidthMap = {}
+
     printerStore.setTable(name, {
       head: {
         height: getHeight(tHead),
-        widths: _.map(ths, th => getHeadThWidth(th))
+        widths: _.map(ths, (th, index) => {
+          let width = getHeadThWidth(th)
+          if (isShowOrderSummaryPer) {
+            if (index === 0) {
+              width = 50
+            }
+          }
+          if (!headThWidthMap[th.dataset.name]) {
+            headThWidthMap[th.dataset.name] = width
+          } else {
+            headThWidthMap[th.dataset.name] = Math.max(
+              headThWidthMap[th.dataset.name],
+              width
+            )
+          }
+          return headThWidthMap[th.dataset.name]
+        })
       },
       body: {
         heights: _.map(trs, tr => getHeight(tr)),
@@ -85,13 +107,20 @@ class Table extends React.Component {
         heights: _.map(trRowSpan, tr => getHeight(tr))
       }
     })
-    // 需要判断一下tableData是否为空
-    // if (!tableData.length) {
-    /** table数据允许为空，如果遇到空的table 数据，导致printer 没有setReady  */
-    setTimeout(() => {
-      this.props.printerStore.setTableReady(this.props.name, true)
-    }, 300)
-    // }
+
+    if (isInit) {
+      // 重新计算一下tableHeight
+      await new Promise(resolve => setTimeout(resolve, 0))
+      await this.getTableHeight(false)
+    } else {
+      // 需要判断一下tableData是否为空
+      // if (!tableData.length) {
+      /** table数据允许为空，如果遇到空的table 数据，导致printer 没有setReady  */
+      setTimeout(() => {
+        this.props.printerStore.setTableReady(this.props.name, true)
+      }, 300)
+      // }
+    }
   }
 
   handleClick = e => {
@@ -147,6 +176,9 @@ class Table extends React.Component {
       // 多栏商品的第二列有点特殊,都带 _MULTI_SUFFIX 后缀
       let res = _.slice(newColumns)
       const colNumber = getMultiNumber(dataKey)
+      // if (this.props.config.arrange === 'vertical') {
+      //   return newColumns
+      // }
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
         const columnsI = newColumns.map((val, index) => {
@@ -189,6 +221,71 @@ class Table extends React.Component {
     }
   }
 
+  getTableData = i => {
+    const {
+      printerStore,
+      name,
+      config: { dataKey, arrange },
+      range
+    } = this.props
+    const isAutoFillingText = getAutoFillingConfig(printerStore.isAutoFilling)
+    const tableData =
+      printerStore.data._table[getDataKey(dataKey, arrange)] || []
+    const isMultiPage = dataKey?.includes('multi')
+    let data = {}
+    if (tableData.length > i) {
+      data = tableData[i]
+    }
+    if (isAutoFillingText === 'number') {
+      if (_.isArray(data)) {
+        if (_.flatten(data).length > 0) {
+          data.forEach((item, index) => {
+            item['序号'] = i + index + 1
+          })
+        }
+      } else {
+        let num = i + 1
+        // 只有双栏才会用到
+        if (isMultiPage && arrange !== 'vertical') {
+          num = i + 1 + i
+        }
+        if (!data || !data['序号']) {
+          data = {
+            ...data,
+            序号: num
+          }
+        }
+      }
+    }
+    // 双栏数据比较特殊，需要特殊处理
+    if (isMultiPage) {
+      const sku2 = {}
+      let data2 = {}
+      if (arrange === 'vertical') {
+        // 当前页数 * 当前行数
+        const index = printerStore.lastTableCellCount[name] + i
+        if (tableData.length > index) {
+          data2 = tableData[index]
+        }
+        _.each(data2, (val, key) => {
+          sku2[key + MULTI_SUFFIX] = val
+        })
+      }
+      if (!data2?.['序号'] && isAutoFillingText === 'number') {
+        // 只有编辑的时候才会用到
+        if (arrange === 'vertical') {
+          const index = printerStore.lastTableCellCount[name] + i + 1
+          sku2['序号' + MULTI_SUFFIX] = index
+        } else {
+          sku2['序号' + MULTI_SUFFIX] = i + i + 2
+        }
+      }
+      return { ...data, ...sku2 }
+    } else {
+      return data
+    }
+  }
+
   renderDefault() {
     let {
       config,
@@ -201,7 +298,6 @@ class Table extends React.Component {
     } = this.props
     // 数据
     dataKey = getDataKey(dataKey, arrange)
-    const tableData = printerStore.data._table[dataKey] || []
     // 列
     const columns = this.getColumns()
 
@@ -237,6 +333,19 @@ class Table extends React.Component {
       return tdStyle
     }
 
+    let begin = range.begin
+    let end = range.end
+    // 设置的时候显示
+    // if (isSetting === true) {
+    //   console.log('isSetting', isSetting)
+    //   if (printerStore.linesPerPage) {
+    //     end = printerStore.linesPerPage
+    //   }
+    // }
+    if (arrange === 'vertical') {
+      begin = range.trueBegin
+      end = Number(begin) + Number(range.size)
+    }
     return (
       <table>
         <thead>
@@ -267,26 +376,24 @@ class Table extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {_.map(_.range(range.begin, range.end), i => {
-            const _special = tableData[i] && tableData[i]._special
+          {_.map(_.range(begin, end), i => {
+            const data = this.getTableData(i)
+            const _special = data && data._special
 
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
             // 如果项为空对象展现一个占满一行的td
-            const isItemNone = !_.keys(tableData[i]).length
+            const isItemNone = false
             // 将数据根据process_task_command_id进行分组
-            const tableDataGroupBy = _.groupBy(
-              tableData[i],
-              'process_task_command_id'
-            )
+            const tableDataGroupBy = _.groupBy(data, 'process_task_command_id')
             // 处理数据是数组的情况(生产单据)
-            if (_.isArray(tableData[i])) {
+            if (_.isArray(data)) {
               // 合并的坐标
               let rowSpanKey = 0
-              return _.map(tableData[i], (item, j) => {
+              return _.map(data, (item, j) => {
                 // 获取process_task_command_id对应的数组
                 const processTaskCommandIdArr =
-                  tableDataGroupBy[tableData[i][j]?.process_task_command_id]
+                  tableDataGroupBy[data[j]?.process_task_command_id]
                 // 处理特殊情况：计算分页时，一个数组中rowSpan的true和false分成了两个数组的情况
                 if (
                   _.every(
@@ -294,9 +401,9 @@ class Table extends React.Component {
                     item => item.rowSpan === false
                   )
                 ) {
-                  _.isArray(tableData[i][j])
-                    ? (tableData[i][j][0].rowSpan = true)
-                    : (tableData[i][j].rowSpan = true)
+                  _.isArray(data[j])
+                    ? (data[j][0].rowSpan = true)
+                    : (data[j].rowSpan = true)
                 }
                 return (
                   <tr style={{ height: `${customerRowHeight}px` }} key={j}>
@@ -312,7 +419,7 @@ class Table extends React.Component {
                         let rowTdRender =
                           includesColText.includes(col.text) && j !== 0
                         // 合并单元格的个数
-                        let rowSpanLength = tableData[i].length
+                        let rowSpanLength = data.length
 
                         // 是熟食的组合工序聚合
                         if (
@@ -323,19 +430,19 @@ class Table extends React.Component {
                           printerStore.config?.tableRowSpanTdArr[2].includes(
                             col.text
                           ) &&
-                          tableData[i][j]?.process_task_command_id
+                          data[j]?.process_task_command_id
                         ) {
                           // 是熟食的组合工序聚合,合并单元格要发生变化
                           // 是否跨行
                           isRowSpan =
                             printerStore.config.tableRowSpanTdArr[2].includes(
                               col.text
-                            ) && tableData[i][j].rowSpan
+                            ) && data[j].rowSpan
                           // 去除对于的单元格
                           rowTdRender =
                             printerStore.config.tableRowSpanTdArr[2].includes(
                               col.text
-                            ) && !tableData[i][j].rowSpan
+                            ) && !data[j].rowSpan
                           // 合并单元格的个数
                           rowSpanLength = processTaskCommandIdArr.length
                         }
@@ -424,7 +531,7 @@ class Table extends React.Component {
                                 )
                               : printerStore.templateTable(
                                   col.text,
-                                  dataKey,
+                                  data,
                                   i,
                                   pageIndex
                                 )
@@ -440,7 +547,7 @@ class Table extends React.Component {
           {/* 区域2 */}
           {this.props?.isDeliverType && (
             <>
-              <SubtotalTrShowRow {...this.props} />
+              <SubtotalTrShowRow {...this.props} begin={begin} end={end} />
               <PageSummary {...this.props} />
               <PageOrderSummary {...this.props} />
               {config?.allOrderSummaryConfig?.orderSummaryShow &&
@@ -480,13 +587,17 @@ class Table extends React.Component {
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
     const active = printerStore.selectedRegion === name
+    // 是否是纵向双列
+    // const isDoubleColumn = arrange === 'vertical' && isMultiTable(dataKey)
     return (
       <div
         ref={this.ref}
         className={classNames(
           'gm-printer-table',
           'gm-printer-table-classname-' + (className || 'default'),
-          { active }
+          {
+            active
+          }
         )}
         data-name={name}
         data-placeholder={placeholder}
@@ -506,7 +617,9 @@ Table.propTypes = {
   placeholder: PropTypes.string,
   printerStore: PropTypes.object,
   isLastPage: PropTypes.bool,
-  isDeliverType: PropTypes.bool
+  isDeliverType: PropTypes.bool,
+  isRenderBefore: PropTypes.bool,
+  isSetting: PropTypes.bool
 }
 
 export default Table
