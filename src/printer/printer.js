@@ -92,7 +92,9 @@ class Printer extends React.Component {
           nextProps.showIngredientDetail
         )
       }
-      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
+      await this.props.printerStore.setLinesPerPage(
+        nextProps.linesPerPage || ''
+      )
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       this.props.printerStore.computedPages()
     }
@@ -101,7 +103,9 @@ class Printer extends React.Component {
       nextProps.isAutoFilling !== this.props.isAutoFilling ||
       nextProps.linesPerPage !== this.props.linesPerPage
     ) {
-      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
+      await this.props.printerStore.setLinesPerPage(
+        nextProps.linesPerPage || ''
+      )
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       await this.props.printerStore.setData(nextProps.data)
       await this.props.printerStore.setReady(true)
@@ -113,7 +117,9 @@ class Printer extends React.Component {
       )
     }
     if (nextProps.updateData !== this.props.updateData) {
-      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
+      await this.props.printerStore.setLinesPerPage(
+        nextProps.linesPerPage || ''
+      )
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       this.props.printerStore.setOverallOrder(nextProps.config)
       await this.props.printerStore.computedPages()
@@ -130,7 +136,7 @@ class Printer extends React.Component {
       // 连续打印不需要计算
       if (batchPrintConfig !== 2) {
         printerStore.setReady(true)
-        this.props.printerStore.setLinesPerPage(config.linesPerPage)
+        this.props.printerStore.setLinesPerPage(config.linesPerPage || '')
         this.props.printerStore.setAutofillConfig(
           config.autoFillConfig?.checked || false
         )
@@ -276,18 +282,14 @@ class Printer extends React.Component {
 
                 // 如果设置了linesPerPage，则只填充linesPerPage行
                 let end = panel.end
-
                 let size = panel.size
-                if (!(isMultiPage && content.arrange === 'vertical')) {
-                  if (!printerStore.linesPerPage) {
-                    size = isAutofillConfig
-                      ? panel.size +
-                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                      : panel.size
-                    end = isAutofillConfig
-                      ? Number(panel.end) + Number(printerStore.linesPerPage)
-                      : panel.end
-                  }
+                if (!printerStore.linesPerPage) {
+                  size = isAutofillConfig
+                    ? panel.size + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                    : panel.size
+                  end = isAutofillConfig
+                    ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                    : panel.end
                 }
 
                 switch (panel.type) {

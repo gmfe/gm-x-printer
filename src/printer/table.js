@@ -261,7 +261,7 @@ class Table extends React.Component {
     if (isMultiPage) {
       const sku2 = {}
       let data2 = {}
-      if (arrange === 'vertical') {
+      if (arrange === 'vertical' && printerStore.isDeliverType) {
         // 当前页数 * 当前行数
         const index = printerStore.lastTableCellCount[name] + i
         if (tableData.length > index) {
@@ -342,11 +342,10 @@ class Table extends React.Component {
     //     end = printerStore.linesPerPage
     //   }
     // }
-    if (arrange === 'vertical') {
+    if (arrange === 'vertical' && printerStore.isDeliverType) {
       begin = range.trueBegin
       end = Number(begin) + Number(range.size)
     }
-    console.log('range', range, begin, end)
     return (
       <table>
         <thead>
@@ -378,13 +377,16 @@ class Table extends React.Component {
         </thead>
         <tbody>
           {_.map(_.range(begin, end), i => {
-            const data = this.getTableData(i)
+            let data = this.getTableData(i)
             const _special = data && data._special
 
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
             // 如果项为空对象展现一个占满一行的td
-            const isItemNone = !_.keys(data).length
+            const isItemNone = false
+            if (i >= printerStore.lastTableCellCount[name]) {
+              data = {}
+            }
             // 将数据根据process_task_command_id进行分组
             const tableDataGroupBy = _.groupBy(data, 'process_task_command_id')
             // 处理数据是数组的情况(生产单据)

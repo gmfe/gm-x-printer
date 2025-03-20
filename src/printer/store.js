@@ -149,9 +149,16 @@ class PrinterStore {
     }
   }
 
+  @computed
+  get isDeliverType() {
+    return this.config.isDeliverType
+  }
+
   get tableConfig() {
     const { autoFillConfig } = this.config
-    if (!this.selectedRegion && !autoFillConfig?.checked) return null
+    const isAutoFilling =
+      getAutoFillingConfig(autoFillConfig?.checked) !== 'manual'
+    if (!this.selectedRegion && !isAutoFilling) return null
     const _selectedRegion = this.selectedRegion || autoFillConfig.region || ''
     const arr = _selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
@@ -209,7 +216,6 @@ class PrinterStore {
     if (!this.tableConfig) return heights
 
     const len = this.data._table[dataKey].length
-    console.log('_.gt(heights.length, len)', _.gt(heights.length, len))
     // 如果是已经开了填充配置，回显的heights包括了填充的表格部分，关闭配置时，这种情况就要去掉填充的
     if (_.gt(heights.length, len)) return heights.slice(0, len)
 
@@ -306,7 +312,6 @@ class PrinterStore {
     let page = []
     /** 处理配送单有多个表格的情况 */
     let tableCount = 0
-    console.log('----------------------开始处理contents')
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
@@ -367,7 +372,6 @@ class PrinterStore {
         let pageAccomodateTableHeight = +new Big(this.pageHeight)
           .minus(currentPageHeight)
           .toFixed(2)
-
         const heights = [
           ...this.getNormalTableBodyHeights(
             table.body.heights,
@@ -392,11 +396,11 @@ class PrinterStore {
           const linesPerPage = this.config.linesPerPage
             ? Number(this.config.linesPerPage)
             : undefined
-
           // 页面 cell 数
           const pageCellCounts = []
           const tableCellCounts = []
-          const isVertical = isMultiPage && arrange === 'vertical'
+          const isVertical =
+            isMultiPage && arrange === 'vertical' && !!this.isDeliverType
           // 当前真实的 cell index
           let cellIndex = 0
           // 当前 table 渲染了多少行
@@ -451,7 +455,7 @@ class PrinterStore {
             const trueIndex = end - trueBegin
             let trHeight = heights[end] || 24
             if (isVertical) {
-              trHeight = heights[trueIndex] || 24
+              trHeight = Math.max(heights[trueIndex], 24)
             }
 
             // 真实的 end 值
@@ -478,7 +482,6 @@ class PrinterStore {
               const overHeight = dataHeights[end] || 24
               // 双栏合计
               if (isMultiPage && !isVertical && subtotal.show) {
-                console.log('双栏合计')
                 /** 正是因为添加了这一行，所以超过了 */
                 // 因为超过，所以要退回上一个
                 end--
@@ -566,7 +569,6 @@ class PrinterStore {
                   end = dataIndex
                 }
                 begin = end
-                console.log('超过限制了', begin, end, dataIndex, nowPage)
                 if (end >= dataIndex) {
                   runInAction(() => {
                     this.lastTableCellCount[`contents.table.${index}`] =
@@ -586,37 +588,30 @@ class PrinterStore {
               }
               // 最后一行，把信息加入 page，并轮下一个contents
               if (isEnd) {
-                console.log(
-                  'isEnd',
-                  currentPageTableCellCount,
-                  begin,
-                  end,
-                  dataIndex
-                )
                 let nowPageSize =
                   end - begin > linesPerPage ? linesPerPage : end - begin
                 if (isVertical) {
                   nowPageSize = currentPageTableCellCount + 1
                 }
-                let emptyCellCount = 0
+                const emptyCellCount = 0
                 // 这里需要判断一下最后一页是否能填充
-                if (isAutoFillingAuto && !linesPerPage && isVertical) {
-                  // 当前剩余内容
-                  const emptyCellHeight =
-                    pageAccomodateTableHeight - currentTableHeight
-                  emptyCellCount =
-                    Math.floor(emptyCellHeight / TR_BASE_HEIGHT) || 0
-                  if (arrange === 'vertical') {
-                    // 这个直接用最大的单元格高度
-                    const maxHeight = heights.reduce((pre, cur) => {
-                      return Math.max(
-                        Number(pre),
-                        Number(cur || TR_BASE_HEIGHT)
-                      )
-                    }, 0)
-                    emptyCellCount = Math.floor(emptyCellHeight / maxHeight)
-                  }
-                }
+                // if (isAutoFillingAuto && !linesPerPage && isMultiPage) {
+                //   // 当前剩余内容
+                //   const emptyCellHeight =
+                //     pageAccomodateTableHeight - currentTableHeight
+                //   emptyCellCount =
+                //     Math.floor(emptyCellHeight / TR_BASE_HEIGHT) || 0
+                //   if (arrange === 'vertical') {
+                //     // 这个直接用最大的单元格高度
+                //     const maxHeight = heights.reduce((pre, cur) => {
+                //       return Math.max(
+                //         Number(pre),
+                //         Number(cur || TR_BASE_HEIGHT)
+                //       )
+                //     }, 0)
+                //     emptyCellCount = Math.floor(emptyCellHeight / maxHeight)
+                //   }
+                // }
                 const nowPage = {
                   type: 'table',
                   index,
@@ -642,14 +637,6 @@ class PrinterStore {
                   // if (begin !== 0) {
                   //   nowPageSize++
                   // }
-                  console.log(
-                    'nowPageSize',
-                    nowPageSize,
-                    lastPageTableCellCount,
-                    tableCellCount,
-                    begin,
-                    end
-                  )
                   const nowPage = {
                     type: 'table',
                     index,
@@ -671,30 +658,12 @@ class PrinterStore {
                       end = dataIndex
                     }
                     begin = end
-                    console.log(
-                      'lastPageTableCellCount',
-                      nowPage,
-                      lastPageTableCellCount,
-                      end,
-                      begin
-                    )
                   }
                   if (end >= dataIndex) {
-                    console.log(
-                      '最后一页',
-                      nowPage,
-                      nowPageSize,
-                      pageSize,
-                      tableCellCount,
-                      lastPageTableCellCount,
-                      lastPageTableCellCountAll,
-                      `${begin}-${end}`
-                    )
                     if (isVertical) {
                       nowPage.end = dataIndex
                       if (linesPerPage) {
                         nowPage.size = nowPageSize
-                        console.log('nowPage.size', nowPage.size)
                       }
                     }
                     page.push(nowPage)
@@ -758,11 +727,6 @@ class PrinterStore {
         }
       }
     }
-    console.log(
-      '----------------------开始处理contents结束',
-      page,
-      this.lastTableCellCount
-    )
     this.pages.push(page)
 
     const safeCurrentPageHeight = Number.isNaN(currentPageHeight)
@@ -1096,7 +1060,10 @@ class PrinterStore {
   // 用于初始化的计算
   getFilledTableData(tableData) {
     const { autoFillConfig } = this.config
-    if (!this.selectedRegion && !autoFillConfig?.checked) return []
+    const isAutoFilling =
+      getAutoFillingConfig(autoFillConfig?.checked) !== 'manual'
+
+    if (!this.selectedRegion && !isAutoFilling) return []
     const tr_count = Math.floor(
       this.remainPageHeight / this.computedTableCustomerRowHeight
     )
