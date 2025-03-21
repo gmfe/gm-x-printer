@@ -209,7 +209,6 @@ class Printer extends React.Component {
                 : content.dataKey
               // eslint-disable-next-line no-case-declarations
               const list = printerStore.data._table[dataKey]
-              console.log('list', list, dataKey)
               return (
                 <Table
                   key={`contents.table.${index}`}
