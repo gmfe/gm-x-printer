@@ -479,9 +479,12 @@ class PrinterStore {
               }
 
               const trueIndex = end - trueBegin
-              let trHeight = dataHeights[end] || 24
+              let trHeight = dataHeights[end] || minHeight
               if (isVertical) {
-                trHeight = Math.max(dataHeights[trueIndex], 24)
+                trHeight = Math.max(
+                  dataHeights[trueIndex] || minHeight,
+                  minHeight
+                )
               }
 
               // 真实的 end 值
@@ -798,11 +801,11 @@ class PrinterStore {
       } else {
         const panelHeight = this.height[`contents.panel.${index}`]
         currentPageHeight += panelHeight
-
         // 当 panel + allPagesHaveThisHeight > 页高度, 停止. 避免死循环
         if (panelHeight + allPagesHaveThisHeight > this.pageHeight) {
           break
         }
+        console.log(this.pageHeight, currentPageHeight, panelHeight)
 
         // 如果是最后一页，必须要加上sign的高度，否则会重叠
         if (index === this.config.contents.length - 1) {
