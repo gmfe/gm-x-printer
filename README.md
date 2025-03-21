@@ -40,6 +40,10 @@ gm-x-printer 是新架构 erp 使用的打印库
 4. 可能断开连接不太好用，不好用的时候，删除 node_modeles，关闭 gm-x-printer，重新 yarn
 5. yarn link 不太稳定
 
+**注意：** 在erp 调试时可以把`package.json`中的`"main": "lib/main.js"`改为`"main": "src/index.js"`, 然后运行 `npm run build:watch`
+
+
+
 ## 与 pnpm 进行连接测试
 1. 在 gm-x-printer 执行 `yarn build:watch`
 2. 在 gm-x-printer 中，执行 `pnpm link --global`
