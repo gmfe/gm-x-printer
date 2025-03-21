@@ -176,9 +176,6 @@ class Table extends React.Component {
       // 多栏商品的第二列有点特殊,都带 _MULTI_SUFFIX 后缀
       let res = _.slice(newColumns)
       const colNumber = getMultiNumber(dataKey)
-      // if (this.props.config.arrange === 'vertical') {
-      //   return newColumns
-      // }
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
         const columnsI = newColumns.map((val, index) => {
@@ -228,6 +225,10 @@ class Table extends React.Component {
       config: { dataKey, arrange },
       range
     } = this.props
+    if (!printerStore.isDeliverType) {
+      const tableData = printerStore.data._table[dataKey] || []
+      return tableData[i]
+    }
     const isAutoFillingText = getAutoFillingConfig(printerStore.isAutoFilling)
     const tableData =
       printerStore.data._table[getDataKey(dataKey, arrange)] || []
@@ -298,6 +299,7 @@ class Table extends React.Component {
     } = this.props
     // 数据
     dataKey = getDataKey(dataKey, arrange)
+    const tableData = printerStore.data._table[dataKey] || []
     // 列
     const columns = this.getColumns()
 
@@ -342,18 +344,12 @@ class Table extends React.Component {
     //     end = printerStore.linesPerPage
     //   }
     // }
-    if (arrange === 'vertical' && printerStore.isDeliverType) {
-      begin = range.trueBegin
-      end = Number(begin) + Number(range.size)
+    if (printerStore.isDeliverType) {
+      if (arrange === 'vertical') {
+        begin = range.trueBegin
+        end = Number(begin) + Number(range.size)
+      }
     }
-    console.log(
-      'begin, end',
-      begin,
-      end,
-      printerStore.data._table,
-      dataKey,
-      arrange
-    )
     return (
       <table>
         <thead>
@@ -391,8 +387,12 @@ class Table extends React.Component {
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
             // 如果项为空对象展现一个占满一行的td
-            const isItemNone = false
+            let isItemNone = !_.keys(data).length
+            if (printerStore.isDeliverType) {
+              isItemNone = false
+            }
             if (
+              printerStore.isDeliverType &&
               i >= printerStore.lastTableCellCount[name] &&
               printerStore.isDeliverType
             ) {
@@ -543,9 +543,16 @@ class Table extends React.Component {
                                   dataKey,
                                   i
                                 )
-                              : printerStore.templateTable(
+                              : printerStore.isDeliverType
+                              ? printerStore.templateTableByDelivery(
                                   col.text,
                                   data,
+                                  i,
+                                  pageIndex
+                                )
+                              : printerStore.templateTable(
+                                  col.text,
+                                  dataKey,
                                   i,
                                   pageIndex
                                 )
@@ -601,17 +608,13 @@ class Table extends React.Component {
     dataKey = getDataKey(dataKey, arrange)
     const tableData = printerStore.data._table[dataKey] || []
     const active = printerStore.selectedRegion === name
-    // 是否是纵向双列
-    // const isDoubleColumn = arrange === 'vertical' && isMultiTable(dataKey)
     return (
       <div
         ref={this.ref}
         className={classNames(
           'gm-printer-table',
           'gm-printer-table-classname-' + (className || 'default'),
-          {
-            active
-          }
+          { active }
         )}
         data-name={name}
         data-placeholder={placeholder}

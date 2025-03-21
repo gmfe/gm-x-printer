@@ -1,4 +1,3 @@
-import Big from 'big.js'
 import { getAutoFillingConfig, getDataKey } from '../../src/util'
 import i18next from '../../locales'
 import React from 'react'
@@ -117,12 +116,13 @@ class Printer extends React.Component {
       )
     }
     if (nextProps.updateData !== this.props.updateData) {
-      await this.props.printerStore.setLinesPerPage(
-        nextProps.linesPerPage || ''
-      )
-      await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
+      if (this.props.printerStore.isDeliverType) {
+        await this.props.printerStore.setLinesPerPage(
+          nextProps.linesPerPage || ''
+        )
+        await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
+      }
       this.props.printerStore.setOverallOrder(nextProps.config)
-      await this.props.printerStore.computedPages()
     }
   }
 
@@ -136,10 +136,12 @@ class Printer extends React.Component {
       // 连续打印不需要计算
       if (batchPrintConfig !== 2) {
         printerStore.setReady(true)
-        this.props.printerStore.setLinesPerPage(config.linesPerPage || '')
-        this.props.printerStore.setAutofillConfig(
-          config.autoFillConfig?.checked || false
-        )
+        if (this.props.printerStore.isDeliverType) {
+          this.props.printerStore.setLinesPerPage(config.linesPerPage || '')
+          this.props.printerStore.setAutofillConfig(
+            config.autoFillConfig?.checked || false
+          )
+        }
         // 开始计算，获取各种数据
         config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
           ? printerStore.computedRowTablePages()
@@ -158,8 +160,6 @@ class Printer extends React.Component {
       }
       // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
       this.setState({}, () => {
-        // 渲染成功了吗
-        console.log('渲染成功了吗')
         this.props.onReady()
       })
     }
@@ -200,10 +200,12 @@ class Printer extends React.Component {
         {_.map(config.contents, (content, index) => {
           switch (content.type) {
             case 'table': {
-              const dataKey = getDataKey(content.dataKey, content.arrange)
+              const dataKey = printerStore.isDeliverType
+                ? getDataKey(content.dataKey, content.arrange)
+                : content.dataKey
               // eslint-disable-next-line no-case-declarations
               const list = printerStore.data._table[dataKey]
-              // 如果设置了linesPerPage，则只填充linesPerPage行
+              console.log('list', list, dataKey)
               return (
                 <Table
                   key={`contents.table.${index}`}
@@ -211,7 +213,7 @@ class Printer extends React.Component {
                   config={content}
                   range={{
                     begin: 0,
-                    end: Number(printerStore.linesPerPage || list?.length || 0),
+                    end: Number(list?.length || 0),
                     size: Number(
                       printerStore.linesPerPage || list?.length || 1
                     ),
@@ -245,7 +247,7 @@ class Printer extends React.Component {
   }
 
   renderPage() {
-    const { printerStore, isSomeSubtotalTr, onReady } = this.props
+    const { printerStore, isSomeSubtotalTr } = this.props
     const isDeliverType = this.props?.config?.isDeliverType
 
     const {
@@ -281,15 +283,22 @@ class Printer extends React.Component {
                   isAutoFillingBool &&
                   panel.end &&
                   content?.dataKey === autoFillConfig?.dataKey
-                const isMultiPage = content?.dataKey?.includes('multi')
 
                 // 如果设置了linesPerPage，则只填充linesPerPage行
                 let end = panel.end
                 let size = panel.size
-                if (!printerStore.linesPerPage) {
-                  size = isAutofillConfig
-                    ? panel.size + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                    : panel.size
+                if (isDeliverType) {
+                  if (!printerStore.linesPerPage) {
+                    size = isAutofillConfig
+                      ? panel.size +
+                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      : panel.size
+                    end = isAutofillConfig
+                      ? panel.end +
+                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      : panel.end
+                  }
+                } else {
                   end = isAutofillConfig
                     ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                     : panel.end
@@ -334,6 +343,7 @@ class Printer extends React.Component {
                             }}
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
+                            isAutoFilling={isAutoFilling}
                             isSomeSubtotalTr={isSomeSubtotalTr}
                             isLastPage={isLastPageHasTable}
                             isDeliverType={isDeliverType}

@@ -58,6 +58,7 @@ class Editor extends React.Component {
       addFields,
       className,
       showNewDate,
+      isDeliverType,
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
@@ -97,7 +98,7 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorSelect />
             {/* <SpecialField addFields={addFields} mockData={mockData} /> */}
-            <EditorCutomizedConfig />
+            <EditorCutomizedConfig isDeliverType={isDeliverType} />
             <Gap height='5px' />
             <EditorField
               tableDataKeyList={tableDataKeyList}
@@ -140,12 +141,14 @@ Editor.propTypes = {
   addFields: PropTypes.object.isRequired,
   showNewDate: PropTypes.bool,
   uploadQiniuImage: PropTypes.func,
-  templateTags: PropTypes.array
+  templateTags: PropTypes.array,
+  isDeliverType: PropTypes.bool
 }
 
 Editor.deaultProps = {
   onSave: _.noop,
-  showNewDate: false
+  showNewDate: false,
+  isDeliverType: false
 }
 
 export default Editor
