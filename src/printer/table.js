@@ -278,13 +278,9 @@ class Table extends React.Component {
           sku2[key + MULTI_SUFFIX] = val
         })
       }
-      if (!data2?.['序号'] && isAutoFillingText === 'number') {
+      if (isAutoFillingText === 'number') {
         // 只有编辑的时候才会用到
-        if (
-          arrange === 'vertical' &&
-          printerStore.isDeliverType &&
-          printerStore.isFirstLeftThenRight
-        ) {
+        if (arrange === 'vertical' && printerStore.isDeliverType) {
           const index = printerStore.lastTableCellCount[name] + i + 1
           sku2['序号' + MULTI_SUFFIX] = index
         } else {
