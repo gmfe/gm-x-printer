@@ -103,6 +103,7 @@ class Editor extends React.Component {
             <EditorField
               tableDataKeyList={tableDataKeyList}
               showNewDate={showNewDate}
+              isDeliverType={isDeliverType}
             />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />

@@ -201,7 +201,11 @@ class Printer extends React.Component {
           switch (content.type) {
             case 'table': {
               const dataKey = printerStore.isDeliverType
-                ? getDataKey(content.dataKey, content.arrange)
+                ? getDataKey(
+                    content.dataKey,
+                    content.arrange,
+                    printerStore.tableVerticalStyle
+                  )
                 : content.dataKey
               // eslint-disable-next-line no-case-declarations
               const list = printerStore.data._table[dataKey]

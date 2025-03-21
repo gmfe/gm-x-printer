@@ -35,7 +35,10 @@ const SubtotalSsuQuantityTr = props => {
     printerStore
   } = props
 
-  const tableData = printerStore.data._table[getDataKey(dataKey, arrange)] || []
+  const tableData =
+    printerStore.data._table[
+      getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+    ] || []
   // 计算合计
   const sumData = (list, field) => {
     return _.reduce(

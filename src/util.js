@@ -209,9 +209,11 @@ const getMultiNumber = dataKey => {
 }
 
 // 由于增加了商品排列（横向排列，纵向排列），所以统一用这个获取dataKey
-const getDataKey = (dataKey, arrange) =>
+const getDataKey = (dataKey, arrange, verticalStyle) =>
   arrange === 'vertical' && isMultiTable(dataKey)
-    ? `${dataKey}_vertical`
+    ? `${dataKey}_vertical${
+        verticalStyle === 'firstLeftThenRight' ? '_firstLeftThenRight' : ''
+      }`
     : dataKey
 
 /**

@@ -156,6 +156,11 @@ class PrinterStore {
     return this.config.isDeliverType
   }
 
+  @computed
+  get tableVerticalStyle() {
+    return this.config.tableVerticalStyle || 'leftToRight'
+  }
+
   get tableConfig() {
     const { autoFillConfig } = this.config
     const isAutoFilling =
@@ -375,7 +380,6 @@ class PrinterStore {
         let pageAccomodateTableHeight = +new Big(this.pageHeight)
           .minus(currentPageHeight)
           .toFixed(2)
-        console.log('this.isDeliverType', this.isDeliverType)
         let heights = this.getNormalTableBodyHeights(
           table.body.heights,
           dataKey
@@ -384,7 +388,7 @@ class PrinterStore {
           heights = [
             ...this.getNormalTableBodyHeights(
               table.body.heights,
-              getDataKey(dataKey, arrange)
+              getDataKey(dataKey, arrange, this.tableVerticalStyle)
             )
           ]
         }
@@ -410,7 +414,10 @@ class PrinterStore {
             // 页面 cell 数
             const pageCellCounts = []
             const tableCellCounts = []
-            const isVertical = isMultiPage && arrange === 'vertical'
+            const isVertical =
+              isMultiPage &&
+              arrange === 'vertical' &&
+              this.tableVerticalStyle === 'firstLeftThenRight'
             // 当前真实的 cell index
             let cellIndex = 0
             // 当前 table 渲染了多少行
