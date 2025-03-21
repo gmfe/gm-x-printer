@@ -3,10 +3,8 @@ const path = require('path')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
   .BundleAnalyzerPlugin
 
-const watch = process.env.WATCH === 'true'
-
 module.exports = {
-  mode: watch ? 'development' : 'production',
+  mode: 'production',
   entry: './src/index.js',
   output: {
     path: path.resolve('lib'),
@@ -14,15 +12,13 @@ module.exports = {
     libraryTarget: 'commonjs',
     filename: '[name].js'
   },
-  externals: watch
-    ? {}
-    : {
-        react: 'react',
-        'react-dom': 'react-dom',
-        mobx: 'mobx',
-        'mobx-react': 'mobx-react',
-        lodash: 'lodash'
-      },
+  externals: {
+    react: 'react',
+    'react-dom': 'react-dom',
+    mobx: 'mobx',
+    'mobx-react': 'mobx-react',
+    lodash: 'lodash'
+  },
   module: {
     rules: [
       {

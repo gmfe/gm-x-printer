@@ -361,19 +361,6 @@ function regExp(text) {
   const key = match ? match[1] : ''
   return key ? key.split('.')[1] : ''
 }
-
-// 兼容行数是否自动填充的旧数据
-const getAutoFillingConfig = isAutoFilling => {
-  if (isAutoFilling === true) {
-    return 'empty'
-  } else if (isAutoFilling === false) {
-    return 'manual'
-  } else if (isAutoFilling === undefined) {
-    return 'manual'
-  }
-  return isAutoFilling
-}
-
 export {
   getPageHeight,
   getWidth,
@@ -398,6 +385,5 @@ export {
   caclRowSpanTdPageHeight,
   caclSingleDetailsPageHeight,
   getOverallOrderTrHeight,
-  regExp,
-  getAutoFillingConfig
+  regExp
 }

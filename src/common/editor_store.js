@@ -1,15 +1,8 @@
-import Big from 'big.js'
 import i18next from '../../locales'
 import { action, computed, observable, set, toJS } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
-import {
-  dispatchMsg,
-  getBlockName,
-  exchange,
-  regExp,
-  getAutoFillingConfig
-} from '../util'
+import { dispatchMsg, getBlockName, exchange, regExp } from '../util'
 
 class EditorStore {
   @observable
@@ -57,13 +50,6 @@ class EditorStore {
   // 是否自动行数填充
   @observable
   isAutoFilling = false
-
-  @observable
-  arrange = 'vertical'
-
-  // 每页行数
-  @observable
-  linesPerPage = undefined
 
   defaultTableDataKey = 'orders'
 
@@ -123,7 +109,6 @@ class EditorStore {
     this.insertPanel = 'header'
     this.mockData = data
     this.isAutoFilling = false
-    this.linesPerPage = undefined
     this.templateTags = templateTags
     if (this.config.tags) {
       this.tags = this.config.tags.split(',')
@@ -135,33 +120,6 @@ class EditorStore {
   @action
   setAutoFillingConfig(bol) {
     this.isAutoFilling = bol
-  }
-
-  @action
-  setLinesPerPage(linesPerPage, isChange = false) {
-    let value = linesPerPage
-    if (!isNaN(Number(value)) && ![undefined, null, ''].includes(value)) {
-      if (Big(value).gt(999)) {
-        value = 999
-      } else if (Big(value).lt(1)) {
-        value = 1
-      }
-    }
-    // 不允许填写小数
-    if (value?.toString().includes('.')) {
-      value = value.toString().split('.')[0]
-    }
-    // if (_.isNumber(value)) {
-    //   this.linesPerPage = value
-    // }
-
-    this.linesPerPage = value
-    set(this.config, {
-      linesPerPage: value
-    })
-    if (isChange) {
-      this.handleChangeTableData(this.isAutoFilling)
-    }
   }
 
   @action
@@ -247,10 +205,17 @@ class EditorStore {
   getFilledTableData(tableData) {
     const { autoFillConfig } = this.config
     if (!this.selectedRegion && !autoFillConfig?.checked) return []
-    // if (linesPerPage) {
-    //   return Array(linesPerPage).fill(filledData)
-    // }
-    return []
+    const tr_count = Math.floor(
+      this.remainPageHeihgt / this.computedTableCustomerRowHeight
+    )
+
+    const filledData = {
+      _isEmptyData: true // 表示是填充的空白数据
+    }
+    _.map(tableData[0], (val, key) => {
+      filledData[key] = ''
+    })
+    return Array(tr_count).fill(filledData)
   }
 
   @action.bound
@@ -269,9 +234,7 @@ class EditorStore {
         checked: isAutoFilling
       }
     })
-    const isAutoFillingBool =
-      getAutoFillingConfig(this.isAutoFilling) !== 'manual'
-    if (isAutoFillingBool) {
+    if (isAutoFilling) {
       table.push(...this.getFilledTableData(table))
     } else {
       this.clearExtraTableData(dataKey)
@@ -523,6 +486,7 @@ class EditorStore {
     for (const [key, table] of Object.entries(tableData)) {
       tableData[key] = table.filter(x => !x._isEmptyData)
     }
+    console.log(tableData)
     // this.setAutoFillingConfig(false)
     set(this.mockData, {
       _table: tableData
@@ -680,7 +644,7 @@ class EditorStore {
     // 切换的时候，要把对应table的多余空数据清掉
     this.clearExtraTableData(table.dataKey)
     table.subtotal.show = !table.subtotal.show
-    this.setAutoFillingConfig('manual')
+    this.setAutoFillingConfig(!this.isAutoFilling)
     set(table.subtotal, {
       isSsuQuantity: false,
       isSsuOtQuantity: false
@@ -887,7 +851,7 @@ class EditorStore {
       })
 
       this.clearExtraTableData(dataKey)
-      this.setAutoFillingConfig('manual')
+      this.setAutoFillingConfig(false)
     }
   }
 
@@ -1068,7 +1032,7 @@ class EditorStore {
         }
         // // 用于触发printer更新最新的剩余高度
         // this.setLineHeight(val)
-        this.setAutoFillingConfig('manual')
+        this.setAutoFillingConfig(false)
       }
     }
   }
@@ -1084,11 +1048,6 @@ class EditorStore {
     }
   }
 
-  // 只是用来触发 render，没有任何作用
-  setArrange(val) {
-    this.arrange = val
-  }
-
   @action.bound
   setTableArrange(val) {
     if (this.selectedRegion) {
@@ -1098,7 +1057,6 @@ class EditorStore {
           ...this.config.contents[arr[2]],
           arrange: val
         }
-        this.changeUpdateData()
       }
     }
   }

@@ -1,4 +1,3 @@
-import ContextMenuAutoFilling from '../common/context_menu_auto_filling'
 import i18next from '../../locales'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -25,11 +24,10 @@ class ContextMenu extends React.Component {
     const {
       editStore,
       editStore: {
-        config: { autoFillConfig, linesPerPage }
+        config: { autoFillConfig }
       }
     } = this.props
 
-    editStore.setLinesPerPage(linesPerPage)
     if (autoFillConfig?.checked) {
       editStore.handleChangeTableData(
         autoFillConfig?.checked,
@@ -113,10 +111,12 @@ class ContextMenu extends React.Component {
             </div>
           </>
         )}
-        <ContextMenuAutoFilling
-          isAutoFilling={isAutoFilling}
-          onChangeTableData={this.handleChangeTableData}
-        />
+        <div
+          onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}
+          className={isAutoFilling ? 'active' : ''}
+        >
+          {i18next.t('行数填充')}
+        </div>
       </>
     )
   }
@@ -132,7 +132,6 @@ class ContextMenu extends React.Component {
         <Printer
           key={editStore.computedPrinterKey}
           selected={editStore.selected}
-          linesPerPage={editStore.linesPerPage}
           selectedRegion={editStore.selectedRegion}
           isAutoFilling={editStore.isAutoFilling}
           lineheight={editStore.computedTableCustomerRowHeight}

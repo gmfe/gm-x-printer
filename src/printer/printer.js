@@ -1,10 +1,8 @@
-import Big from 'big.js'
-import { getAutoFillingConfig, getDataKey } from '../../src/util'
 import i18next from '../../locales'
 import React from 'react'
 import { reaction } from 'mobx'
 import classNames from 'classnames'
-import { inject, Observer, observer, Provider } from 'mobx-react'
+import { inject, observer, Provider } from 'mobx-react'
 import PropTypes from 'prop-types'
 import PrinterStore, { TR_BASE_HEIGHT } from './store'
 import Page from './page'
@@ -92,16 +90,10 @@ class Printer extends React.Component {
           nextProps.showIngredientDetail
         )
       }
-      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
-      await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       this.props.printerStore.computedPages()
     }
     /** @decscription 空白行填充补充 */
-    if (
-      nextProps.isAutoFilling !== this.props.isAutoFilling ||
-      nextProps.linesPerPage !== this.props.linesPerPage
-    ) {
-      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
+    if (nextProps.isAutoFilling !== this.props.isAutoFilling) {
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       await this.props.printerStore.setData(nextProps.data)
       await this.props.printerStore.setReady(true)
@@ -113,10 +105,7 @@ class Printer extends React.Component {
       )
     }
     if (nextProps.updateData !== this.props.updateData) {
-      await this.props.printerStore.setLinesPerPage(nextProps.linesPerPage)
-      await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
       this.props.printerStore.setOverallOrder(nextProps.config)
-      await this.props.printerStore.computedPages()
     }
   }
 
@@ -130,17 +119,16 @@ class Printer extends React.Component {
       // 连续打印不需要计算
       if (batchPrintConfig !== 2) {
         printerStore.setReady(true)
-        this.props.printerStore.setLinesPerPage(config.linesPerPage)
-        this.props.printerStore.setAutofillConfig(
-          config.autoFillConfig?.checked || false
-        )
-        /** @decscription 空白行填充补充 */
-        printerStore.computedPages()
         // 开始计算，获取各种数据
         config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
           ? printerStore.computedRowTablePages()
           : printerStore.computedPages()
+        /** @decscription 空白行填充补充 */
+        printerStore.computedPages()
         if (config.autoFillConfig?.checked) {
+          this.props.printerStore.setAutofillConfig(
+            config.autoFillConfig?.checked || false
+          )
           this.props.printerStore.changeTableData()
         }
         // 获取剩余空白高度，传到editor
@@ -149,8 +137,6 @@ class Printer extends React.Component {
       }
       // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
       this.setState({}, () => {
-        // 渲染成功了吗
-        console.log('渲染成功了吗')
         this.props.onReady()
       })
     }
@@ -190,32 +176,20 @@ class Printer extends React.Component {
 
         {_.map(config.contents, (content, index) => {
           switch (content.type) {
-            case 'table': {
-              const dataKey = getDataKey(content.dataKey, content.arrange)
+            case 'table':
               // eslint-disable-next-line no-case-declarations
-              const list = printerStore.data._table[dataKey]
-              // 如果设置了linesPerPage，则只填充linesPerPage行
+              const list = printerStore.data._table[content.dataKey]
               return (
                 <Table
                   key={`contents.table.${index}`}
                   name={`contents.table.${index}`}
                   config={content}
-                  range={{
-                    begin: 0,
-                    end: Number(printerStore.linesPerPage || list?.length || 0),
-                    size: Number(
-                      printerStore.linesPerPage || list?.length || 1
-                    ),
-                    trueBegin: 0,
-                    linesPerPage: printerStore.linesPerPage
-                  }}
+                  range={{ begin: 0, end: list?.length || 0 }}
                   pageIndex={0}
-                  isRenderBefore
                   placeholder={`${i18next.t('区域')} ${index}`}
                   isDeliverType={isDeliverType}
                 />
               )
-            }
 
             default:
               return (
@@ -236,7 +210,7 @@ class Printer extends React.Component {
   }
 
   renderPage() {
-    const { printerStore, isSomeSubtotalTr, onReady } = this.props
+    const { printerStore, isSomeSubtotalTr } = this.props
     const isDeliverType = this.props?.config?.isDeliverType
 
     const {
@@ -247,7 +221,6 @@ class Printer extends React.Component {
       showIngredientDetail,
       pages
     } = printerStore
-    const isAutoFillingBool = getAutoFillingConfig(isAutoFilling) !== 'manual'
     return (
       <>
         {_.map(printerStore.pages, (page, i) => {
@@ -269,26 +242,13 @@ class Printer extends React.Component {
                 const autoFillConfig = config?.autoFillConfig || {}
                 const isAutofillConfig =
                   isLastPage &&
-                  isAutoFillingBool &&
+                  isAutoFilling &&
                   panel.end &&
                   content?.dataKey === autoFillConfig?.dataKey
-                const isMultiPage = content?.dataKey?.includes('multi')
 
-                // 如果设置了linesPerPage，则只填充linesPerPage行
-                let end = panel.end
-
-                let size = panel.size
-                if (!(isMultiPage && content.arrange === 'vertical')) {
-                  if (!printerStore.linesPerPage) {
-                    size = isAutofillConfig
-                      ? panel.size +
-                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
-                      : panel.size
-                    end = isAutofillConfig
-                      ? Number(panel.end) + Number(printerStore.linesPerPage)
-                      : panel.end
-                  }
-                }
+                const end = isAutofillConfig
+                  ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                  : panel.end
 
                 switch (panel.type) {
                   case 'table': {
@@ -322,10 +282,7 @@ class Printer extends React.Component {
                             )}
                             range={{
                               begin: panel.begin,
-                              end: end,
-                              size: panel.pageSize,
-                              page: panel.page,
-                              linesPerPage: panel.linesPerPage
+                              end: end
                             }}
                             placeholder={`${i18next.t('区域')} ${panel.index}`}
                             pageIndex={i}
@@ -343,14 +300,8 @@ class Printer extends React.Component {
                           config={config.contents[panel.index]}
                           range={{
                             begin: panel.begin,
-                            end: end,
-                            size: size || printerStore.linesPerPage,
-                            trueBegin: panel.trueBegin,
-                            pageIndex: panel.pageIndex,
-                            linesPerPage:
-                              panel.linesPerPage || printerStore.linesPerPage
+                            end: end
                           }}
-                          isAutoFilling={isAutoFilling}
                           placeholder={`${i18next.t('区域')} ${panel.index}`}
                           pageIndex={i}
                           isSomeSubtotalTr={isSomeSubtotalTr}
@@ -482,7 +433,6 @@ Printer.propTypes = {
   selected: PropTypes.string,
   selectedRegion: PropTypes.string,
   isAutoFilling: PropTypes.bool,
-  linesPerPage: PropTypes.string,
   lineheight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   data: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
