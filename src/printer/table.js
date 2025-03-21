@@ -264,7 +264,11 @@ class Table extends React.Component {
     if (isMultiPage) {
       const sku2 = {}
       let data2 = {}
-      if (arrange === 'vertical' && printerStore.isDeliverType) {
+      if (
+        arrange === 'vertical' &&
+        printerStore.isDeliverType &&
+        printerStore.isFirstLeftThenRight
+      ) {
         // 当前页数 * 当前行数
         const index = printerStore.lastTableCellCount[name] + i
         if (tableData.length > index) {
@@ -276,7 +280,11 @@ class Table extends React.Component {
       }
       if (!data2?.['序号'] && isAutoFillingText === 'number') {
         // 只有编辑的时候才会用到
-        if (arrange === 'vertical') {
+        if (
+          arrange === 'vertical' &&
+          printerStore.isDeliverType &&
+          printerStore.isFirstLeftThenRight
+        ) {
           const index = printerStore.lastTableCellCount[name] + i + 1
           sku2['序号' + MULTI_SUFFIX] = index
         } else {
@@ -347,7 +355,7 @@ class Table extends React.Component {
     //   }
     // }
     if (printerStore.isDeliverType) {
-      if (arrange === 'vertical') {
+      if (arrange === 'vertical' && printerStore.isFirstLeftThenRight) {
         begin = range.trueBegin
         end = Number(begin) + Number(range.size)
       }

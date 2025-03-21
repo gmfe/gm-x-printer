@@ -161,6 +161,11 @@ class PrinterStore {
     return this.config.tableVerticalStyle || 'leftToRight'
   }
 
+  @computed
+  get isFirstLeftThenRight() {
+    return this.tableVerticalStyle === 'firstLeftThenRight'
+  }
+
   get tableConfig() {
     const { autoFillConfig } = this.config
     const isAutoFilling =
@@ -415,9 +420,7 @@ class PrinterStore {
             const pageCellCounts = []
             const tableCellCounts = []
             const isVertical =
-              isMultiPage &&
-              arrange === 'vertical' &&
-              this.tableVerticalStyle === 'firstLeftThenRight'
+              isMultiPage && arrange === 'vertical' && this.isFirstLeftThenRight
             // 当前真实的 cell index
             let cellIndex = 0
             // 当前 table 渲染了多少行
