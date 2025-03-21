@@ -1,12 +1,10 @@
 /* eslint-disable react/prop-types */
-import { getAutoFillingConfig } from '../util'
 import i18next from '../../locales'
 import React from 'react'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
 import { Printer } from '../printer'
-import ContextMenuAutoFilling from '../common/context_menu_auto_filling'
 
 const blockTypeList = [
   { value: 'rise', text: i18next.t('插入抬头') },
@@ -74,10 +72,12 @@ class ContextMenu extends React.Component {
         >
           {i18next.t('每页合计')}
         </div>
-        <ContextMenuAutoFilling
-          isAutoFilling={isAutoFilling}
-          onChangeTableData={this.handleChangeTableData}
-        />
+        <div
+          onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}
+          className={isAutoFilling ? 'active' : ''}
+        >
+          {i18next.t('行数填充')}
+        </div>
       </>
     )
   }

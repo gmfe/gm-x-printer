@@ -1,6 +1,6 @@
-import ContextMenuAutoFilling from '../common/context_menu_auto_filling'
 import i18next from '../../locales'
 import React from 'react'
+import PropTypes from 'prop-types'
 import CommonContextMenu from '../common/common_context_menu'
 import { inject, observer } from 'mobx-react'
 import _ from 'lodash'
@@ -141,10 +141,12 @@ class ContextMenu extends React.Component {
         >
           {i18next.t('每页合计（套账出库金额）')}
         </div>
-        <ContextMenuAutoFilling
-          isAutoFilling={isAutoFilling}
-          onChangeTableData={this.handleChangeTableData}
-        />
+        <div
+          onClick={this.handleChangeTableData.bind(this, !isAutoFilling)}
+          className={isAutoFilling ? 'active' : ''}
+        >
+          {i18next.t('行数填充')}
+        </div>
       </>
     )
   }
