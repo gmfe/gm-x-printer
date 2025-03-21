@@ -153,6 +153,7 @@ class EditorField extends React.Component {
       tableDataKeyList,
       editStore,
       type,
+      isDeliverType,
       showMergeOption,
       showProductPermutation = true,
       renderExtra
@@ -222,10 +223,32 @@ class EditorField extends React.Component {
                 <Option value='vertical'>{i18next.t('纵向排列')}</Option>
               </Select>
             </Flex>
-
             <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
               {i18next.t('商品排列仅适用于双栏商品设置')}
             </Flex>
+            {editStore.computedTableArrange === 'vertical' && isDeliverType && (
+              <>
+                <Gap height='5px' />
+                <Flex alignCenter>
+                  <Flex alignCenter>{i18next.t('排列样式')}：</Flex>
+                  <Select
+                    className='gm-printer-edit-select'
+                    value={editStore.computedTableVerticalStyle}
+                    onChange={editStore.setTableVerticalStyle}
+                  >
+                    <Option value='leftToRight'>{i18next.t('左右均分')}</Option>
+                    <Option value='firstLeftThenRight'>
+                      {i18next.t('先左后右')}
+                    </Option>
+                  </Select>
+                </Flex>
+                <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                  {i18next.t(
+                    '选择左右均分时，商品将在先左后右的基础上左右平均分配进行显示，以减少空白单元格的情况。选择先左后右时，商品将先填充左侧单元格，随后填充右侧单元格。'
+                  )}
+                </Flex>
+              </>
+            )}
           </>
         )}
         {renderExtra && renderExtra()}
@@ -339,7 +362,8 @@ EditorField.propTypes = {
   showMergeOption: PropTypes.bool,
   /** 是否显示商品排列 */
   showProductPermutation: PropTypes.bool,
-  renderExtra: PropTypes.func
+  renderExtra: PropTypes.func,
+  isDeliverType: PropTypes.bool
 }
 
 export default EditorField

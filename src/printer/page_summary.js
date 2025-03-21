@@ -49,7 +49,7 @@ const PageSummary = props => {
     range,
     printerStore
   } = props
-  const _dataKey = getDataKey(dataKey, arrange)
+  const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
   const summaryConfig = get(config, 'summaryConfig')
 
   const {

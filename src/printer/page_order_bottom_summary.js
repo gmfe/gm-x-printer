@@ -51,7 +51,7 @@ const PageSummary = props => {
     isLastPage,
     range
   } = props
-  const _dataKey = getDataKey(dataKey, arrange)
+  const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
   const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig')
 
   const {

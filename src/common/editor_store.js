@@ -164,6 +164,19 @@ class EditorStore {
     }
   }
 
+  @computed
+  get computedTableVerticalStyle() {
+    return this.config.tableVerticalStyle || 'leftToRight'
+  }
+
+  @action
+  setTableVerticalStyle = value => {
+    this.config = {
+      ...this.config,
+      tableVerticalStyle: value
+    }
+  }
+
   @action
   setTemplateTags(tags) {
     this.templateTags = tags

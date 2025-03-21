@@ -58,7 +58,7 @@ class Table extends React.Component {
     const isShowOrderSummaryPer = !!this.props.config?.allOrderSummaryConfig
       ?.isShowOrderSummaryPer
     // 数据
-    dataKey = getDataKey(dataKey, arrange)
+    dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
     const $table = this.ref.current.querySelector('table')
     const tHead = $table.querySelector('thead')
@@ -231,7 +231,9 @@ class Table extends React.Component {
     }
     const isAutoFillingText = getAutoFillingConfig(printerStore.isAutoFilling)
     const tableData =
-      printerStore.data._table[getDataKey(dataKey, arrange)] || []
+      printerStore.data._table[
+        getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+      ] || []
     const isMultiPage = dataKey?.includes('multi')
     let data = {}
     if (tableData.length > i) {
@@ -298,7 +300,7 @@ class Table extends React.Component {
       isLastPage
     } = this.props
     // 数据
-    dataKey = getDataKey(dataKey, arrange)
+    dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
     // 列
     const columns = this.getColumns()
@@ -605,7 +607,7 @@ class Table extends React.Component {
       placeholder,
       printerStore
     } = this.props
-    dataKey = getDataKey(dataKey, arrange)
+    dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
     const active = printerStore.selectedRegion === name
     return (
