@@ -1,12 +1,14 @@
 import i18next from '../../locales'
-import { action, observable, computed } from 'mobx'
+import { action, observable, computed, toJS, runInAction } from 'mobx'
 import {
   getSumTrHeight,
   isMultiTable,
   getArrayMid,
   caclRowSpanTdPageHeight,
   caclSingleDetailsPageHeight,
-  getOverallOrderTrHeight
+  getOverallOrderTrHeight,
+  getDataKey,
+  getAutoFillingConfig
 } from '../util'
 import _ from 'lodash'
 import Big from 'big.js'
@@ -63,6 +65,9 @@ class PrinterStore {
 
   data = {}
 
+  // 需要存一下 table 最后的行数，双栏的时候要用到
+  @observable lastTableCellCount = {}
+
   // 选中某个东西，具体见 edit/store.js 定义
   @observable
   selected = null
@@ -98,6 +103,11 @@ class PrinterStore {
   @action
   setAutofillConfig(bol) {
     this.isAutoFilling = bol
+  }
+
+  @action
+  setLinesPerPage(linesPerPage) {
+    this.linesPerPage = linesPerPage
   }
 
   @action
@@ -141,9 +151,26 @@ class PrinterStore {
     }
   }
 
+  @computed
+  get isDeliverType() {
+    return this.config.isDeliverType
+  }
+
+  @computed
+  get tableVerticalStyle() {
+    return this.config.tableVerticalStyle || 'leftToRight'
+  }
+
+  @computed
+  get isFirstLeftThenRight() {
+    return this.tableVerticalStyle === 'firstLeftThenRight'
+  }
+
   get tableConfig() {
     const { autoFillConfig } = this.config
-    if (!this.selectedRegion && !autoFillConfig?.checked) return null
+    const isAutoFilling =
+      getAutoFillingConfig(autoFillConfig?.checked) !== 'manual'
+    if (!this.selectedRegion && !isAutoFilling) return null
     const _selectedRegion = this.selectedRegion || autoFillConfig.region || ''
     const arr = _selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
@@ -200,7 +227,7 @@ class PrinterStore {
   getNormalTableBodyHeights(heights, dataKey) {
     if (!this.tableConfig) return heights
 
-    const len = this.tableData.length
+    const len = this.data._table[dataKey].length
     // 如果是已经开了填充配置，回显的heights包括了填充的表格部分，关闭配置时，这种情况就要去掉填充的
     if (_.gt(heights.length, len)) return heights.slice(0, len)
 
@@ -208,10 +235,14 @@ class PrinterStore {
     const isOrderCategroy = dataKey === this.config?.autoFillConfig?.dataKey
     const { customerRowHeight = TR_BASE_HEIGHT } = this.tableConfig
 
-    if (hasEmptyData && !this.isAutoFilling && isOrderCategroy) {
+    const isAutoFillingBool =
+      getAutoFillingConfig(this.isAutoFilling) !== 'manual'
+    console.log('heights', heights)
+
+    if (hasEmptyData && !isAutoFillingBool && isOrderCategroy) {
       // 如果tableData有填充的空数据， 则去掉
       return heights.slice(0, -this.filledTableLen)
-    } else if (this.isAutoFilling && isOrderCategroy) {
+    } else if (isAutoFillingBool && isOrderCategroy) {
       // 如果没有空数据，且isAutofilling是true,即选择了要填充数据
       return [
         ...heights,
@@ -277,6 +308,8 @@ class PrinterStore {
     // debugger
     // 每次先初始化置空
     this.pages = []
+    const isAutoFillingAuto =
+      getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
     // 退出计算! 因为页眉 + 页脚 > currentPageHeight,页面装不下其他东西
@@ -300,7 +333,8 @@ class PrinterStore {
         /**
          * 判断组合商品表格,
          * 因为写死了两个固定的content，页码计算要处理一下
-         */ if (content.id === 'combine' && !this.showCombineSkuDetail) {
+         */
+        if (content.id === 'combine' && !this.showCombineSkuDetail) {
           index++
           continue
         }
@@ -319,12 +353,15 @@ class PrinterStore {
         // 表格原始的高度和宽度信息
         const table = this.tablesInfo[`contents.table.${index}`]
         const {
+          arrange,
           subtotal,
+          allOrderSummaryConfig,
           dataKey,
           /** 本页小计 or 每页合计 */
           summaryConfig,
           overallOrder
         } = content
+        const isMultiPage = dataKey?.includes('multi')
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
         // 如果显示整单合计,那么table高度多预留一行高度
@@ -348,11 +385,18 @@ class PrinterStore {
         let pageAccomodateTableHeight = +new Big(this.pageHeight)
           .minus(currentPageHeight)
           .toFixed(2)
-
-        const heights = this.getNormalTableBodyHeights(
+        let heights = this.getNormalTableBodyHeights(
           table.body.heights,
           dataKey
         )
+        if (this.isDeliverType) {
+          heights = [
+            ...this.getNormalTableBodyHeights(
+              table.body.heights,
+              getDataKey(dataKey, arrange, this.tableVerticalStyle)
+            )
+          ]
+        }
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0
@@ -367,93 +411,388 @@ class PrinterStore {
           /** 去最小的tr高度，用于下面的计算compare,(避免特殊情况：一般来说最小tr——height = 23, 比23还小的不考虑计算) */
           const minHeight = Math.max(getArrayMid(heights), 23)
 
-          /* 遍历表格每一行，填充表格内容 */
-          while (end < heights.length) {
-            currentTableHeight += heights[end]
-            // 用于计算最后一页有footer情况的高度
-            currentPageHeight += heights[end]
-            // 当前页没有多余空间
-            if (currentTableHeight > pageAccomodateTableHeight) {
-              const overHeight = heights[end]
-              // 双栏合计
-              if (dataKey?.includes('multi')) {
-                /** 正是因为添加了这一行，所以超过了 */
-                // 因为超过，所以要退回上一个
-                end--
-              }
-              /** 当前页table渲染完后剩余的高度 */
-              const currentRemainTableHeight = +Big(pageAccomodateTableHeight)
-                .minus(currentTableHeight)
-                .plus(overHeight)
-
-              /**
-               * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
-               * 2. heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
-               * 3. heights[end] 高度超过了 pageAccomodateTableHeight
-               */
-              if (
-                (currentRemainTableHeight / minHeight > 1.5 &&
-                  overHeight / currentRemainTableHeight > 1) ||
-                overHeight > pageAccomodateTableHeight
-              ) {
-                // debugger
-                if (currentRemainTableHeight >= 23) {
-                  const detailsPageHeight = this.computedData(
-                    dataKey,
-                    table,
-                    end,
-                    currentRemainTableHeight
-                  )
-                  // 拆分明细后，同时也要更新body.heights 不能影响后续计算
-                  if (detailsPageHeight.length > 0) {
-                    // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
-                    detailsPageHeight[1] = Math.max(
-                      minHeight,
-                      detailsPageHeight[1]
-                    )
-                    heights.splice(end, 1, ...detailsPageHeight)
-                    end++
-                  }
+          if (this.isDeliverType) {
+            // 如果设置了linesPerPage，则只填充linesPerPage行
+            const linesPerPage = this.config.linesPerPage
+              ? Number(this.config.linesPerPage)
+              : undefined
+            // 页面 cell 数
+            const pageCellCounts = []
+            const tableCellCounts = []
+            const isVertical =
+              isMultiPage && arrange === 'vertical' && this.isFirstLeftThenRight
+            // 当前真实的 cell index
+            let cellIndex = 0
+            // 当前 table 渲染了多少行
+            let tableCellCount = 0
+            // 当前 table 分了几页
+            let pageIndex = 0
+            // 上一页的 table 渲染了几行
+            let lastPageTableCellCount = 0
+            // 截止到上一页的总行数
+            let lastPageTableCellCountAll = 0
+            // 正确的 begin, 用于双栏纵向情况
+            let trueBegin = 0
+            let dataIndex = heights.length
+            // 如果需要自动填充的话，需要计算一下填充行数
+            let dataHeights = [...heights]
+            const cumputeDataIndexAndDataHeights = () => {
+              if (isAutoFillingAuto && linesPerPage) {
+                // 如果填写了linesPerPage && isAutoFillingAuto
+                // 那要把 dataIndex 给填满到 linesPerPage
+                const maxPageIndex = Math.ceil(dataIndex / linesPerPage)
+                dataIndex = +maxPageIndex * +linesPerPage
+                if (isVertical) {
+                  dataIndex =
+                    Math.ceil(dataIndex / (linesPerPage * 2)) *
+                    +(linesPerPage * 2)
+                  dataHeights = [...heights]
                 }
+                // const maxPageIndex = Math.ceil(heights.length / linesPerPage)
+                // dataIndex = +maxPageIndex * +linesPerPage
               }
-              // 第一条极端会有问题
-              if (end !== 0) {
-                page.push({
-                  type: 'table',
-                  index,
-                  begin,
-                  end
-                })
-                // 此页完成任务
-                this.pages.push(page)
-                page = []
-              }
-              // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
-              // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
-              if (tableCount > 1 && end === 0) {
-                this.pages.push(page)
-                page = []
-              }
+            }
+            cumputeDataIndexAndDataHeights()
 
-              begin = end
+            console.log('????', dataHeights, dataIndex)
+
+            // 完成页面后
+            const tablePageComplete = () => {
+              cellIndex = 0
+              pageCellCounts.push(lastPageTableCellCount)
+
               // 开启新一页,重置页面高度
               pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
                 allPagesHaveThisHeight
               )
               currentTableHeight = allTableHaveThisHeight
               currentPageHeight = currentPageMinimumHeight
-            } else {
-              // 有空间，继续做下行
-              end++
-              // 最后一行，把信息加入 page，并轮下一个contents
-              if (end === heights.length) {
-                page.push({
+            }
+            const onLinePerPageComplete = () => {
+              tableCellCounts.push(tableCellCount)
+            }
+
+            /* 遍历表格每一行，填充表格内容 */
+            while (dataIndex > end) {
+              if (end > dataIndex) {
+                break
+              }
+
+              const trueIndex = end - trueBegin
+              let trHeight = dataHeights[end] || minHeight
+              if (isVertical) {
+                trHeight = Math.max(
+                  dataHeights[trueIndex] || minHeight,
+                  minHeight
+                )
+              }
+
+              // 真实的 end 值
+
+              // 当前页没有多余空间
+              // 双栏 & 垂直的话，只判断一次就好了，不需要每次都判断
+              currentTableHeight += trHeight
+              // 用于计算最后一页有footer情况的高度
+              currentPageHeight += trHeight
+              // 当前页数，5-0,11-5
+              const pageSize = end - begin
+              // 当前页 table 的 cell 数
+              let currentPageTableCellCount = pageSize
+
+              // 如果设置了linesPerPage，那么不允许一页的 cell 超过linesPerPage
+              if (linesPerPage) {
+                currentPageTableCellCount =
+                  pageSize > linesPerPage ? linesPerPage : pageSize
+              }
+              // 渲染一行
+              tableCellCount++
+
+              if (currentTableHeight > pageAccomodateTableHeight) {
+                const overHeight = dataHeights[end] || 24
+                // 双栏合计
+                if (isMultiPage && !isVertical && subtotal.show) {
+                  /** 正是因为添加了这一行，所以超过了 */
+                  // 因为超过，所以要退回上一个
+                  end--
+                }
+                /** 当前页table渲染完后剩余的高度 */
+                const currentRemainTableHeight = +Big(pageAccomodateTableHeight)
+                  .minus(currentTableHeight)
+                  .plus(overHeight)
+
+                /**
+                 * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
+                 * 2. heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
+                 * 3. heights[end] 高度超过了 pageAccomodateTableHeight
+                 */
+                if (
+                  (currentRemainTableHeight / minHeight > 1.5 &&
+                    overHeight / currentRemainTableHeight > 1) ||
+                  overHeight > pageAccomodateTableHeight
+                ) {
+                  // debugger
+                  if (currentRemainTableHeight >= 23) {
+                    const detailsPageHeight = this.computedData(
+                      dataKey,
+                      table,
+                      end,
+                      currentRemainTableHeight
+                    )
+                    // 拆分明细后，同时也要更新body.heights 不能影响后续计算
+                    if (detailsPageHeight.length > 0) {
+                      // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
+                      detailsPageHeight[1] = Math.max(
+                        minHeight,
+                        detailsPageHeight[1]
+                      )
+                      heights.splice(end, 1, ...detailsPageHeight)
+                      dataHeights.splice(end, 1, ...detailsPageHeight)
+                      end++
+                    }
+                  }
+                }
+                const nowPage = {
                   type: 'table',
                   index,
                   begin,
+                  trueBegin,
+                  pageIndex,
+                  size: currentPageTableCellCount,
+                  linesPerPage,
                   end
-                })
-                index++
+                }
+                // 第一条极端会有问题
+                if (end !== 0) {
+                  page.push(nowPage)
+                  lastPageTableCellCount = nowPage.size
+                  lastPageTableCellCountAll += lastPageTableCellCount
+                  // 此页完成任务
+                  this.pages.push(page)
+                  page = []
+                  pageIndex++
+                  tablePageComplete()
+                }
+                // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
+                // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
+                if (tableCount > 1 && end === 0) {
+                  this.pages.push(page)
+                  page = []
+                  pageIndex++
+                  tablePageComplete()
+                }
+                trueBegin = trueBegin + currentPageTableCellCount
+                // 这里如果已经超限了，重置一下行数
+                if (linesPerPage && tableCellCount - 1 > linesPerPage) {
+                  tableCellCount = 0
+                } else {
+                  tableCellCount--
+                }
+                if (isVertical) {
+                  end = end + lastPageTableCellCount
+                  // if (linesPerPage) {
+                  //   end++
+                  // }
+                  if (end > dataIndex) {
+                    end = dataIndex
+                  }
+                  begin = end
+                  if (end >= dataIndex) {
+                    runInAction(() => {
+                      this.lastTableCellCount[`contents.table.${index}`] =
+                        Number(nowPage.size) + Number(nowPage.trueBegin)
+                    })
+                    index++
+                  }
+                } else {
+                  begin = end
+                }
+              } else {
+                end++
+                cellIndex++
+                const isEnd = end >= dataIndex
+                // 最后一行，把信息加入 page，并轮下一个contents
+                if (isEnd) {
+                  let nowPageSize =
+                    end - begin > linesPerPage ? linesPerPage : end - begin
+                  if (isVertical) {
+                    nowPageSize = currentPageTableCellCount + 1
+                  }
+                  const emptyCellCount = 0
+                  const nowPage = {
+                    type: 'table',
+                    index,
+                    begin,
+                    trueBegin,
+                    pageIndex,
+                    size: nowPageSize,
+                    // 最后一页的 end 要+1
+                    end: end
+                  }
+                  page.push(nowPage)
+                  lastPageTableCellCount = nowPage.size
+                  lastPageTableCellCountAll += lastPageTableCellCount
+                  this.lastTableCellCount[`contents.table.${index}`] =
+                    Number(nowPage.size) + Number(nowPage.trueBegin)
+                  index++
+                } else {
+                  // 只需要在超过了linesPerPage的情况下，就创建一个新的page，并且将当前的page的数据拼接到新的page中
+                  if (
+                    linesPerPage &&
+                    tableCellCount === linesPerPage &&
+                    this.isDeliverType
+                  ) {
+                    // 当前的 page 和 linesPerPage 应该都等于 linesPerPage
+                    const nowPageSize =
+                      end - begin > linesPerPage ? linesPerPage : end - begin
+                    // if (begin !== 0) {
+                    //   nowPageSize++
+                    // }
+                    const nowPage = {
+                      type: 'table',
+                      index,
+                      begin,
+                      trueBegin,
+                      pageIndex,
+                      size: nowPageSize,
+                      end: end
+                    }
+                    if (isVertical) {
+                      if (!linesPerPage) {
+                        trueBegin++
+                      }
+                    }
+                    if (isMultiPage && isVertical) {
+                      lastPageTableCellCount = nowPage.size
+                      end = end + lastPageTableCellCount
+                      if (end > dataIndex) {
+                        end = dataIndex
+                      }
+                      begin = end
+                    }
+                    if (end >= dataIndex) {
+                      if (isVertical) {
+                        nowPage.end = dataIndex
+                        if (linesPerPage) {
+                          nowPage.size = nowPageSize
+                        }
+                      }
+                      page.push(nowPage)
+                      // nowPage.size = trueBegin - nowPage.trueBegin
+                      this.lastTableCellCount[`contents.table.${index}`] =
+                        Number(nowPage.size) + Number(nowPage.trueBegin)
+                      index++
+                    } else {
+                      // 超限之后新建一页
+                      page.push(nowPage)
+                      lastPageTableCellCount = nowPage.size
+                      // 重新开始
+                      if (!isVertical) {
+                        begin = nowPage.end
+                      }
+                      trueBegin = trueBegin + nowPageSize
+                      // 此页完成任务
+                      this.pages.push(page)
+                      page = []
+                      pageIndex++
+                      tablePageComplete()
+                    }
+                    // 分页完成
+                    onLinePerPageComplete()
+                    tableCellCount = 0
+                    // return
+                  }
+                }
+              }
+            }
+          } else {
+            /* 遍历表格每一行，填充表格内容 */
+            while (end < heights.length) {
+              currentTableHeight += heights[end]
+              // 用于计算最后一页有footer情况的高度
+              currentPageHeight += heights[end]
+              // 当前页没有多余空间
+              if (currentTableHeight > pageAccomodateTableHeight) {
+                const overHeight = heights[end]
+                // 双栏合计
+                if (dataKey?.includes('multi')) {
+                  /** 正是因为添加了这一行，所以超过了 */
+                  // 因为超过，所以要退回上一个
+                  end--
+                }
+                /** 当前页table渲染完后剩余的高度 */
+                const currentRemainTableHeight = +Big(pageAccomodateTableHeight)
+                  .minus(currentTableHeight)
+                  .plus(overHeight)
+
+                /**
+                 * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
+                 * 2. heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
+                 * 3. heights[end] 高度超过了 pageAccomodateTableHeight
+                 */
+                if (
+                  (currentRemainTableHeight / minHeight > 1.5 &&
+                    overHeight / currentRemainTableHeight > 1) ||
+                  overHeight > pageAccomodateTableHeight
+                ) {
+                  // debugger
+                  if (currentRemainTableHeight >= 23) {
+                    const detailsPageHeight = this.computedData(
+                      dataKey,
+                      table,
+                      end,
+                      currentRemainTableHeight
+                    )
+                    // 拆分明细后，同时也要更新body.heights 不能影响后续计算
+                    if (detailsPageHeight.length > 0) {
+                      // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
+                      detailsPageHeight[1] = Math.max(
+                        minHeight,
+                        detailsPageHeight[1]
+                      )
+                      heights.splice(end, 1, ...detailsPageHeight)
+                      end++
+                    }
+                  }
+                }
+                // 第一条极端会有问题
+                if (end !== 0) {
+                  page.push({
+                    type: 'table',
+                    index,
+                    begin,
+                    end
+                  })
+                  // 此页完成任务
+                  this.pages.push(page)
+                  page = []
+                }
+                // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
+                // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
+                if (tableCount > 1 && end === 0) {
+                  this.pages.push(page)
+                  page = []
+                }
+
+                begin = end
+                // 开启新一页,重置页面高度
+                pageAccomodateTableHeight = +new Big(this.pageHeight).minus(
+                  allPagesHaveThisHeight
+                )
+                currentTableHeight = allTableHaveThisHeight
+                currentPageHeight = currentPageMinimumHeight
+              } else {
+                // 有空间，继续做下行
+                end++
+                // 最后一行，把信息加入 page，并轮下一个contents
+                if (end === heights.length) {
+                  page.push({
+                    type: 'table',
+                    index,
+                    begin,
+                    end
+                  })
+                  index++
+                }
               }
             }
           }
@@ -462,11 +801,11 @@ class PrinterStore {
       } else {
         const panelHeight = this.height[`contents.panel.${index}`]
         currentPageHeight += panelHeight
-
         // 当 panel + allPagesHaveThisHeight > 页高度, 停止. 避免死循环
         if (panelHeight + allPagesHaveThisHeight > this.pageHeight) {
           break
         }
+        console.log(this.pageHeight, currentPageHeight, panelHeight)
 
         // 如果是最后一页，必须要加上sign的高度，否则会重叠
         if (index === this.config.contents.length - 1) {
@@ -498,6 +837,8 @@ class PrinterStore {
     this.remainPageHeight = +Big(
       this.pageHeight - safeCurrentPageHeight
     ).toFixed(0)
+
+    // 这里计算一下 table 的空行
   }
 
   @action
@@ -745,6 +1086,30 @@ class PrinterStore {
     }
   }
 
+  templateTableByDelivery(text, data, index, pageIndex) {
+    // 做好保护，出错就返回 text
+    try {
+      const result = _.template(text, {
+        interpolate: /{{([\s\S]+?)}}/g
+      })({
+        ...this.data.common,
+        [i18next.t('列')]: data || this.data._table.orders[index],
+        [i18next.t('当前页码')]: pageIndex + 1,
+        [i18next.t('页码总数')]: this.pages.length,
+        price: price, // 提供一个价格处理函数
+        diyRandom: diyRandom, // 提供一个计算随机数的函数
+        parseFloatFun: parseFloatFun
+      })
+      // 特殊处理配送单双栏打印出现  '元/'
+      if (result === '元/') {
+        return ''
+      }
+      return result
+    } catch (err) {
+      return text
+    }
+  }
+
   templateTable(text, dataKey, index, pageIndex) {
     // 做好保护，出错就返回 text
     try {
@@ -842,11 +1207,14 @@ class PrinterStore {
   @action.bound
   changeTableData() {
     const { autoFillConfig } = this.config
-    if (!this.isAutoFilling) return
+    const isAutoFilling = getAutoFillingConfig(this.isAutoFilling) !== 'manual'
+    if (!isAutoFilling) return
     const dataKey = autoFillConfig?.dataKey
     const table = this.data._table[dataKey]
 
-    table.push(...this.getFilledTableData(table))
+    if (!this.isDeliverType) {
+      table.push(...this.getFilledTableData(table))
+    }
     this.data._table[dataKey] = table
   }
 }

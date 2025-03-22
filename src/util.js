@@ -209,9 +209,11 @@ const getMultiNumber = dataKey => {
 }
 
 // 由于增加了商品排列（横向排列，纵向排列），所以统一用这个获取dataKey
-const getDataKey = (dataKey, arrange) =>
+const getDataKey = (dataKey, arrange, verticalStyle) =>
   arrange === 'vertical' && isMultiTable(dataKey)
-    ? `${dataKey}_vertical`
+    ? `${dataKey}_vertical${
+        verticalStyle === 'firstLeftThenRight' ? '_firstLeftThenRight' : ''
+      }`
     : dataKey
 
 /**
@@ -361,6 +363,19 @@ function regExp(text) {
   const key = match ? match[1] : ''
   return key ? key.split('.')[1] : ''
 }
+
+// 兼容行数是否自动填充的旧数据
+const getAutoFillingConfig = isAutoFilling => {
+  if (isAutoFilling === true) {
+    return 'empty'
+  } else if (isAutoFilling === false) {
+    return 'manual'
+  } else if (isAutoFilling === undefined) {
+    return 'manual'
+  }
+  return isAutoFilling
+}
+
 export {
   getPageHeight,
   getWidth,
@@ -385,5 +400,6 @@ export {
   caclRowSpanTdPageHeight,
   caclSingleDetailsPageHeight,
   getOverallOrderTrHeight,
-  regExp
+  regExp,
+  getAutoFillingConfig
 }
