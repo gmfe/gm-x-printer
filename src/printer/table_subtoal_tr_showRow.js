@@ -73,7 +73,11 @@ const SubtotalTrShowRow = props => {
   } = summaryConfig
 
   // 每页小计
-  if (pageSummaryShow && showPageType === SHOW_WAY_ENUM.row) {
+  if (
+    pageSummaryShow &&
+    showPageType === SHOW_WAY_ENUM.row &&
+    printerStore.ready
+  ) {
     let list = tableData.slice(range.begin, range.end)
     if (
       arrange === 'vertical' &&
