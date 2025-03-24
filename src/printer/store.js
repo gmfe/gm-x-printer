@@ -237,7 +237,6 @@ class PrinterStore {
 
     const isAutoFillingBool =
       getAutoFillingConfig(this.isAutoFilling) !== 'manual'
-    console.log('heights', heights)
 
     if (hasEmptyData && !isAutoFillingBool && isOrderCategroy) {
       // 如果tableData有填充的空数据， 则去掉
@@ -453,8 +452,6 @@ class PrinterStore {
               }
             }
             cumputeDataIndexAndDataHeights()
-
-            console.log('????', dataHeights, dataIndex)
 
             // 完成页面后
             const tablePageComplete = () => {
@@ -805,7 +802,6 @@ class PrinterStore {
         if (panelHeight + allPagesHaveThisHeight > this.pageHeight) {
           break
         }
-        console.log(this.pageHeight, currentPageHeight, panelHeight)
 
         // 如果是最后一页，必须要加上sign的高度，否则会重叠
         if (index === this.config.contents.length - 1) {
