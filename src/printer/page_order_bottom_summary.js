@@ -12,7 +12,7 @@ import { getDataKey, regExp } from '../util'
 import Big from 'big.js'
 import { observer } from 'mobx-react'
 import { get } from 'mobx'
-import { SHOW_WAY_ENUM } from '../config'
+import { MULTI_SUFFIX, SHOW_WAY_ENUM } from '../config'
 /**
  * 每列统计
  * @param key
@@ -32,6 +32,9 @@ const sumCol = (key, dataList, isAllProduct) => {
       }
 
       acc = acc.plus(parseFloat(item[key]) || 0)
+      if (item[key + MULTI_SUFFIX]) {
+        acc = acc.plus(parseFloat(item[key + MULTI_SUFFIX]))
+      }
       return acc
     }, Big(0))
   } catch (e) {
@@ -68,6 +71,7 @@ const PageSummary = props => {
   // 是否是打印全部商品
   // 打印全部商品不需要计算子商品
   const isAllProduct = get(config, 'dataKey') === 'allprod'
+  const isMultiPage = _dataKey?.includes('multi')
   if (
     orderSummaryShow &&
     (config?.allOrderSummaryConfig?.isShowOrderSummaryPer || isLastPage) &&
@@ -103,6 +107,14 @@ const PageSummary = props => {
             />
           )
         })}
+        {isMultiPage && (
+          <td
+            colSpan={99}
+            style={{
+              ...style
+            }}
+          />
+        )}
       </tr>
     )
   }

@@ -171,6 +171,23 @@ class EditorStore {
 
   @action
   setTableVerticalStyle = value => {
+    // 先将分类小计移除，不然会报错
+    if (value === 'firstLeftThenRight') {
+      const arr = this.selected.split('.')
+      const { dataKey } = this.config.contents[arr[2]]
+      const keyArr = dataKey.split('_')
+
+      // 左右均分不支持分类小计，所以需要清除掉分类小计
+      if (keyArr.includes('category')) {
+        keyArr.splice(keyArr.indexOf('category'), 1)
+        const newDataKey = keyArr.join('_')
+        this.config.contents[arr[2]].dataKey = newDataKey
+      } else if (keyArr.includes('fake')) {
+        keyArr.splice(keyArr.indexOf('fake'), 1)
+        const newDataKey = keyArr.join('_')
+        this.config.contents[arr[2]].dataKey = newDataKey
+      }
+    }
     this.config = {
       ...this.config,
       tableVerticalStyle: value

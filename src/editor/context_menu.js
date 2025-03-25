@@ -70,7 +70,7 @@ class ContextMenu extends React.Component {
     }
 
     const {
-      editStore: { isAutoFilling }
+      editStore: { isAutoFilling, config }
     } = this.props
     const arr = name.split('.')
     const { dataKey } = this.props.editStore.config.contents[arr[2]]
@@ -84,6 +84,13 @@ class ContextMenu extends React.Component {
 
     const isfakeOutstockPrice = keyArr.includes('fake')
 
+    // 是否是双栏商品并且纵向排列并且先左后右
+    const isDoubleColumn =
+      isMultiActive &&
+      this.props.editStore.computedTableVerticalStyle ===
+        'firstLeftThenRight' &&
+      this.props.editStore.computedTableArrange === 'vertical'
+
     return (
       <>
         <div
@@ -93,26 +100,28 @@ class ContextMenu extends React.Component {
           {i18next.t('双栏商品')}
         </div>
         {/* 组合商品没做商品分类 */}
-        {!isCombine && (
-          <>
-            <div
-              onClick={this.handleChangeTableDataKey.bind(
-                this,
-                'category',
-                name
-              )}
-              className={isCategoryActive ? 'active' : ''}
-            >
-              {i18next.t('分类小计(出库金额)')}
-            </div>
-            <div
-              onClick={this.handleChangeTableDataKey.bind(this, 'fake', name)}
-              className={isfakeOutstockPrice ? 'active' : ''}
-            >
-              {i18next.t('分类小计(套账出库金额)')}
-            </div>
-          </>
-        )}
+        {!isCombine &&
+          !isDoubleColumn &&
+          config.computedTableVerticalStyle !== 'firstLeftThenRight' && (
+            <>
+              <div
+                onClick={this.handleChangeTableDataKey.bind(
+                  this,
+                  'category',
+                  name
+                )}
+                className={isCategoryActive ? 'active' : ''}
+              >
+                {i18next.t('分类小计(出库金额)')}
+              </div>
+              <div
+                onClick={this.handleChangeTableDataKey.bind(this, 'fake', name)}
+                className={isfakeOutstockPrice ? 'active' : ''}
+              >
+                {i18next.t('分类小计(套账出库金额)')}
+              </div>
+            </>
+          )}
         <ContextMenuAutoFilling
           isAutoFilling={isAutoFilling}
           onChangeTableData={this.handleChangeTableData}
