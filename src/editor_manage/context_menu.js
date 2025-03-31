@@ -70,7 +70,6 @@ class ContextMenu extends React.Component {
         uploadQiniuImage={uploadQiniuImage}
       >
         <Printer
-          key={editStore.computedPrinterKey}
           selected={editStore.selected}
           selectedRegion={editStore.selectedRegion}
           config={editStore.config}
