@@ -6,7 +6,12 @@ const withStore = store => WrapComponent =>
   class extends React.Component {
     constructor(props) {
       super(props)
-      this.store = store
+      /** wms
+       *
+       * 【【lite-wms】打印模板设置 同时打开创建和编辑打印模板页面，返回创建打印模板页面展示为空白】
+       *   https://www.tapd.cn/tapd_fe/63171414/bug/detail/1163171414001057230
+       * 单例导致出问题，这里改成工厂模式，withStore 也要改一下 */
+      this.store = typeof store === 'function' ? store() : store
       this.store.init(props.config, props.mockData, props.templateTags)
     }
 

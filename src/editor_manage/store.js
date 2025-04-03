@@ -26,4 +26,4 @@ class Store extends EditorStore {
   }
 }
 
-export default new Store()
+export default Store
