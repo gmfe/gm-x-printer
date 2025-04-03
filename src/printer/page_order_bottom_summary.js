@@ -41,8 +41,11 @@ const sumCol = (key, dataList, isAllProduct) => {
     result = ''
   }
   const isInt = !arr?.find(item => item?.includes('.'))
+  if (result) {
+    return isInt ? result : result.toFixed(2)
+  }
+  return result
   // 累加各个项时，如果存在小数那么保留两位小数
-  return isInt ? result : result.toFixed(2)
 }
 
 // 最新每页合计
