@@ -187,12 +187,12 @@ class SummarySetting extends React.Component {
                   <Select
                     className='gm-printer-edit-select'
                     value={fields?.[0].name ?? '{{列.商品销售额}}'}
-                    onChange={value =>
+                    onChange={value => {
                       this.handleSelectPageSummaryColumns(
                         'chose_page_summary_field',
                         value
                       )
-                    }
+                    }}
                   >
                     {_.map(newSummaryFields, v => (
                       <Option key={v.value} value={v.value}>
@@ -581,6 +581,7 @@ SummarySetting.propTypes = {
 class EditorSummary extends React.Component {
   render() {
     const { editStore, orderPerSummaryFields, hideOrderSummary } = this.props
+    console.log(this.props)
     if (editStore.computedRegionIsTable) {
       return (
         <SummarySetting
