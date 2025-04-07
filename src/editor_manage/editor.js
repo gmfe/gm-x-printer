@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { Flex } from '../components'
 import { Gap, Title } from '../common/component'
-import editStore from './store'
+import EditStore from './store'
 import { observer, inject } from 'mobx-react'
 import EditorTitle from '../common/editor_title'
 import EditorSelect from '../common/editor_select'
@@ -18,7 +18,8 @@ import EditorAdaptive from '../common/editor_adaptive'
 
 const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
 
-@withStore(editStore)
+/** 单例导致出问题，这里改成工厂模式，withStore 也要改一下 */
+@withStore(() => new EditStore())
 @inject('editStore')
 @observer
 class Editor extends React.Component {
