@@ -38,7 +38,37 @@ const sumCol = (key, dataList, isAllProduct) => {
   }
   const isInt = !arr?.find(item => item?.includes('.'))
   // 累加各个项时，如果存在小数那么保留两位小数
-  return isInt ? result : result.toFixed(2)
+  if (result) {
+    return isInt ? result : result.toFixed(2)
+  }
+  return result
+}
+
+const sumColWithMulti = (key, dataList, isAllProduct) => {
+  let result
+  const arr = []
+  try {
+    result = dataList.reduce((acc, item) => {
+      arr.push(item[key])
+      arr.push(item[`${key}_MULTI_SUFFIX`])
+      if (isAllProduct) {
+        if (item['子商品']) {
+          return acc
+        }
+      }
+      acc = acc.plus(parseFloat(item[key]) || 0)
+      acc = acc.plus(parseFloat(item[`${key}_MULTI_SUFFIX`]) || 0)
+      return acc
+    }, Big(0))
+  } catch (e) {
+    result = ''
+  }
+  const isInt = !arr?.find(item => item?.includes('.'))
+  // 累加各个项时，如果存在小数那么保留两位小数
+  if (result) {
+    return isInt ? result : result.toFixed(2)
+  }
+  return result
 }
 
 // 最新每页合计
@@ -59,21 +89,18 @@ const PageSummary = props => {
     summaryColumns
   } = summaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
-
+  // console.log(props)
   const currentPageTableData = tableData.slice(range.begin, range.end)
 
   // 是否是打印全部商品
   // 打印全部商品不需要计算组合商品
   const isAllProduct = get(config, 'dataKey') === 'allprod'
 
-  if (
-    pageSummaryShow &&
-    showPageType === SHOW_WAY_ENUM.bottom &&
-    printerStore.ready &&
-    !isMultiTable(_dataKey)
-  ) {
+  const isMulti = isMultiTable(_dataKey)
+
+  const renderColumns = () => {
     return (
-      <tr>
+      <>
         {_.map(columns, (col, index) => {
           let html
           // 第一列
@@ -83,7 +110,9 @@ const PageSummary = props => {
             const key = regExp(col.text)
             html =
               summaryColumns.map(text => regExp(text)).includes(key) && key
-                ? sumCol(key, currentPageTableData, isAllProduct)
+                ? !isMulti
+                  ? sumCol(key, currentPageTableData, isAllProduct)
+                  : sumColWithMulti(key, currentPageTableData, isAllProduct)
                 : ' '
           }
           return (
@@ -100,6 +129,18 @@ const PageSummary = props => {
             />
           )
         })}
+      </>
+    )
+  }
+
+  if (
+    pageSummaryShow &&
+    showPageType === SHOW_WAY_ENUM.bottom &&
+    printerStore.ready
+  ) {
+    return (
+      <tr style={isMulti ? { borderRight: '1px solid ' } : {}}>
+        {renderColumns()}
       </tr>
     )
   }
