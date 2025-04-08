@@ -1,8 +1,8 @@
 {
   "name": "gm-x-printer",
-  "version": "1.11.0-beta.8",
+  "version": "1.11.0-beta.9",
   "description": "diy printer",
-  "main": "src/index.js",
+  "main": "lib/main.js",
   "scripts": {
     "precommit": "lint-staged",
     "start": "webpack-dev-server --hot",
