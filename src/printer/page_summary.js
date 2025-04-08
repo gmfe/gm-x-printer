@@ -118,7 +118,6 @@ const PageSummary = props => {
           return (
             <td
               style={{
-                whiteSpace: 'nowrap',
                 fontWeight: 'bold',
                 textAlign: 'center',
                 ...summaryConfig.style
@@ -133,11 +132,7 @@ const PageSummary = props => {
     )
   }
 
-  if (
-    pageSummaryShow &&
-    showPageType === SHOW_WAY_ENUM.bottom &&
-    printerStore.ready
-  ) {
+  if (pageSummaryShow && showPageType === SHOW_WAY_ENUM.bottom) {
     return (
       <tr style={isMulti ? { borderRight: '1px solid ' } : {}}>
         {renderColumns()}
