@@ -43,7 +43,9 @@ class Table extends React.Component {
     if (!this.props.printerStore.tableReady[this.props.name]) {
       // TODO 增加定时器，页面渲染完成后再获取高度 因为如果不设置定时器，页面渲染完成后，table的高度还没有计算出来
       setTimeout(async () => {
-        await this.getTableHeight()
+        if (!this.props.printerStore.tableReady[this.props.name]) {
+          await this.getTableHeight()
+        }
       }, 3000)
     }
   }
@@ -373,8 +375,8 @@ class Table extends React.Component {
                 data-name={getTableColumnName(name, col.index)}
                 draggable
                 style={{
-                  ...getTdStyle(i, col.style),
-                  ...col.headStyle
+                  ...getTdStyle(i, col.style)
+                  // ...col.headStyle
                 }}
                 className={classNames({
                   active:
@@ -579,10 +581,14 @@ class Table extends React.Component {
             }
           })}
           {/* 区域2 */}
-          {this.props?.isDeliverType && (
+          {(this.props?.isDeliverType ||
+            config?.allOrderSummaryConfig ||
+            config.summaryConfig) && (
             <>
               <SubtotalTrShowRow {...this.props} begin={begin} end={end} />
+              {/* /** 每页合计 */}
               <PageSummary {...this.props} />
+              {/* 整单合计 */}
               <PageOrderSummary {...this.props} />
               {config?.allOrderSummaryConfig?.orderSummaryShow &&
                 (config?.allOrderSummaryConfig?.isShowOrderSummaryPer ||

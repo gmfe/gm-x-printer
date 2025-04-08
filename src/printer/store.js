@@ -311,6 +311,7 @@ class PrinterStore {
       getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
+
     // 退出计算! 因为页眉 + 页脚 > currentPageHeight,页面装不下其他东西
     if (allPagesHaveThisHeight > this.pageHeight) {
       return
@@ -363,6 +364,10 @@ class PrinterStore {
         const isMultiPage = dataKey?.includes('multi')
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
+        const allOrderSummaryTrHeight = allOrderSummaryConfig?.isShowOrderSummaryPer
+          ? getSumTrHeight(allOrderSummaryConfig) + 5
+          : 0
+
         // 如果显示整单合计,那么table高度多预留一行高度
         const overallOrderTrHeight = overallOrder?.show
           ? getOverallOrderTrHeight(overallOrder)
@@ -376,7 +381,10 @@ class PrinterStore {
           table.head.height +
           subtotalTrHeight +
           pageSummaryTrHeight +
-          overallOrderTrHeight
+          overallOrderTrHeight +
+          allOrderSummaryTrHeight +
+          5
+
         /** 当前page页面的最小高度 */
         const currentPageMinimumHeight =
           allPagesHaveThisHeight + allTableHaveThisHeight
