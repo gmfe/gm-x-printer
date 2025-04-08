@@ -711,7 +711,16 @@ class PrinterStore {
             }
           } else {
             /* 遍历表格每一行，填充表格内容 */
-            while (end < heights.length) {
+            let length = heights.length
+            /** 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
+            if (allOrderSummaryTrHeight) {
+              length = length - 1
+            }
+
+            if (pageSummaryTrHeight) {
+              length = length - 1
+            }
+            while (end < length) {
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
@@ -789,7 +798,7 @@ class PrinterStore {
                 // 有空间，继续做下行
                 end++
                 // 最后一行，把信息加入 page，并轮下一个contents
-                if (end === heights.length) {
+                if (end === length) {
                   page.push({
                     type: 'table',
                     index,
