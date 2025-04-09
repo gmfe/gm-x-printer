@@ -81,6 +81,7 @@ function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
       <Printer
         config={config}
         data={data}
+        isInPrint
         onReady={() => {
           afterImgAndSvgLoaded(() => {
             if (isPrint) {
