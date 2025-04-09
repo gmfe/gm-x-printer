@@ -99,6 +99,7 @@ const PageSummary = props => {
   const isMulti = isMultiTable(_dataKey)
 
   const renderColumns = () => {
+    console.log(12323333)
     return (
       <>
         {_.map(columns, (col, index) => {
