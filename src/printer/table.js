@@ -43,9 +43,7 @@ class Table extends React.Component {
     if (!this.props.printerStore.tableReady[this.props.name]) {
       // TODO 增加定时器，页面渲染完成后再获取高度 因为如果不设置定时器，页面渲染完成后，table的高度还没有计算出来
       setTimeout(async () => {
-        if (!this.props.printerStore.tableReady[this.props.name]) {
-          await this.getTableHeight()
-        }
+        await this.getTableHeight()
       }, 3000)
     }
   }
