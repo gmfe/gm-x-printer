@@ -416,6 +416,16 @@ class PrinterStore {
         }
         let heightsLength = heights.length
 
+        if (pageSummaryTrHeight && heightsLength >= 2) {
+          heightsLength = heightsLength - 1
+        }
+        /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
+        if (allOrderSummaryTrHeight) {
+          if (heightsLength >= 2) {
+            heightsLength = heightsLength - 1
+          }
+        }
+
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0
@@ -722,16 +732,6 @@ class PrinterStore {
               }
             }
           } else {
-            if (pageSummaryTrHeight && heightsLength >= 2) {
-              heightsLength = heightsLength - 1
-            }
-            /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
-            if (allOrderSummaryTrHeight) {
-              if (heightsLength >= 2) {
-                heightsLength = heightsLength - 1
-              }
-            }
-
             if (heightsLength === 0) {
               index++
               continue
