@@ -80,6 +80,9 @@ class PrinterStore {
   @observable
   isAutoFilling = false
 
+  @observable
+  isInPrint = false
+
   @action
   init(config, data) {
     this.ready = false
@@ -149,6 +152,11 @@ class PrinterStore {
       ...this.tableReady,
       [name]: ready
     }
+  }
+
+  @action
+  setIsInPrint(isInPrint) {
+    this.isInPrint = isInPrint
   }
 
   @computed
@@ -352,6 +360,7 @@ class PrinterStore {
         tableCount++
         // 表格原始的高度和宽度信息
         const table = this.tablesInfo[`contents.table.${index}`]
+
         const {
           arrange,
           subtotal,
@@ -376,14 +385,15 @@ class PrinterStore {
         const pageSummaryTrHeight = summaryConfig?.pageSummaryShow
           ? getSumTrHeight(summaryConfig)
           : 0
+
+        console.log(pageSummaryTrHeight)
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
           table.head.height +
           subtotalTrHeight +
           pageSummaryTrHeight +
           overallOrderTrHeight +
-          allOrderSummaryTrHeight +
-          5
+          allOrderSummaryTrHeight
 
         /** 当前page页面的最小高度 */
         const currentPageMinimumHeight =
@@ -392,6 +402,7 @@ class PrinterStore {
         let pageAccomodateTableHeight = +new Big(this.pageHeight)
           .minus(currentPageHeight)
           .toFixed(2)
+
         let heights = this.getNormalTableBodyHeights(
           table.body.heights,
           dataKey
@@ -404,11 +415,23 @@ class PrinterStore {
             )
           ]
         }
+        let heightsLength = heights.length
+        if (this.isInPrint) {
+          /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
+          if (allOrderSummaryTrHeight) {
+            heightsLength = heightsLength - 1
+          }
+
+          if (pageSummaryTrHeight) {
+            heightsLength = heightsLength - 1
+          }
+        }
+
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
         let end = 0
         // 如果表格没有数据,那么轮一下个content
-        if (heights.length === 0) {
+        if (heightsLength <= 0) {
           index++
         } else {
           /** 仅计算当前页table的累积高度 */
@@ -440,7 +463,7 @@ class PrinterStore {
             let lastPageTableCellCountAll = 0
             // 正确的 begin, 用于双栏纵向情况
             let trueBegin = 0
-            let dataIndex = heights.length
+            let dataIndex = heightsLength
             // 如果需要自动填充的话，需要计算一下填充行数
             let dataHeights = [...heights]
             const cumputeDataIndexAndDataHeights = () => {
@@ -710,17 +733,12 @@ class PrinterStore {
               }
             }
           } else {
+            if (heightsLength === 0) {
+              index++
+              continue
+            }
             /* 遍历表格每一行，填充表格内容 */
-            let length = heights.length
-            /** 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
-            if (allOrderSummaryTrHeight) {
-              length = length - 1
-            }
-
-            if (pageSummaryTrHeight) {
-              length = length - 1
-            }
-            while (end < length) {
+            while (end < heightsLength) {
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
@@ -798,7 +816,7 @@ class PrinterStore {
                 // 有空间，继续做下行
                 end++
                 // 最后一行，把信息加入 page，并轮下一个contents
-                if (end === length) {
+                if (end === heightsLength) {
                   page.push({
                     type: 'table',
                     index,
