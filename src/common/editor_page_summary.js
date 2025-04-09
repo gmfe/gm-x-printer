@@ -581,7 +581,6 @@ SummarySetting.propTypes = {
 class EditorSummary extends React.Component {
   render() {
     const { editStore, orderPerSummaryFields, hideOrderSummary } = this.props
-    console.log(this.props)
     if (editStore.computedRegionIsTable) {
       return (
         <SummarySetting
