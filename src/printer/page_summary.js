@@ -134,7 +134,20 @@ const PageSummary = props => {
 
   if (pageSummaryShow && showPageType === SHOW_WAY_ENUM.bottom) {
     return (
-      <tr style={isMulti ? { borderRight: '1px solid ' } : {}}>
+      <tr
+        style={
+          isMulti
+            ? {
+                borderRight: '1px solid',
+                borderBottom:
+                  !config?.allOrderSummaryConfig?.orderSummaryShow ||
+                  !config?.allOrderSummaryConfig?.isShowOrderSummaryPer
+                    ? '1px solid'
+                    : 'none'
+              }
+            : {}
+        }
+      >
         {renderColumns()}
       </tr>
     )

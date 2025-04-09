@@ -156,7 +156,7 @@ class PrinterStore {
 
   @action
   setIsInPrint(isInPrint) {
-    this.isInPrint = isInPrint
+    this.isInPrint = isInPrint || false
   }
 
   @computed
@@ -386,7 +386,6 @@ class PrinterStore {
           ? getSumTrHeight(summaryConfig)
           : 0
 
-        console.log(pageSummaryTrHeight)
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
           table.head.height +
@@ -416,16 +415,6 @@ class PrinterStore {
           ]
         }
         let heightsLength = heights.length
-        if (this.isInPrint) {
-          /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
-          if (allOrderSummaryTrHeight) {
-            heightsLength = heightsLength - 1
-          }
-
-          if (pageSummaryTrHeight) {
-            heightsLength = heightsLength - 1
-          }
-        }
 
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
@@ -733,6 +722,16 @@ class PrinterStore {
               }
             }
           } else {
+            if (pageSummaryTrHeight && heightsLength >= 2) {
+              heightsLength = heightsLength - 1
+            }
+            /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
+            if (allOrderSummaryTrHeight) {
+              if (heightsLength >= 2) {
+                heightsLength = heightsLength - 1
+              }
+            }
+
             if (heightsLength === 0) {
               index++
               continue

@@ -1439,7 +1439,9 @@ class EditorStore {
       //   this.clearExtraTableData(config.dataKey)
       // }
 
-      this.config = toJS(this.config)
+      this.config = {
+        ...this.config
+      }
     }
 
     // 如果只是勾选要展示的合计类目的选项，则不需要执行以下操作， 否则会重复清空数据
