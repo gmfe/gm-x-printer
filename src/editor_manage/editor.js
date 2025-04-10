@@ -17,9 +17,12 @@ import classNames from 'classnames'
 import EditorAdaptive from '../common/editor_adaptive'
 
 const tableDataKeyList = [{ value: 'orders', text: i18next.t('全部商品') }]
+function createEditorStore() {
+  return new EditStore() // 每次调用都返回新实例
+}
 
 /** 单例导致出问题，这里改成工厂模式，withStore 也要改一下 */
-@withStore(() => new EditStore())
+@withStore(createEditorStore)
 @inject('editStore')
 @observer
 class Editor extends React.Component {
