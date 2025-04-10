@@ -291,9 +291,9 @@ class TextAlign extends React.Component {
   }
 
   render() {
-    const {
-      style: { textAlign }
-    } = this.props
+    const { style } = this.props
+
+    const { textAlign } = style || {}
 
     return (
       <span className='gm-printer-edit-text-align'>

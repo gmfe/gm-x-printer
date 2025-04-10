@@ -114,7 +114,7 @@ class EditorStore {
   init(config, data, templateTags) {
     // batchPrintConfig: 1 不连续打印（一张采购单不出现多供应商）2 连续打印（一张采购单可能出现多个供应商）
     this.config = Object.assign(
-      { batchPrintConfig: 1, templateType: 1 },
+      { batchPrintConfig: 1, templateType: 1, __key__: Date.now() },
       config
     )
     this.originConfig = config
