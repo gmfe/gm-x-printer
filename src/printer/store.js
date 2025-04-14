@@ -333,6 +333,7 @@ class PrinterStore {
     let page = []
     /** 处理配送单有多个表格的情况 */
     let tableCount = 0
+
     /* --- 遍历 contents,将内容动态分配到page --- */
     while (index < this.config.contents.length) {
       const content = this.config.contents[index]
@@ -370,6 +371,7 @@ class PrinterStore {
           summaryConfig,
           overallOrder
         } = content
+
         const isMultiPage = dataKey?.includes('multi')
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
@@ -415,14 +417,23 @@ class PrinterStore {
           ]
         }
         let heightsLength = heights.length
-
-        if (pageSummaryTrHeight && heightsLength >= 2) {
-          heightsLength = heightsLength - 1
-        }
-        /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
-        if (allOrderSummaryTrHeight) {
-          if (heightsLength >= 2) {
+        if (allOrderSummaryConfig.isShowOrderSummaryPer) {
+          /** 这里不用减，好像有点奇怪 */
+          if (pageSummaryTrHeight && heightsLength >= 2) {
             heightsLength = heightsLength - 1
+          }
+          /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
+          if (allOrderSummaryTrHeight) {
+            if (heightsLength >= 2) {
+              heightsLength = heightsLength - 1
+            }
+          }
+        } else if (allOrderSummaryConfig.orderSummaryShow) {
+          if (!allOrderSummaryConfig.isShowOrderSummaryPer) {
+            // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
+            if (pageSummaryTrHeight && heightsLength >= 2) {
+              heightsLength = heightsLength - 1
+            }
           }
         }
 
