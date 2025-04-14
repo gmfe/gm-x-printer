@@ -429,7 +429,10 @@ class PrinterStore {
             }
           }
         } else if (allOrderSummaryConfig.orderSummaryShow) {
-          if (!allOrderSummaryConfig.isShowOrderSummaryPer) {
+          if (
+            !allOrderSummaryConfig.isShowOrderSummaryPer &&
+            summaryConfig.showPageType === 'bottom'
+          ) {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
