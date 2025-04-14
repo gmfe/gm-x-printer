@@ -417,7 +417,7 @@ class PrinterStore {
           ]
         }
         let heightsLength = heights.length
-        if (allOrderSummaryConfig.isShowOrderSummaryPer) {
+        if (allOrderSummaryConfig?.isShowOrderSummaryPer) {
           /** 这里不用减，好像有点奇怪 */
           if (pageSummaryTrHeight && heightsLength >= 2) {
             heightsLength = heightsLength - 1
@@ -428,9 +428,9 @@ class PrinterStore {
               heightsLength = heightsLength - 1
             }
           }
-        } else if (allOrderSummaryConfig.orderSummaryShow) {
+        } else if (allOrderSummaryConfig?.orderSummaryShow) {
           if (
-            !allOrderSummaryConfig.isShowOrderSummaryPer &&
+            !allOrderSummaryConfig?.isShowOrderSummaryPer &&
             summaryConfig.showPageType === 'bottom'
           ) {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
