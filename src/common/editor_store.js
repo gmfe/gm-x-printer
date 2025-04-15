@@ -312,7 +312,9 @@ class EditorStore {
 
   @action
   clearExtraTableData(dataKey) {
-    const newTable = this.mockData._table[dataKey].filter(x => !x._isEmptyData)
+    const newTable = this.mockData._table?.[dataKey]?.filter(
+      x => !x._isEmptyData
+    )
     this.mockData._table[dataKey] = newTable
   }
 
