@@ -397,10 +397,7 @@ class Table extends React.Component {
             if (printerStore.isDeliverType) {
               isItemNone = false
             }
-            const tableData =
-              printerStore.data._table[
-                getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-              ] || []
+            const tableData = printerStore.data._table[dataKey] || []
             if (
               printerStore.isDeliverType &&
               i >= tableData.length &&
