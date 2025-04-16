@@ -270,7 +270,7 @@ class Table extends React.Component {
         printerStore.isFirstLeftThenRight
       ) {
         // 当前页数 * 当前行数
-        const index = printerStore.lastTableCellCount[name] + i
+        const index = range.end + i - range.begin
         if (tableData.length > index) {
           data2 = tableData[index]
         }
@@ -279,12 +279,12 @@ class Table extends React.Component {
         })
       }
       if (isAutoFillingText === 'number') {
+        const index = range.end + i - range.begin + 1
         // 只有编辑的时候才会用到
         if (arrange === 'vertical' && printerStore.isDeliverType) {
-          const index = printerStore.lastTableCellCount[name] + i + 1
           sku2['序号' + MULTI_SUFFIX] = index
         } else {
-          sku2['序号' + MULTI_SUFFIX] = i + i + 2
+          sku2['序号' + MULTI_SUFFIX] = index
         }
       }
       return { ...data, ...sku2 }
@@ -341,7 +341,7 @@ class Table extends React.Component {
       return tdStyle
     }
 
-    let begin = range.begin
+    const begin = range.begin
     let end = range.end
     // 设置的时候显示
     // if (isSetting === true) {
@@ -352,7 +352,7 @@ class Table extends React.Component {
     // }
     if (printerStore.isDeliverType) {
       if (arrange === 'vertical' && printerStore.isFirstLeftThenRight) {
-        begin = range.trueBegin
+        // begin = range.trueBegin
         end = Number(begin) + Number(range.size)
       }
     }
@@ -397,9 +397,13 @@ class Table extends React.Component {
             if (printerStore.isDeliverType) {
               isItemNone = false
             }
+            const tableData =
+              printerStore.data._table[
+                getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+              ] || []
             if (
               printerStore.isDeliverType &&
-              i >= printerStore.lastTableCellCount[name] &&
+              i >= tableData.length &&
               printerStore.isDeliverType
             ) {
               data = {}
