@@ -264,13 +264,14 @@ class Table extends React.Component {
     if (isMultiPage) {
       const sku2 = {}
       let data2 = {}
+      const end = Number(range.begin) + Number(range.size)
       if (
         arrange === 'vertical' &&
         printerStore.isDeliverType &&
         printerStore.isFirstLeftThenRight
       ) {
         // 当前页数 * 当前行数
-        const index = printerStore.lastTableCellCount[name] + i
+        const index = end + i - range.begin
         if (tableData.length > index) {
           data2 = tableData[index]
         }
@@ -281,8 +282,13 @@ class Table extends React.Component {
       if (isAutoFillingText === 'number') {
         // 只有编辑的时候才会用到
         if (arrange === 'vertical' && printerStore.isDeliverType) {
-          const index = printerStore.lastTableCellCount[name] + i + 1
-          sku2['序号' + MULTI_SUFFIX] = index
+          const index = end + i - range.begin + 1
+          if (printerStore.isFirstLeftThenRight) {
+            sku2['序号' + MULTI_SUFFIX] = index
+          } else {
+            sku2['序号' + MULTI_SUFFIX] =
+              printerStore.lastTableCellCount[name] + i + 1
+          }
         } else {
           sku2['序号' + MULTI_SUFFIX] = i + i + 2
         }
@@ -305,7 +311,6 @@ class Table extends React.Component {
     } = this.props
     // 数据
     dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-    const tableData = printerStore.data._table[dataKey] || []
     // 列
     const columns = this.getColumns()
 
@@ -341,7 +346,7 @@ class Table extends React.Component {
       return tdStyle
     }
 
-    let begin = range.begin
+    const begin = range.begin
     let end = range.end
     // 设置的时候显示
     // if (isSetting === true) {
@@ -352,10 +357,11 @@ class Table extends React.Component {
     // }
     if (printerStore.isDeliverType) {
       if (arrange === 'vertical' && printerStore.isFirstLeftThenRight) {
-        begin = range.trueBegin
+        // begin = range.trueBegin
         end = Number(begin) + Number(range.size)
       }
     }
+    console.log(range, begin, end)
     return (
       <table>
         <thead>
@@ -387,7 +393,7 @@ class Table extends React.Component {
         </thead>
         <tbody>
           {_.map(_.range(begin, end), i => {
-            let data = this.getTableData(i)
+            const data = this.getTableData(i)
             const _special = data && data._special
 
             if (_special)
@@ -397,13 +403,14 @@ class Table extends React.Component {
             if (printerStore.isDeliverType) {
               isItemNone = false
             }
-            if (
-              printerStore.isDeliverType &&
-              i >= printerStore.lastTableCellCount[name] &&
-              printerStore.isDeliverType
-            ) {
-              data = {}
-            }
+            // const tableData = printerStore.data._table[dataKey] || []
+            // if (
+            //   printerStore.isDeliverType &&
+            //   i >= tableData.length &&
+            //   printerStore.isDeliverType
+            // ) {
+            //   data = {}
+            // }
             // 将数据根据process_task_command_id进行分组
             const tableDataGroupBy = _.groupBy(data, 'process_task_command_id')
             // 处理数据是数组的情况(生产单据)
