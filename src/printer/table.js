@@ -279,12 +279,17 @@ class Table extends React.Component {
         })
       }
       if (isAutoFillingText === 'number') {
-        const index = range.end + i - range.begin + 1
         // 只有编辑的时候才会用到
         if (arrange === 'vertical' && printerStore.isDeliverType) {
-          sku2['序号' + MULTI_SUFFIX] = index
+          const index = range.end + i - range.begin + 1
+          if (printerStore.isFirstLeftThenRight) {
+            sku2['序号' + MULTI_SUFFIX] = index
+          } else {
+            sku2['序号' + MULTI_SUFFIX] =
+              printerStore.lastTableCellCount[name] + i + 1
+          }
         } else {
-          sku2['序号' + MULTI_SUFFIX] = index
+          sku2['序号' + MULTI_SUFFIX] = i + i + 2
         }
       }
       return { ...data, ...sku2 }
