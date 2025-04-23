@@ -15,6 +15,7 @@ import EditorSpecialTable from './editor_special_table'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
+import EditorPageSummary from '../common/editor_page_summary'
 
 @withStore(editStore)
 @inject('editStore')
@@ -63,6 +64,11 @@ class Editor extends React.Component {
             <EditorAddField addFields={addFields} />
             <Gap height='5px' />
             <EditorSpecialTable addFields={addFields} />
+            {!!addFields?.orderPerSummaryFields && (
+              <EditorPageSummary
+                orderPerSummaryFields={addFields.orderPerSummaryFields}
+              />
+            )}
 
             <div id='gm-printer-tip' />
 

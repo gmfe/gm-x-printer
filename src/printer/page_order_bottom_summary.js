@@ -41,11 +41,14 @@ const sumCol = (key, dataList, isAllProduct) => {
     result = ''
   }
   const isInt = !arr?.find(item => item?.includes('.'))
+  if (result) {
+    return isInt ? result : result.toFixed(2)
+  }
+  return result
   // 累加各个项时，如果存在小数那么保留两位小数
-  return isInt ? result : result.toFixed(2)
 }
 
-// 最新每页合计
+// 最新整单合计
 const PageSummary = props => {
   const {
     config,
@@ -75,8 +78,7 @@ const PageSummary = props => {
   if (
     orderSummaryShow &&
     (config?.allOrderSummaryConfig?.isShowOrderSummaryPer || isLastPage) &&
-    showOrderType === SHOW_WAY_ENUM.bottom &&
-    printerStore.ready
+    showOrderType === SHOW_WAY_ENUM.bottom
   ) {
     return (
       <tr>
@@ -89,7 +91,9 @@ const PageSummary = props => {
             const key = regExp(col.text)
 
             html =
-              summaryOrderColumns.map(text => regExp(text)).includes(key) && key
+              printerStore.ready &&
+              summaryOrderColumns.map(text => regExp(text)).includes(key) &&
+              key
                 ? sumCol(key, currentOrderTableData, isAllProduct)
                 : ' '
           }

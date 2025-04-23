@@ -50,8 +50,9 @@ const SubtotalTrShowRow = props => {
 
         result = a.plus(parseFloat(b[field]) || 0)
         if (b[field + MULTI_SUFFIX]) {
+          const multiRes = parseFloat(b[field + MULTI_SUFFIX] || 0)
           // parseFloat:取值的时候可能返回来的值可能带有单位
-          result = result.plus(parseFloat(b[field + MULTI_SUFFIX]))
+          result = result.plus(_.isNaN(multiRes) ? 0 : multiRes)
         }
         return result
       },

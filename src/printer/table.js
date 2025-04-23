@@ -325,7 +325,7 @@ class Table extends React.Component {
       ] ||
       []
 
-    const getTdStyle = (index, style = {}) => {
+    const getTdStyle = (index, style = {}, headerStyle = {}) => {
       const width = thWidths[index]
       const { fontSize } = style
       let tdStyle = {}
@@ -333,6 +333,17 @@ class Table extends React.Component {
 
       if (!width) return tdStyle
       if (fontSize) minWidth = _.parseInt(fontSize) * 2
+
+      // 如果设置了宽度，则不要再去计算
+      if (headerStyle.width && headerStyle.width !== 'auto') {
+        const styleWidth = _.parseInt(headerStyle.width)
+        minWidth = Math.max(minWidth, styleWidth)
+        tdStyle = {
+          minWidth: minWidth
+        }
+        return tdStyle
+      }
+
       if (width >= 150) {
         tdStyle = {
           minWidth: width
@@ -373,7 +384,7 @@ class Table extends React.Component {
                 data-name={getTableColumnName(name, col.index)}
                 draggable
                 style={{
-                  ...getTdStyle(i, col.style),
+                  ...getTdStyle(i, col.style, col.headStyle),
                   ...col.headStyle
                 }}
                 className={classNames({
@@ -395,7 +406,6 @@ class Table extends React.Component {
           {_.map(_.range(begin, end), i => {
             const data = this.getTableData(i)
             const _special = data && data._special
-
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
             // 如果项为空对象展现一个占满一行的td
@@ -540,7 +550,7 @@ class Table extends React.Component {
                           data-name={getTableColumnName(name, col.index)}
                           style={{
                             wordBreak: 'break-all',
-                            ...getTdStyle(j, col.style),
+                            ...getTdStyle(j, col.style, col.headStyle),
                             ...col.style
                           }}
                           className={classNames({
@@ -579,10 +589,14 @@ class Table extends React.Component {
             }
           })}
           {/* 区域2 */}
-          {this.props?.isDeliverType && (
+          {(this.props?.isDeliverType ||
+            config?.allOrderSummaryConfig ||
+            config.summaryConfig) && (
             <>
               <SubtotalTrShowRow {...this.props} begin={begin} end={end} />
+              {/* /** 每页合计 */}
               <PageSummary {...this.props} />
+              {/* 整单合计 */}
               <PageOrderSummary {...this.props} />
               {config?.allOrderSummaryConfig?.orderSummaryShow &&
                 (config?.allOrderSummaryConfig?.isShowOrderSummaryPer ||
