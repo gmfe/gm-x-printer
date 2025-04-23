@@ -419,7 +419,7 @@ class PrinterStore {
         let heightsLength = heights.length
         /** 开启整页合计 且整页合计是每页显示 */
         if (
-          allOrderSummaryConfig.orderSummaryShow &&
+          allOrderSummaryConfig?.orderSummaryShow &&
           allOrderSummaryConfig?.isShowOrderSummaryPer
         ) {
           /** 这里不用减，好像有点奇怪 */
