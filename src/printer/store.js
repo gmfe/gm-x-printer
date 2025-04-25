@@ -423,12 +423,14 @@ class PrinterStore {
           allOrderSummaryConfig?.isShowOrderSummaryPer
         ) {
           /** 这里不用减，好像有点奇怪 */
-          if (pageSummaryTrHeight && heightsLength >= 2) {
-            heightsLength = heightsLength - 1
+          if (summaryConfig.showPageType === 'bottom') {
+            // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
+            if (pageSummaryTrHeight && heightsLength >= 2) {
+              heightsLength = heightsLength - 1
+            }
           }
-          /** 打印状态下 每页显示合计，height 也会加上这两行，是不对的，应该要减去 */
-          if (allOrderSummaryTrHeight) {
-            if (heightsLength >= 2) {
+          if (allOrderSummaryConfig.showOrderType === 'bottom') {
+            if (allOrderSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
             }
           }
