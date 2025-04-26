@@ -417,6 +417,7 @@ class PrinterStore {
           ]
         }
         let heightsLength = heights.length
+        let isShowOrderSummary = false
         /** 开启整页合计 且整页合计是每页显示 */
         if (
           allOrderSummaryConfig?.orderSummaryShow &&
@@ -427,11 +428,13 @@ class PrinterStore {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowOrderSummary = true
             }
           }
           if (allOrderSummaryConfig.showOrderType === 'bottom') {
             if (allOrderSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowOrderSummary = true
             }
           }
         } else if (allOrderSummaryConfig?.orderSummaryShow) {
@@ -443,6 +446,7 @@ class PrinterStore {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowOrderSummary = true
             }
           }
         } else if (summaryConfig?.pageSummaryShow) {
@@ -451,6 +455,7 @@ class PrinterStore {
             // 如果开了每页合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowOrderSummary = true
             }
           }
         }
@@ -854,6 +859,10 @@ class PrinterStore {
                   })
                   index++
                 }
+              }
+              heightsLength = heights.length
+              if (isShowOrderSummary) {
+                heightsLength = heights.length - 1
               }
             }
           }
