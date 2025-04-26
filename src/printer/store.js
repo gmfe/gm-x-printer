@@ -435,6 +435,7 @@ class PrinterStore {
             }
           }
         } else if (allOrderSummaryConfig?.orderSummaryShow) {
+          /** 整单合计，不是是每页显示整单合计且在每页底部显示 且开启每页显示在每页底部显示 */
           if (
             !allOrderSummaryConfig?.isShowOrderSummaryPer &&
             summaryConfig.showPageType === 'bottom'
@@ -444,7 +445,16 @@ class PrinterStore {
               heightsLength = heightsLength - 1
             }
           }
+        } else if (summaryConfig?.pageSummaryShow) {
+          /** 每页合计， 在每页底部显示 */
+          if (summaryConfig.showPageType === 'bottom') {
+            // 如果开了每页合计，并且显示每页合计，那么height = 1
+            if (pageSummaryTrHeight && heightsLength >= 2) {
+              heightsLength = heightsLength - 1
+            }
+          }
         }
+        console.log(toJS(summaryConfig))
 
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
