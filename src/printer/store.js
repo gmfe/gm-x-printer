@@ -418,6 +418,7 @@ class PrinterStore {
         }
         let heightsLength = heights.length
         let isShowOrderSummary = false
+        let isShowAllOrderSummary = false
         /** 开启整页合计 且整页合计是每页显示 */
         if (
           allOrderSummaryConfig?.orderSummaryShow &&
@@ -434,7 +435,7 @@ class PrinterStore {
           if (allOrderSummaryConfig.showOrderType === 'bottom') {
             if (allOrderSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
-              isShowOrderSummary = true
+              isShowAllOrderSummary = true
             }
           }
         } else if (allOrderSummaryConfig?.orderSummaryShow) {
@@ -459,7 +460,6 @@ class PrinterStore {
             }
           }
         }
-        console.log(toJS(summaryConfig))
 
         // 表格行的索引,用于table.slice(begin, end), 分割到不同页面中
         let begin = 0
@@ -862,7 +862,10 @@ class PrinterStore {
               }
               heightsLength = heights.length
               if (isShowOrderSummary) {
-                heightsLength = heights.length - 1
+                heightsLength--
+              }
+              if (isShowAllOrderSummary) {
+                heightsLength--
               }
             }
           }
