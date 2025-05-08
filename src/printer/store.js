@@ -388,9 +388,10 @@ class PrinterStore {
           ? getSumTrHeight(summaryConfig)
           : 0
 
+        const tableHeadHeight = table.head.height
         // 每个表格都具有的高度
         const allTableHaveThisHeight =
-          table.head.height +
+          tableHeadHeight +
           subtotalTrHeight +
           pageSummaryTrHeight +
           overallOrderTrHeight +
@@ -461,6 +462,8 @@ class PrinterStore {
           const minHeight = Math.max(getArrayMid(heights), 23)
 
           if (this.isDeliverType) {
+            // 是否不显示 table header
+            const isHiddenTableHeader = this.config.isPrintTableHeader === false
             // 如果设置了linesPerPage，则只填充linesPerPage行
             const linesPerPage = this.config.linesPerPage
               ? Number(this.config.linesPerPage)
@@ -514,6 +517,10 @@ class PrinterStore {
               )
               currentTableHeight = allTableHaveThisHeight
               currentPageHeight = currentPageMinimumHeight
+              // 这边如果说隐藏了 header 需要减去 header 的高度
+              if (isHiddenTableHeader) {
+                currentPageHeight -= tableHeadHeight
+              }
             }
             const onLinePerPageComplete = () => {
               tableCellCounts.push(tableCellCount)
@@ -526,7 +533,7 @@ class PrinterStore {
               }
 
               const trueIndex = end - trueBegin
-              let trHeight = dataHeights[end] || minHeight
+              let trHeight = dataHeights[end] || 24
               if (isVertical) {
                 trHeight = Math.max(
                   dataHeights[trueIndex] || minHeight,

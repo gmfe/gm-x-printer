@@ -1451,6 +1451,16 @@ class EditorStore {
     //   this.setAutoFillingConfig(false)
     // }
   }
+
+  @action.bound
+  setIsPrintTableHeader(selected) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        this.config.isPrintTableHeader = selected
+      }
+    }
+  }
 }
 
 export default EditorStore
