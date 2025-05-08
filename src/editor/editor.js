@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Flex } from '../components'
+import { Flex, Switch } from '../components'
 import { Gap, Title } from '../common/component'
 import editStore from './store'
 import { observer, inject } from 'mobx-react'
@@ -59,6 +59,7 @@ class Editor extends React.Component {
       className,
       showNewDate,
       isDeliverType,
+      editStore,
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
@@ -120,6 +121,22 @@ class Editor extends React.Component {
                 orderPerSummaryFields={addFields.orderPerSummaryFields}
               />
             )}
+            {editStore.computedRegionIsTable && (
+              <>
+                <Title title='表头打印' />
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <div>{i18next.t('仅首页打印表头')}：</div>
+                  <Switch
+                    checked={
+                      editStore?.config?.isPrintTableHeader === undefined
+                        ? false
+                        : !editStore?.config?.isPrintTableHeader
+                    }
+                    onChange={editStore.setIsPrintTableHeader}
+                  />
+                </Flex>
+              </>
+            )}
             <div id='gm-printer-tip' />
 
             <div id='gm-printer-modal' />
@@ -143,7 +160,8 @@ Editor.propTypes = {
   showNewDate: PropTypes.bool,
   uploadQiniuImage: PropTypes.func,
   templateTags: PropTypes.array,
-  isDeliverType: PropTypes.bool
+  isDeliverType: PropTypes.bool,
+  editStore: PropTypes.object
 }
 
 Editor.deaultProps = {
