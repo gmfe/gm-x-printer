@@ -47,9 +47,10 @@ class Editor extends React.Component {
       addFields,
       showNewDate,
       uploadQiniuImage,
-      hideCombineSkuSetting
+      hideCombineSkuSetting,
+      editStore
     } = this.props
-
+    console.log(editStore.config)
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -77,6 +78,26 @@ class Editor extends React.Component {
             <EditorTitle onSave={onSave} />
             <Gap height='10px' />
             <EditorSelect />
+            <div className='gm-padding-top-5'>
+              <input
+                type='checkbox'
+                checked={editStore.config.isHideZeroPriceItems}
+                onChange={e =>
+                  editStore.setIsHideZeroPriceItems(e.target.checked)
+                }
+              />
+              <span>&nbsp;{i18next.t('不展示报价为0的商品')}</span>
+            </div>
+            <div className='gm-padding-top-5'>
+              <input
+                checked={editStore.config.isHideRemovedPriceItems}
+                type='checkbox'
+                onChange={e =>
+                  editStore.setIsHideRemovedPriceItems(e.target.checked)
+                }
+              />
+              <span>&nbsp;{i18next.t('不展示已下架的商品')}</span>
+            </div>
             <Gap height='5px' />
             <EditorField
               tableDataKeyList={tableDataKeyList}
@@ -109,7 +130,8 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   showNewDate: PropTypes.bool,
-  hideCombineSkuSetting: PropTypes.bool
+  hideCombineSkuSetting: PropTypes.bool,
+  editStore: PropTypes.object
 }
 
 Editor.deaultProps = {
