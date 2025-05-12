@@ -1457,7 +1457,10 @@ class EditorStore {
     if (this.selectedRegion) {
       const arr = this.selectedRegion.split('.')
       if (arr.includes('table')) {
-        this.config.isPrintTableHeader = selected
+        this.config = {
+          ...this.config,
+          isPrintTableHeader: !selected
+        }
       }
     }
   }
