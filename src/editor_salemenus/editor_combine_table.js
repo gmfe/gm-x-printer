@@ -103,6 +103,26 @@ class TableDetailEditor extends React.Component {
           </Flex>
           <div>{i18next.t('开启后，无基本单位报价的商品不打印')}</div>
         </div>
+        <div className='gm-padding-top-5'>
+          <Flex alignCenter>
+            <div>{i18next.t('不展示报价为0的商品')}：</div>
+            <Switch
+              checked={editStore.config.isHideZeroPriceItems}
+              onChange={e => editStore.setIsHideZeroPriceItems(e)}
+            />
+          </Flex>
+          <div>{i18next.t('开启后，报价为0的商品不打印')}</div>
+        </div>
+        <div className='gm-padding-top-5'>
+          <Flex alignCenter>
+            <div>{i18next.t('不展示已下架的商品')}：</div>
+            <Switch
+              checked={editStore.config.isHideRemovedPriceItems}
+              onChange={e => editStore.setIsHideRemovedPriceItems(e)}
+            />
+          </Flex>
+          <div>{i18next.t('开启后，已下架的商品不打印')}</div>
+        </div>
       </>
     )
   }
