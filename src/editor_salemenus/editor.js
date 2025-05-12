@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Flex } from '../components'
+import { Flex, Switch } from '../components'
 import { Gap, Title } from '../common/component'
 import editStore from './store'
 import { observer, inject } from 'mobx-react'
@@ -78,26 +78,6 @@ class Editor extends React.Component {
             <EditorTitle onSave={onSave} />
             <Gap height='10px' />
             <EditorSelect />
-            <div className='gm-padding-top-5'>
-              <input
-                type='checkbox'
-                checked={editStore.config.isHideZeroPriceItems}
-                onChange={e =>
-                  editStore.setIsHideZeroPriceItems(e.target.checked)
-                }
-              />
-              <span>&nbsp;{i18next.t('不展示报价为0的商品')}</span>
-            </div>
-            <div className='gm-padding-top-5'>
-              <input
-                checked={editStore.config.isHideRemovedPriceItems}
-                type='checkbox'
-                onChange={e =>
-                  editStore.setIsHideRemovedPriceItems(e.target.checked)
-                }
-              />
-              <span>&nbsp;{i18next.t('不展示已下架的商品')}</span>
-            </div>
             <Gap height='5px' />
             <EditorField
               tableDataKeyList={tableDataKeyList}
