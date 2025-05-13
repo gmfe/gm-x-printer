@@ -36,6 +36,15 @@ class Table extends React.Component {
   componentDidMount() {
     if (!this.props.printerStore.ready) {
       this.getTableHeight()
+      let {
+        config: { dataKey, arrange },
+        printerStore
+      } = this.props
+      dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+      const tableData = printerStore.data._table[dataKey] || []
+      if (!tableData.length) {
+        this.props.printerStore.setTableReady(this.props.name, true)
+      }
     }
   }
 
@@ -639,6 +648,7 @@ class Table extends React.Component {
     dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
     const active = printerStore.selectedRegion === name
+    console.log(tableData.length)
     return (
       <div
         ref={this.ref}
