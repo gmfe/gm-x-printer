@@ -91,6 +91,11 @@ declare module 'gm-x-printer' {
     any
   > {}
 
+  class EditorSorting<T extends EditorProps> extends React.Component<
+    T,
+    any
+  > {}
+
   class Printer<T extends PrinterProps> extends React.Component<T, any> {}
 
   class BatchPrinter<T extends BatchPrinterProps> extends React.Component<
@@ -148,6 +153,7 @@ declare module 'gm-x-printer' {
     BatchPrinter,
     EditorMaterialRequisition,
     EditorAfterSales,
+    EditorSorting,
     MULTI_SUFFIX,
     insertCSS,
     getCSS,
