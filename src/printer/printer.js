@@ -465,6 +465,7 @@ class Printer extends React.Component {
     } else {
       // renderBefore ，拿到各种数据，哪些模块哪些内容放合适位置，切割表格
       // renderPage，最终渲染打印的页面
+      console.log(23232222, printerStore.ready)
       return printerStore.ready ? this.renderPage() : this.renderBefore()
     }
   }
