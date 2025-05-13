@@ -19,6 +19,7 @@ import EditEshop from './editor_eshop'
 import EditorManage from './editor_manage'
 import EditorPurchaseDemand from './editor_purchase_demand'
 import EditorSupplierSettleSheet from './editor_manage_supplier_settle_sheet'
+import EditorSorting from './editor_sorting'
 
 import {
   BatchPrinter,
@@ -53,6 +54,7 @@ export {
   EditorManage,
   EditEshop,
   EditorPurchaseDemand,
+  EditorSorting,
   Printer,
   BatchPrinter,
   doPrint,
