@@ -212,20 +212,24 @@ class EditorField extends React.Component {
         {showProductPermutation && (
           <>
             <Gap height='5px' />
-            <Flex alignCenter>
-              <Flex alignCenter>{i18next.t('商品排列')}：</Flex>
-              <Select
-                className='gm-printer-edit-select'
-                value={editStore.computedTableArrange}
-                onChange={editStore.setTableArrange}
-              >
-                <Option value='lateral'>{i18next.t('横向排列')}</Option>
-                <Option value='vertical'>{i18next.t('纵向排列')}</Option>
-              </Select>
-            </Flex>
-            <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
-              {i18next.t('商品排列仅适用于双栏商品设置')}
-            </Flex>
+            {editStore.computedTableArrange === 'vertical' && isDeliverType && (
+              <>
+                <Flex alignCenter>
+                  <Flex alignCenter>{i18next.t('商品排列')}：</Flex>
+                  <Select
+                    className='gm-printer-edit-select'
+                    value={editStore.computedTableArrange}
+                    onChange={editStore.setTableArrange}
+                  >
+                    <Option value='lateral'>{i18next.t('横向排列')}</Option>
+                    <Option value='vertical'>{i18next.t('纵向排列')}</Option>
+                  </Select>
+                </Flex>
+                <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                  {i18next.t('商品排列仅适用于双栏商品设置')}
+                </Flex>
+              </>
+            )}
             {editStore.computedTableArrange === 'vertical' && isDeliverType && (
               <>
                 <Gap height='5px' />

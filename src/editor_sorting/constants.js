@@ -2,7 +2,7 @@ import i18next from '../../locales'
 
 /** 采购明细列 模版TEXT */
 const DETAIL_CONFIG_TEXT = i18next.t(
-  '{{需求数_下单单位}}{{下单单位}}*{{需求数_采购单位}}{{采购单位}}*{{商户名}}*{{商品备注}}*{{对内备注}}'
+  '{{需求数_下单单位}}{{下单单位}}（{{客户名称}}）'
 )
 
 /** 单列换行-下单数（客户） */
@@ -25,6 +25,14 @@ export const SORTING_DETAIL_NO_BREAK = {
   separator: '+',
   specialDetailsKey: '__details',
   text: DETAIL_CONFIG_TEXT
+}
+
+export const SORTING_NO_DETAIL = {
+  head: i18next.t('客户1'),
+  headStyle: { textAlign: 'center' },
+  style: { textAlign: 'left' },
+  text: '{{列.需求数_下单单位_0}}',
+  isCustomerColumn: true
 }
 
 /** 按下单单位汇总的采购明细  */
@@ -64,10 +72,10 @@ export const BLOCK_TYPE_LIST = [
 /** 设置采购明细显示 options */
 
 export const SORTING_DETAIL_SHOW_OPTIONS = [
-  { value: 'sorting', text: i18next.t('多列-每个客户单列') },
-  { value: 'sorting_detail', text: i18next.t('单列换行-下单数（客户）') },
+  { value: 'purchase_no_detail', text: i18next.t('多列-每个客户单列') },
+  { value: 'purchase_last_col', text: i18next.t('单列换行-下单数（客户）') },
   {
-    value: 'sorting_detail_noLineBreak',
+    value: 'purchase_last_col_noLineBreak',
     text: i18next.t('单列不换行-下单数（客户）')
   }
 ]
