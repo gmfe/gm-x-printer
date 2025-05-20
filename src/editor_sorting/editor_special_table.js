@@ -60,11 +60,11 @@ class TableDetailEditor extends React.Component {
 
     return (
       <div>
-        <Title title={i18next.t('设置采购明细')} />
+        <Title title={i18next.t('设置分拣明细')} />
         <Gap />
 
         <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('采购明细')}：</div>
+          <div>{i18next.t('分拣明细')}：</div>
           <Select
             className='gm-printer-edit-select'
             value={dataKey}
