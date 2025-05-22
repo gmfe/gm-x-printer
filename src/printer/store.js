@@ -417,6 +417,8 @@ class PrinterStore {
           ]
         }
         let heightsLength = heights.length
+        let isShowOrderSummary = false
+        let isShowAllOrderSummary = false
         /** 开启整页合计 且整页合计是每页显示 */
         if (
           allOrderSummaryConfig?.orderSummaryShow &&
@@ -427,14 +429,17 @@ class PrinterStore {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowOrderSummary = true
             }
           }
           if (allOrderSummaryConfig.showOrderType === 'bottom') {
             if (allOrderSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowAllOrderSummary = true
             }
           }
         } else if (allOrderSummaryConfig?.orderSummaryShow) {
+          /** 整单合计，不是是每页显示整单合计且在每页底部显示 且开启每页显示在每页底部显示 */
           if (
             !allOrderSummaryConfig?.isShowOrderSummaryPer &&
             summaryConfig.showPageType === 'bottom'
@@ -442,6 +447,16 @@ class PrinterStore {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
+              isShowOrderSummary = true
+            }
+          }
+        } else if (summaryConfig?.pageSummaryShow) {
+          /** 每页合计， 在每页底部显示 */
+          if (summaryConfig.showPageType === 'bottom') {
+            // 如果开了每页合计，并且显示每页合计，那么height = 1
+            if (pageSummaryTrHeight && heightsLength >= 2) {
+              heightsLength = heightsLength - 1
+              isShowOrderSummary = true
             }
           }
         }
@@ -844,6 +859,13 @@ class PrinterStore {
                   })
                   index++
                 }
+              }
+              heightsLength = heights.length
+              if (isShowOrderSummary) {
+                heightsLength--
+              }
+              if (isShowAllOrderSummary) {
+                heightsLength--
               }
             }
           }
