@@ -62,7 +62,7 @@ class ContextMenu extends React.Component {
     const { editStore, mockData, uploadQiniuImage } = this.props
     return (
       <CommonContextMenu
-        renderTableAction={this.renderOrderActionBtn}
+        // renderTableAction={this.renderOrderActionBtn}
         insertBlockList={BLOCK_TYPE_LIST}
         uploadQiniuImage={uploadQiniuImage}
       >
