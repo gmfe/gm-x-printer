@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
-import { Flex } from '../components'
+import { Flex, Switch } from '../components'
 import { Gap, Title } from '../common/component'
 import editStore from './store'
 import { observer, inject } from 'mobx-react'
@@ -47,9 +47,10 @@ class Editor extends React.Component {
       addFields,
       showNewDate,
       uploadQiniuImage,
-      hideCombineSkuSetting
+      hideCombineSkuSetting,
+      editStore
     } = this.props
-
+    console.log(editStore.config)
     return (
       <div className='gm-printer-edit'>
         <Flex className='gm-printer-edit-title-fixed'>
@@ -109,7 +110,8 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   showNewDate: PropTypes.bool,
-  hideCombineSkuSetting: PropTypes.bool
+  hideCombineSkuSetting: PropTypes.bool,
+  editStore: PropTypes.object
 }
 
 Editor.deaultProps = {

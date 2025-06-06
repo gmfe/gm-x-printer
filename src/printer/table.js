@@ -36,6 +36,15 @@ class Table extends React.Component {
   componentDidMount() {
     if (!this.props.printerStore.ready) {
       this.getTableHeight()
+      let {
+        config: { dataKey, arrange },
+        printerStore
+      } = this.props
+      dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+      const tableData = printerStore.data._table[dataKey] || []
+      if (!tableData.length) {
+        this.props.printerStore.setTableReady(this.props.name, true)
+      }
     }
   }
 
@@ -44,7 +53,8 @@ class Table extends React.Component {
       // TODO 增加定时器，页面渲染完成后再获取高度 因为如果不设置定时器，页面渲染完成后，table的高度还没有计算出来
       setTimeout(async () => {
         await this.getTableHeight()
-      }, 3000)
+        this.props.printerStore.setTableReady(this.props.name, true)
+      }, 100)
     }
   }
 
@@ -60,6 +70,7 @@ class Table extends React.Component {
     // 数据
     dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
+    if (!this.ref.current) return
     const $table = this.ref.current.querySelector('table')
     const tHead = $table.querySelector('thead')
     const ths = tHead.querySelectorAll('th') || []
@@ -110,16 +121,8 @@ class Table extends React.Component {
 
     if (isInit) {
       // 重新计算一下tableHeight
-      await new Promise(resolve => setTimeout(resolve, 0))
+      // await new Promise(resolve => setTimeout(resolve, 0))
       await this.getTableHeight(false)
-    } else {
-      // 需要判断一下tableData是否为空
-      // if (!tableData.length) {
-      /** table数据允许为空，如果遇到空的table 数据，导致printer 没有setReady  */
-      setTimeout(() => {
-        this.props.printerStore.setTableReady(this.props.name, true)
-      }, 300)
-      // }
     }
   }
 
@@ -302,7 +305,7 @@ class Table extends React.Component {
   renderDefault() {
     let {
       config,
-      config: { dataKey, arrange, customerRowHeight = 23 },
+      config: { dataKey, arrange, customerRowHeight = 23, isPrintTableHeader },
       name,
       range,
       pageIndex,
@@ -372,9 +375,20 @@ class Table extends React.Component {
         end = Number(begin) + Number(range.size)
       }
     }
+    // 不显示
+    const isHiddenTableHeader =
+      printerStore.config.isPrintTableHeader === false && pageIndex !== 0
     return (
       <table>
-        <thead>
+        <thead
+          style={
+            isHiddenTableHeader
+              ? {
+                  display: 'none'
+                }
+              : undefined
+          }
+        >
           <tr style={{ height: `${customerRowHeight}px` }}>
             {_.map(columns, (col, i) => (
               <th
@@ -634,6 +648,7 @@ class Table extends React.Component {
     dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
     const active = printerStore.selectedRegion === name
+    console.log(tableData.length)
     return (
       <div
         ref={this.ref}

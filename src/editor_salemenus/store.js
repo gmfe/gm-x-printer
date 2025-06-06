@@ -53,6 +53,18 @@ class Store extends EditorStore {
       }
     }
   }
+
+  // 设置是否不展示报价为0的商品
+  @action.bound
+  setIsHideZeroPriceItems(value) {
+    this.config.isHideZeroPriceItems = value
+  }
+
+  // 设置是否不展示已下架的商品
+  @action.bound
+  setIsHideRemovedPriceItems(value) {
+    this.config.isHideRemovedPriceItems = value
+  }
 }
 
 export default new Store()
