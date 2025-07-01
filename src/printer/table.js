@@ -407,7 +407,8 @@ class Table extends React.Component {
                           style={{
                             wordBreak: 'break-all',
                             ...getTdStyle(j, col.style),
-                            ...col.style
+                            ...col.style,
+                            ...col.headStyle
                           }}
                           className={classNames({
                             active:
