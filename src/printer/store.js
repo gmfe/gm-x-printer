@@ -886,10 +886,6 @@ class PrinterStore {
           break
         }
 
-        // 如果是最后一页，必须要加上sign的高度，否则会重叠
-        if (index === this.config.contents.length - 1) {
-          currentPageHeight += this.height?.sign
-        }
         if (currentPageHeight <= this.pageHeight) {
           // 空间充足，把信息加入 page，并轮下一个contents
           page.push({
@@ -898,10 +894,15 @@ class PrinterStore {
           })
 
           index++
+          // 如果是最后一页，必须要加上sign的高度，否则会重叠， 从外面移了进来
+          const isLastContent = index === this.config.contents.length - 1
+
+          if (isLastContent) {
+            currentPageHeight += this.height?.sign
+          }
         } else {
           // 此页空间不足，此页完成任务
           this.pages.push(page)
-
           // 为下一页做准备
           page = []
           currentPageHeight = allPagesHaveThisHeight
