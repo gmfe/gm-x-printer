@@ -37,23 +37,15 @@ const parseFloatFun = a => {
  * @param num 处理小数点末尾零
  * @returns
  */
-export function formatDecimal(num) {
-  // 将输入转为字符串
-  const str = String(num)
-
-  // 检查是否是整数（不含小数点）
-  if (!str.includes('.')) return str
-
-  // 处理小数部分
-  let [integerPart, decimalPart] = str.split('.')
-
-  // 移除小数部分末尾的所有零
-  decimalPart = decimalPart.replace(/0+$/, '')
-
-  // 返回结果
-  return decimalPart.length
-    ? `${integerPart}.${decimalPart}` // 保留非零小数
-    : integerPart // 没有小数部分时只返回整数
+function removeTrailingZeros(str) {
+  const toString = String(str)
+  return toString.replace(
+    /(\d+(?:\.\d+)?)0*([^\d]*)/g,
+    (match, number, unit) => {
+      // 使用parseFloat自动处理，然后转回字符串
+      return parseFloat(number) + (unit || '')
+    }
+  )
 }
 
 /** @description 这个使用来计算的 只能debugger一层一层看  我真的是醉掉😤 */
@@ -1184,7 +1176,7 @@ class PrinterStore {
         price: price,
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        formatDecimal: formatDecimal
+        removeTrailingZeros: removeTrailingZeros
       })
     } catch (err) {
       return text
@@ -1204,7 +1196,7 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        formatDecimal: formatDecimal
+        removeTrailingZeros: removeTrailingZeros
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1230,7 +1222,7 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        formatDecimal: formatDecimal
+        removeTrailingZeros: removeTrailingZeros
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1258,7 +1250,7 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        formatDecimal: formatDecimal
+        removeTrailingZeros: removeTrailingZeros
       })
     } catch (err) {
       return text
