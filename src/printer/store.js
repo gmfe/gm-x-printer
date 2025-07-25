@@ -32,6 +32,22 @@ const parseFloatFun = a => {
   return parseFloat(+a)
 }
 
+/**
+ *
+ * @param num 处理小数点末尾零
+ * @returns
+ */
+function removeTrailingZeros(str) {
+  const toString = String(str)
+  return toString.replace(
+    /(\d+(?:\.\d+)?)0*([^\d]*)/g,
+    (match, number, unit) => {
+      // 使用parseFloat自动处理，然后转回字符串
+      return parseFloat(number) + (unit || '')
+    }
+  )
+}
+
 /** @description 这个使用来计算的 只能debugger一层一层看  我真的是醉掉😤 */
 class PrinterStore {
   @observable ready = false
@@ -1159,7 +1175,8 @@ class PrinterStore {
         [i18next.t('页码总数')]: this.pages.length,
         price: price,
         diyRandom: diyRandom, // 提供一个计算随机数的函数
-        parseFloatFun: parseFloatFun
+        parseFloatFun: parseFloatFun,
+        removeTrailingZeros: removeTrailingZeros
       })
     } catch (err) {
       return text
@@ -1178,7 +1195,8 @@ class PrinterStore {
         [i18next.t('页码总数')]: this.pages.length,
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
-        parseFloatFun: parseFloatFun
+        parseFloatFun: parseFloatFun,
+        removeTrailingZeros: removeTrailingZeros
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1203,7 +1221,8 @@ class PrinterStore {
         [i18next.t('页码总数')]: this.pages.length,
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
-        parseFloatFun: parseFloatFun
+        parseFloatFun: parseFloatFun,
+        removeTrailingZeros: removeTrailingZeros
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1229,7 +1248,9 @@ class PrinterStore {
       })({
         [i18next.t('列')]: item,
         price: price, // 提供一个价格处理函数
-        diyRandom: diyRandom // 提供一个计算随机数的函数
+        diyRandom: diyRandom, // 提供一个计算随机数的函数
+        parseFloatFun: parseFloatFun,
+        removeTrailingZeros: removeTrailingZeros
       })
     } catch (err) {
       return text
