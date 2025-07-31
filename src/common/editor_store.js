@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import i18next from '../../locales'
-import { action, computed, observable, set } from 'mobx'
+import { action, computed, extendObservable, observable, set } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
 import {
@@ -1378,21 +1378,30 @@ class EditorStore {
     }
   }
 
-  @action
+  @action.bound
   changeAllOrderSummaryShow(value) {
     const arr = this.selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
-    tableConfig.allOrderSummaryShow = value
+    // tableConfig.allOrderSummaryShow = value
+
+    extendObservable(tableConfig, {
+      allOrderSummaryShow: value
+    })
     this.config = {
       ...this.config
     }
   }
 
-  @action
+  @action.bound
   changeIsShowAllOrderSummaryPer(value) {
     const arr = this.selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
-    tableConfig.isShowAllOrderSummaryPer = value
+    extendObservable(tableConfig, {
+      isShowAllOrderSummaryPer: value
+    })
+    this.config = {
+      ...this.config
+    }
   }
 
   // 修改文案系列

@@ -12,7 +12,7 @@ import i18next from '../../locales'
 import _ from 'lodash'
 import { has, get } from 'mobx'
 import { Flex, Switch, Select, Option } from '../components'
-import { inject, observer } from 'mobx-react'
+import { inject, Observer, observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 import {
   TEMPLATE_SHOW_STYLE_LIST,
@@ -521,21 +521,29 @@ class SummarySetting extends React.Component {
             )}
           </>
         )}
+        <Observer>
+          {() => (
+            <Flex alignCenter className='gm-padding-top-5'>
+              <div>{i18next.t('分单打印时显示总单合计')}：</div>
+              <Switch
+                checked={allOrderSummaryShow}
+                onChange={this.handleAllOrderSummaryShow}
+              />
+            </Flex>
+          )}
+        </Observer>
 
-        <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('分单打印时显示总单合计')}：</div>
-          <Switch
-            checked={allOrderSummaryShow}
-            onChange={this.handleAllOrderSummaryShow}
-          />
-        </Flex>
-        <Flex alignCenter className='gm-padding-top-5'>
-          <div>{i18next.t('是否每页显示总单合计')}：</div>
-          <Switch
-            checked={isShowAllOrderSummaryPer}
-            onChange={this.handleIsShowAllOrderSummaryPer}
-          />
-        </Flex>
+        <Observer>
+          {() => (
+            <Flex alignCenter className='gm-padding-top-5'>
+              <div>{i18next.t('是否每页显示总单合计')}：</div>
+              <Switch
+                checked={isShowAllOrderSummaryPer}
+                onChange={this.handleIsShowAllOrderSummaryPer}
+              />
+            </Flex>
+          )}
+        </Observer>
       </>
     )
   }
