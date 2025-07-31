@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import i18next from '../../locales'
-import { action, computed, observable, set, toJS } from 'mobx'
+import { action, computed, observable, set } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
 import {
@@ -105,6 +105,12 @@ class EditorStore {
   @observable
   tags = []
 
+  @observable
+  allOrderSummaryShow = false
+
+  @observable
+  isShowAllOrderSummaryPer = false
+
   // 默认table的dataKey
   setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
 
@@ -117,6 +123,9 @@ class EditorStore {
       { batchPrintConfig: 1, templateType: 1, __key__: Date.now() },
       config
     )
+    if (this.config.allOrderSummaryConfig) {
+      console.log(this.config.allOrderSummaryConfig)
+    }
     this.originConfig = config
     this.selected = null
     this.selectedRegion = null
@@ -1369,6 +1378,23 @@ class EditorStore {
     }
   }
 
+  @action
+  changeAllOrderSummaryShow(value) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    tableConfig.allOrderSummaryShow = value
+    this.config = {
+      ...this.config
+    }
+  }
+
+  @action
+  changeIsShowAllOrderSummaryPer(value) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    tableConfig.isShowAllOrderSummaryPer = value
+  }
+
   // 修改文案系列
   @action
   changeSumName(type, value) {
@@ -1462,6 +1488,14 @@ class EditorStore {
           isPrintTableHeader: !selected
         }
       }
+    }
+  }
+
+  @action.bound
+  setPrintedPageOrderAndTotal(value) {
+    this.config.printedPageOrderAndTotal = value
+    this.config = {
+      ...this.config
     }
   }
 }

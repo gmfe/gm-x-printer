@@ -1,5 +1,5 @@
 import i18next from '../../locales'
-import { action, observable, computed, toJS, runInAction } from 'mobx'
+import { action, observable, computed, runInAction } from 'mobx'
 import {
   getSumTrHeight,
   isMultiTable,
@@ -11,6 +11,7 @@ import {
   getAutoFillingConfig
 } from '../util'
 import _ from 'lodash'
+import batchPrinterStore from './batch_printer_store'
 import Big from 'big.js'
 
 export const TR_BASE_HEIGHT = 23
@@ -50,6 +51,14 @@ function removeTrailingZeros(str) {
 
 /** @description 这个使用来计算的 只能debugger一层一层看  我真的是醉掉😤 */
 class PrinterStore {
+  constructor(batchKey) {
+    if (batchKey !== undefined) {
+      this.batchKey = batchKey
+    }
+  }
+
+  @observable batchKey = undefined
+
   @observable ready = false
 
   /**
@@ -82,6 +91,7 @@ class PrinterStore {
   data = {}
 
   // 需要存一下 table 最后的行数，双栏的时候要用到
+  // eslint-disable-next-line gmfe/no-observable-empty-object
   @observable lastTableCellCount = {}
 
   // 选中某个东西，具体见 edit/store.js 定义
@@ -391,9 +401,12 @@ class PrinterStore {
         const isMultiPage = dataKey?.includes('multi')
         // 如果显示每页合计,那么table高度多预留一行高度
         const subtotalTrHeight = subtotal.show ? getSumTrHeight(subtotal) : 0
-        const allOrderSummaryTrHeight = allOrderSummaryConfig?.isShowOrderSummaryPer
+        let allOrderSummaryTrHeight = allOrderSummaryConfig?.isShowOrderSummaryPer
           ? getSumTrHeight(allOrderSummaryConfig) + 5
           : 0
+        if (content?.isShowAllOrderSummaryPer) {
+          allOrderSummaryTrHeight += getSumTrHeight(allOrderSummaryConfig) + 5
+        }
 
         // 如果显示整单合计,那么table高度多预留一行高度
         const overallOrderTrHeight = overallOrder?.show
@@ -455,8 +468,10 @@ class PrinterStore {
               isShowAllOrderSummary = true
             }
           }
+          console.log('都有吗')
         } else if (allOrderSummaryConfig?.orderSummaryShow) {
           /** 整单合计，不是是每页显示整单合计且在每页底部显示 且开启每页显示在每页底部显示 */
+          console.log('整单合计')
           if (
             !allOrderSummaryConfig?.isShowOrderSummaryPer &&
             summaryConfig.showPageType === 'bottom'
@@ -934,6 +949,9 @@ class PrinterStore {
       this.pageHeight - safeCurrentPageHeight
     ).toFixed(0)
 
+    if (this.batchKey !== undefined) {
+      batchPrinterStore.setPageSizes(this.batchKey, this.pages.length)
+    }
     // 这里计算一下 table 的空行
   }
 
@@ -1164,15 +1182,22 @@ class PrinterStore {
     this.pages.push(page)
   }
 
-  template(text, pageIndex) {
+  template(text, pageIndex, total) {
     // 做好保护，出错就返回 text
+    let currentPage = pageIndex + 1
+    let totalPage = this.pages.length
+    if (this.batchKey !== undefined) {
+      currentPage =
+        batchPrinterStore.getPrePageSize(this.batchKey) + currentPage
+      totalPage = total
+    }
     try {
       return _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         ...this.data.common,
-        [i18next.t('当前页码')]: pageIndex + 1,
-        [i18next.t('页码总数')]: this.pages.length,
+        [i18next.t('当前页码')]: currentPage,
+        [i18next.t('页码总数')]: totalPage,
         price: price,
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
@@ -1185,14 +1210,16 @@ class PrinterStore {
 
   templateTableByDelivery(text, data, index, pageIndex) {
     // 做好保护，出错就返回 text
+    const currentPage = pageIndex + 1
+    const totalPage = this.pages.length
     try {
       const result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
         ...this.data.common,
         [i18next.t('列')]: data || this.data._table.orders[index],
-        [i18next.t('当前页码')]: pageIndex + 1,
-        [i18next.t('页码总数')]: this.pages.length,
+        [i18next.t('当前页码')]: currentPage,
+        [i18next.t('页码总数')]: totalPage,
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
