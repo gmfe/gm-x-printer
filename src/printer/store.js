@@ -1186,7 +1186,7 @@ class PrinterStore {
     // 做好保护，出错就返回 text
     let currentPage = pageIndex + 1
     let totalPage = this.pages.length
-    if (this.batchKey !== undefined) {
+    if (this.batchKey !== undefined && this.config.printedPageOrderAndTotal) {
       currentPage =
         batchPrinterStore.getPrePageSize(this.batchKey) + currentPage
       totalPage = total
