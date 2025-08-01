@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
+import batchPrinterStore from './batch_printer_store'
 import Counter from './counter'
 import { inject, observer } from 'mobx-react'
 import { dispatchMsg, getStyleWithDiff } from '../util'
@@ -125,7 +126,11 @@ class Block extends React.Component {
     let content = null
     let specialStyle = null
     if (!type || type === 'text' || type === 'rise') {
-      content = printerStore.template(text, pageIndex)
+      content = printerStore.template(
+        text,
+        pageIndex,
+        batchPrinterStore.totalSize
+      )
     } else if (type === 'line') {
       content = null
     } else if (type === 'image') {

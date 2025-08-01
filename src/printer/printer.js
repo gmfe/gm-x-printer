@@ -3,7 +3,7 @@ import i18next from '../../locales'
 import React from 'react'
 import { reaction } from 'mobx'
 import classNames from 'classnames'
-import { inject, Observer, observer, Provider } from 'mobx-react'
+import { inject, observer, Provider } from 'mobx-react'
 import PropTypes from 'prop-types'
 import PrinterStore, { TR_BASE_HEIGHT } from './store'
 import Page from './page'
@@ -465,7 +465,6 @@ class Printer extends React.Component {
     } else {
       // renderBefore ，拿到各种数据，哪些模块哪些内容放合适位置，切割表格
       // renderPage，最终渲染打印的页面
-      console.log(23232222, printerStore.ready)
       return printerStore.ready ? this.renderPage() : this.renderBefore()
     }
   }
@@ -529,7 +528,7 @@ Printer.defaultProps = {
 class WithStorePrinter extends React.Component {
   constructor(props) {
     super(props)
-    this.printerStore = new PrinterStore()
+    this.printerStore = new PrinterStore(props.batchKey)
   }
 
   render() {

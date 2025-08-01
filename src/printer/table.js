@@ -67,6 +67,9 @@ class Table extends React.Component {
     // 整单合计，如果设置了整单合计，那么需要给第一个单元格增加宽度
     const isShowOrderSummaryPer = !!this.props.config?.allOrderSummaryConfig
       ?.isShowOrderSummaryPer
+    // 总单合计
+    const isShowAllOrderSummaryPer = !!this.props.config?.allOrderSummaryConfig
+      ?.isShowAllOrderSummaryPer
     // 数据
     dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
@@ -95,6 +98,11 @@ class Table extends React.Component {
         widths: _.map(ths, (th, index) => {
           let width = getHeadThWidth(th)
           if (isShowOrderSummaryPer) {
+            if (index === 0) {
+              width = 50
+            }
+          }
+          if (isShowAllOrderSummaryPer) {
             if (index === 0) {
               width = 50
             }
@@ -620,6 +628,16 @@ class Table extends React.Component {
                     printerStore={printerStore}
                   />
                 )}
+              {/* 总单合计 */}
+              {config?.allOrderSummaryShow &&
+                (config?.isShowAllOrderSummaryPer || isLastPage) && (
+                  <AllOrderSummaryRow
+                    range={range}
+                    config={config}
+                    isAll
+                    printerStore={printerStore}
+                  />
+                )}
             </>
           )}
         </tbody>
@@ -648,7 +666,6 @@ class Table extends React.Component {
     dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     const tableData = printerStore.data._table[dataKey] || []
     const active = printerStore.selectedRegion === name
-    console.log(tableData.length)
     return (
       <div
         ref={this.ref}

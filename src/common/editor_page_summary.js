@@ -12,7 +12,7 @@ import i18next from '../../locales'
 import _ from 'lodash'
 import { has, get } from 'mobx'
 import { Flex, Switch, Select, Option } from '../components'
-import { inject, observer } from 'mobx-react'
+import { inject, Observer, observer } from 'mobx-react'
 import PropTypes from 'prop-types'
 import {
   TEMPLATE_SHOW_STYLE_LIST,
@@ -313,6 +313,11 @@ class SummarySetting extends React.Component {
     )
     const {
       allOrderSummaryConfig,
+      // 分单打印时显示总单合计
+      allOrderSummaryShow,
+      // 是否每页显示总单合计
+      isShowAllOrderSummaryPer,
+      allOrderSummaryText,
       subtotal
     } = editStore.computedTableSpecialConfig
     const {
@@ -326,6 +331,7 @@ class SummarySetting extends React.Component {
       orderLowerCaseText,
       isShowOrderSummaryPer
     } = allOrderSummaryConfig
+    console.log(allOrderSummaryConfig)
     // 由于初始末班没有summary 这个object，为了UI响应数据，只能这么写了
     const hasAllOrderSummaryConfig = has(
       editStore.computedTableSpecialConfig,
@@ -516,6 +522,48 @@ class SummarySetting extends React.Component {
             )}
           </>
         )}
+        <Observer>
+          {() => (
+            <Flex alignCenter className='gm-padding-top-5'>
+              <div>{i18next.t('分单打印时显示总单合计')}：</div>
+              <Switch
+                checked={allOrderSummaryShow}
+                onChange={this.handleAllOrderSummaryShow}
+              />
+            </Flex>
+          )}
+        </Observer>
+
+        <Observer>
+          {() =>
+            allOrderSummaryShow ? (
+              <Flex alignCenter className='gm-padding-top-5'>
+                <div>{i18next.t('是否每页显示总单合计')}：</div>
+                <Switch
+                  checked={isShowAllOrderSummaryPer}
+                  onChange={this.handleIsShowAllOrderSummaryPer}
+                />
+              </Flex>
+            ) : (
+              <></>
+            )
+          }
+        </Observer>
+
+        <Observer>
+          {() =>
+            allOrderSummaryShow ? (
+              <ShowInputText
+                value={allOrderSummaryText}
+                onChange={this.handleSumName}
+                type='all_order_summary_text'
+                text='总单合计'
+              />
+            ) : (
+              <></>
+            )
+          }
+        </Observer>
       </>
     )
   }
@@ -553,6 +601,16 @@ class SummarySetting extends React.Component {
   handleIsShowPerOrderSummary = isShowOrderSummaryPer => {
     this.props.editStore.changeUpdateData()
     this.setOrderSummaryConfig({ isShowOrderSummaryPer })
+  }
+
+  handleAllOrderSummaryShow = allOrderSummaryShow => {
+    this.props.editStore.changeAllOrderSummaryShow(allOrderSummaryShow)
+  }
+
+  handleIsShowAllOrderSummaryPer = isShowAllOrderSummaryPer => {
+    this.props.editStore.changeIsShowAllOrderSummaryPer(
+      isShowAllOrderSummaryPer
+    )
   }
 
   render() {

@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import i18next from '../../locales'
-import { action, computed, observable, set, toJS } from 'mobx'
+import { action, computed, extendObservable, observable, set } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
 import {
@@ -105,6 +105,12 @@ class EditorStore {
   @observable
   tags = []
 
+  @observable
+  allOrderSummaryShow = false
+
+  @observable
+  isShowAllOrderSummaryPer = false
+
   // 默认table的dataKey
   setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
 
@@ -117,6 +123,9 @@ class EditorStore {
       { batchPrintConfig: 1, templateType: 1, __key__: Date.now() },
       config
     )
+    if (this.config.allOrderSummaryConfig) {
+      console.log(this.config.allOrderSummaryConfig)
+    }
     this.originConfig = config
     this.selected = null
     this.selectedRegion = null
@@ -1369,6 +1378,44 @@ class EditorStore {
     }
   }
 
+  @action.bound
+  changeAllOrderSummaryShow(value) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    // tableConfig.allOrderSummaryShow = value
+
+    extendObservable(tableConfig, {
+      allOrderSummaryShow: value
+    })
+    this.config = {
+      ...this.config
+    }
+  }
+
+  @action.bound
+  changeIsShowAllOrderSummaryPer(value) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    extendObservable(tableConfig, {
+      isShowAllOrderSummaryPer: value
+    })
+    this.config = {
+      ...this.config
+    }
+  }
+
+  @action.bound
+  changeAllOrderSummaryText(value) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    extendObservable(tableConfig, {
+      allOrderSummaryText: value
+    })
+    this.config = {
+      ...this.config
+    }
+  }
+
   // 修改文案系列
   @action
   changeSumName(type, value) {
@@ -1397,6 +1444,9 @@ class EditorStore {
       case 'order_big':
         this.order_big = value
         this.setOrderSummaryConfig({ orderUpperCaseText: value })
+        break
+      case 'all_order_summary_text':
+        this.changeAllOrderSummaryText(value)
         break
       default:
         break
@@ -1462,6 +1512,16 @@ class EditorStore {
           isPrintTableHeader: !selected
         }
       }
+    }
+  }
+
+  @action.bound
+  setPrintedPageOrderAndTotal(value) {
+    extendObservable(this.config, {
+      printedPageOrderAndTotal: value
+    })
+    this.config = {
+      ...this.config
     }
   }
 }

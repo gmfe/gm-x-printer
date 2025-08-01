@@ -4,7 +4,7 @@ import _ from 'lodash'
 import { Flex, Switch } from '../components'
 import { Gap, Title } from '../common/component'
 import editStore from './store'
-import { observer, inject } from 'mobx-react'
+import { observer, inject, Observer } from 'mobx-react'
 import EditorTitle from '../common/editor_title'
 import EditorSelect from '../common/editor_select'
 import EditorField from '../common/editor_edit_field'
@@ -111,6 +111,22 @@ class Editor extends React.Component {
             {/* 自适应页面内容开关 */}
             <EditorAdaptive />
             <Gap height='5px' />
+            <Observer>
+              {() => (
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <div>{i18next.t('页码始终按打印顺序和打印总页数展示')}：</div>
+                  <Switch
+                    checked={
+                      editStore?.config?.printedPageOrderAndTotal === undefined
+                        ? false
+                        : editStore?.config?.printedPageOrderAndTotal
+                    }
+                    onChange={editStore.setPrintedPageOrderAndTotal}
+                  />
+                </Flex>
+              )}
+            </Observer>
+            <Gap height='5px' />
             {/* 配送单特殊设置 */}
             {!!addFields?.specialFields && (
               <EditorSpacialSetting addFields={addFields} />
@@ -158,6 +174,7 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   showNewDate: PropTypes.bool,
+  className: PropTypes.string,
   uploadQiniuImage: PropTypes.func,
   templateTags: PropTypes.array,
   isDeliverType: PropTypes.bool,
