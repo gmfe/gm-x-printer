@@ -317,6 +317,7 @@ class SummarySetting extends React.Component {
       allOrderSummaryShow,
       // 是否每页显示总单合计
       isShowAllOrderSummaryPer,
+      allOrderSummaryText,
       subtotal
     } = editStore.computedTableSpecialConfig
     const {
@@ -534,15 +535,30 @@ class SummarySetting extends React.Component {
         </Observer>
 
         <Observer>
-          {() => (
-            <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('是否每页显示总单合计')}：</div>
-              <Switch
-                checked={isShowAllOrderSummaryPer}
-                onChange={this.handleIsShowAllOrderSummaryPer}
+          {() =>
+            allOrderSummaryShow && (
+              <Flex alignCenter className='gm-padding-top-5'>
+                <div>{i18next.t('是否每页显示总单合计')}：</div>
+                <Switch
+                  checked={isShowAllOrderSummaryPer}
+                  onChange={this.handleIsShowAllOrderSummaryPer}
+                />
+              </Flex>
+            )
+          }
+        </Observer>
+
+        <Observer>
+          {() =>
+            allOrderSummaryShow && (
+              <ShowInputText
+                value={allOrderSummaryText}
+                onChange={this.handleSumName}
+                type='all_order_summary_text'
+                text='总单合计'
               />
-            </Flex>
-          )}
+            )
+          }
         </Observer>
       </>
     )

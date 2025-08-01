@@ -1404,6 +1404,18 @@ class EditorStore {
     }
   }
 
+  @action.bound
+  changeAllOrderSummaryText(value) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    extendObservable(tableConfig, {
+      allOrderSummaryText: value
+    })
+    this.config = {
+      ...this.config
+    }
+  }
+
   // 修改文案系列
   @action
   changeSumName(type, value) {
@@ -1432,6 +1444,9 @@ class EditorStore {
       case 'order_big':
         this.order_big = value
         this.setOrderSummaryConfig({ orderUpperCaseText: value })
+        break
+      case 'all_order_summary_text':
+        this.changeAllOrderSummaryText(value)
         break
       default:
         break
@@ -1502,7 +1517,9 @@ class EditorStore {
 
   @action.bound
   setPrintedPageOrderAndTotal(value) {
-    this.config.printedPageOrderAndTotal = value
+    extendObservable(this.config, {
+      printedPageOrderAndTotal: value
+    })
     this.config = {
       ...this.config
     }

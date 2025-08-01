@@ -122,7 +122,9 @@ const AllOrderSummary = props => {
             textAlign: 'center'
           }}
           dangerouslySetInnerHTML={{
-            __html: isAll ? '总单合计' : orderSummaryText
+            __html: isAll
+              ? config?.allOrderSummaryText || '总单合计'
+              : orderSummaryText
           }}
         />
         <td
