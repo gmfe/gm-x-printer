@@ -17,6 +17,7 @@ import { coverDigit2Uppercase, getDataKey } from '../util'
 import { get } from 'mobx'
 const AllOrderSummary = props => {
   const {
+    isAll,
     config,
     config: { dataKey, arrange, subtotal },
     printerStore
@@ -24,7 +25,9 @@ const AllOrderSummary = props => {
 
   const tableData =
     printerStore.data._table[
-      getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+      isAll
+        ? 'allprod'
+        : getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     ] || []
   // 计算合计
   const sumData = (list, field, isAllProduct) => {
@@ -61,7 +64,7 @@ const AllOrderSummary = props => {
   } = allOrderSummaryConfig
   // 每页小计
   if (
-    orderSummaryShow &&
+    (orderSummaryShow || (isAll && config?.allOrderSummaryShow)) &&
     showOrderType === SHOW_WAY_ENUM.row &&
     printerStore.ready
   ) {
@@ -119,7 +122,9 @@ const AllOrderSummary = props => {
             textAlign: 'center'
           }}
           dangerouslySetInnerHTML={{
-            __html: orderSummaryText
+            __html: isAll
+              ? config?.allOrderSummaryText || '总单合计'
+              : orderSummaryText
           }}
         />
         <td
@@ -138,6 +143,7 @@ const AllOrderSummary = props => {
   }
 }
 AllOrderSummary.propTypes = {
+  isAll: PropTypes.bool,
   config: PropTypes.object.isRequired,
   range: PropTypes.object.isRequired,
   printerStore: PropTypes.object
