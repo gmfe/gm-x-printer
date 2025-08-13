@@ -45,7 +45,7 @@ class ContextMenu extends React.Component {
    */
   hasSubtotalBtn = name => {
     if (!name) return false
-    const noSubtotalList = ['abnormal', 'abnormalDetails']
+    const noSubtotalList = ['abnormal', 'abnormalDetails', 'afterSale']
     const arr = name.split('.')
     if (_.includes(arr, 'table')) {
       const dataKey = this.props.editStore.config.contents[arr[2]].dataKey
