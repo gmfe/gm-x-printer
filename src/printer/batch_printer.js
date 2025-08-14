@@ -23,7 +23,7 @@ class BatchPrinter extends React.Component {
       <Printer
         isInPrint
         key={i}
-        batchKey={i}
+        batchKey={`${(data?.batchKey || '') + '-' + i}`}
         data={data}
         config={config}
         onReady={this.handleReady}

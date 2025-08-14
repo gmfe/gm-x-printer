@@ -114,7 +114,9 @@ class Editor extends React.Component {
             <Observer>
               {() => (
                 <Flex alignCenter className='gm-padding-top-5'>
-                  <div>{i18next.t('页码始终按打印顺序和打印总页数展示')}：</div>
+                  <div>
+                    {i18next.t('页码始终按打印顺序和打印订单总页数展示')}：
+                  </div>
                   <Switch
                     checked={
                       editStore?.config?.printedPageOrderAndTotal === undefined
