@@ -1182,14 +1182,15 @@ class PrinterStore {
     this.pages.push(page)
   }
 
-  template(text, pageIndex, total) {
+  template(text, pageIndex, totalMap) {
     // 做好保护，出错就返回 text
     let currentPage = pageIndex + 1
     let totalPage = this.pages.length
     if (this.batchKey !== undefined && this.config.printedPageOrderAndTotal) {
+      const [id] = this.batchKey.split('-')
       currentPage =
         batchPrinterStore.getPrePageSize(this.batchKey) + currentPage
-      totalPage = total
+      totalPage = totalMap?.[id]
     }
     try {
       return _.template(text, {

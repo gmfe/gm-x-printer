@@ -129,7 +129,7 @@ class Block extends React.Component {
       content = printerStore.template(
         text,
         pageIndex,
-        batchPrinterStore.totalSize
+        batchPrinterStore.totalSizes
       )
     } else if (type === 'line') {
       content = null
