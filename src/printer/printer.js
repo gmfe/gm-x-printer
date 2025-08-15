@@ -163,7 +163,6 @@ class Printer extends React.Component {
         this.props.onReady()
       })
     }
-
     if (Object.keys(printerStore.tableReady).length === 0) {
       compute()
     } else {
@@ -175,8 +174,14 @@ class Printer extends React.Component {
           )
           if (tableIsReady) {
             compute()
-            disposer()
+            if (disposer) {
+              disposer()
+            }
           }
+        },
+        {
+          fireImmediately: true,
+          delay: 500
         }
       )
     }
