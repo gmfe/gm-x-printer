@@ -200,6 +200,12 @@ class PrinterStore {
     return this.tableVerticalStyle === 'firstLeftThenRight'
   }
 
+  // 是否是根据单据计算页数
+  @computed
+  get isPrintedPageOrderAndTotal() {
+    return this.batchKey !== undefined && this.config.printedPageOrderAndTotal
+  }
+
   get tableConfig() {
     const { autoFillConfig } = this.config
     const isAutoFilling =

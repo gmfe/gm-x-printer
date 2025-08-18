@@ -160,7 +160,15 @@ class Printer extends React.Component {
       }
       // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
       this.setState({}, () => {
-        this.props.onReady()
+        // 这里需要等计算完成渲染完成之后
+        if (this.props?.printerStore?.isPrintedPageOrderAndTotal) {
+          setTimeout(() => {
+            this.props.onReady()
+          }, 100)
+        } else {
+          // 这里如果需要计算
+          this.props.onReady()
+        }
       })
     }
     if (Object.keys(printerStore.tableReady).length === 0) {
