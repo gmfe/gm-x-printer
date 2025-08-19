@@ -22,11 +22,10 @@ const Sign = props => (
     {...props}
     style={{
       ...props.style,
-      position: 'absolute',
+      position: props?.isAdaptive ? 'relative' : 'absolute',
       left: 0,
-      right: 0,
+      right: 0
       // 开启自适应的话，则重置bottom
-      bottom: props.isAdaptive ? 'unset' : props.style?.bottom
     }}
     name='sign'
     placeholder={i18next.t('签名')}
@@ -43,11 +42,11 @@ const Footer = props => (
     {...props}
     style={{
       ...props.style,
-      position: 'absolute',
+      position: props?.isAdaptive ? 'relative' : 'absolute',
       left: 0,
       right: 0,
       // 开启自适应的话，则重置bottom
-      bottom: props.isAdaptive ? 'unset' : props.style?.bottom,
+      bottom: 0
     }}
     name='footer'
     placeholder={i18next.t('页脚')}
