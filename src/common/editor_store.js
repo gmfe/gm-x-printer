@@ -112,7 +112,7 @@ class EditorStore {
   isShowAllOrderSummaryPer = false
 
   // 默认table的dataKey
-  setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
+  setTableDataKeyEffect() { } // 改变dataKey后,做的副作用操作
 
   defaultTableSubtotal = { show: false }
 
@@ -212,6 +212,15 @@ class EditorStore {
   @action
   toggleIsAdaptive(isAdaptive) {
     this.config.sign.isAdaptive = isAdaptive ?? !this.config?.sign.isAdaptive
+    // 这里是为了让config修改后生效
+    this.config = { ...this.config }
+  }
+
+  /** 切换自适应 */
+  @action
+  toggleIsFooterAdaptive(isAdaptive) {
+    this.config.footer.isAdaptive =
+      isAdaptive ?? !this.config?.footer.isAdaptive
     // 这里是为了让config修改后生效
     this.config = { ...this.config }
   }

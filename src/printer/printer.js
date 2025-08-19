@@ -22,11 +22,10 @@ const Sign = props => (
     {...props}
     style={{
       ...props.style,
-      position: 'absolute',
+      position: props?.isAdaptive ? 'relative' : 'absolute',
       left: 0,
-      right: 0,
+      right: 0
       // 开启自适应的话，则重置bottom
-      bottom: props.isAdaptive ? 'unset' : props.style?.bottom
     }}
     name='sign'
     placeholder={i18next.t('签名')}
@@ -43,10 +42,11 @@ const Footer = props => (
     {...props}
     style={{
       ...props.style,
-      position: 'absolute',
-      bottom: 0,
+      position: props?.isAdaptive ? 'relative' : 'absolute',
       left: 0,
-      right: 0
+      right: 0,
+      // 开启自适应的话，则重置bottom
+      bottom: 0
     }}
     name='footer'
     placeholder={i18next.t('页脚')}
@@ -54,7 +54,8 @@ const Footer = props => (
 )
 
 Footer.propTypes = {
-  style: PropTypes.object
+  style: PropTypes.object,
+  isAdaptive: PropTypes.bool
 }
 
 @inject('printerStore')
@@ -223,10 +224,10 @@ class Printer extends React.Component {
             case 'table': {
               const dataKey = printerStore.isDeliverType
                 ? getDataKey(
-                    content.dataKey,
-                    content.arrange,
-                    printerStore.tableVerticalStyle
-                  )
+                  content.dataKey,
+                  content.arrange,
+                  printerStore.tableVerticalStyle
+                )
                 : content.dataKey
               // eslint-disable-next-line no-case-declarations
               const list = printerStore.data._table[dataKey]
@@ -315,11 +316,11 @@ class Printer extends React.Component {
                   if (!printerStore.linesPerPage) {
                     size = isAutofillConfig
                       ? panel.size +
-                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                       : panel.size
                     end = isAutofillConfig
                       ? panel.end +
-                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                       : panel.end
                   }
                 } else {
@@ -339,10 +340,10 @@ class Printer extends React.Component {
                         if (
                           (showIngredientDetail &&
                             config.contents[panel.index].dataKey ===
-                              'combine_withoutIg') ||
+                            'combine_withoutIg') ||
                           (!showIngredientDetail &&
                             config.contents[panel.index].dataKey ===
-                              'combine_withIg')
+                            'combine_withIg')
                         ) {
                           return null
                         }
@@ -354,9 +355,9 @@ class Printer extends React.Component {
                               c =>
                                 c.id === 'combine' &&
                                 c.dataKey ===
-                                  (showIngredientDetail
-                                    ? 'combine_withIg'
-                                    : 'combine_withoutIg')
+                                (showIngredientDetail
+                                  ? 'combine_withIg'
+                                  : 'combine_withoutIg')
                             )}
                             range={{
                               begin: panel.begin,
@@ -420,7 +421,11 @@ class Printer extends React.Component {
                   isAdaptive={this.props.config?.sign?.isAdaptive}
                 />
               )}
-              <Footer config={config.footer} pageIndex={i} />
+              <Footer
+                config={config.footer}
+                isAdaptive={this.props.config?.footer?.isAdaptive}
+                pageIndex={i}
+              />
             </Page>
           )
         })}
