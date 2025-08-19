@@ -16,6 +16,12 @@ class EditorAdaptive extends React.Component {
     editStore.toggleIsAdaptive()
   }
 
+  /** 切换自适应 */
+  handleToggleFooterAdaptive = () => {
+    const { editStore } = this.props
+    editStore.toggleIsFooterAdaptive()
+  }
+
   render() {
     const {
       editStore: { config }
@@ -32,6 +38,18 @@ class EditorAdaptive extends React.Component {
         <Flex className='gm-padding-top-5 gm-text-red' column>
           {i18next.t(
             '注意：开启后签名区域内容会紧跟内容区域，不会一直固定在底部'
+          )}
+        </Flex>
+        <Flex alignCenter className='gm-padding-top-5'>
+          <div>{i18next.t('自适应页面内容')}：</div>
+          <Switch
+            checked={config?.footer?.isAdaptive}
+            onChange={this.handleToggleFooterAdaptive}
+          />
+        </Flex>
+        <Flex className='gm-padding-top-5 gm-text-red' column>
+          {i18next.t(
+            '注意：开启后页脚区域内容会紧跟内容区域，不会一直固定在底部'
           )}
         </Flex>
       </>
