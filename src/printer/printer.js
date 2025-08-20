@@ -24,7 +24,8 @@ const Sign = props => (
       ...props.style,
       position: props?.isAdaptive ? 'relative' : 'absolute',
       left: 0,
-      right: 0
+      right: 0,
+      bottom: 0
       // 开启自适应的话，则重置bottom
     }}
     name='sign'
