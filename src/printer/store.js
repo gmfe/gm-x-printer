@@ -1208,7 +1208,9 @@ class PrinterStore {
         price: price,
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        removeTrailingZeros: removeTrailingZeros
+        removeTrailingZeros: removeTrailingZeros,
+        /** 直接覆盖他，parseFloat("") => 出现NAN  */
+        parseFloat: parseFloatFun
       })
     } catch (err) {
       return text
@@ -1230,7 +1232,9 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        removeTrailingZeros: removeTrailingZeros
+        removeTrailingZeros: removeTrailingZeros,
+        /** 直接覆盖他，parseFloat("") => 出现NAN  */
+        parseFloat: parseFloatFun
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1256,7 +1260,9 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        removeTrailingZeros: removeTrailingZeros
+        removeTrailingZeros: removeTrailingZeros,
+        /** 直接覆盖他，parseFloat("") => 出现NAN  */
+        parseFloat: parseFloatFun
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1284,7 +1290,9 @@ class PrinterStore {
         price: price, // 提供一个价格处理函数
         diyRandom: diyRandom, // 提供一个计算随机数的函数
         parseFloatFun: parseFloatFun,
-        removeTrailingZeros: removeTrailingZeros
+        removeTrailingZeros: removeTrailingZeros,
+        /** 直接覆盖他，parseFloat("") => 出现NAN  */
+        parseFloat: parseFloatFun
       })
     } catch (err) {
       return text

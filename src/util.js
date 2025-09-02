@@ -376,6 +376,137 @@ const getAutoFillingConfig = isAutoFilling => {
   return isAutoFilling
 }
 
+function addVariableSuffix(text, suffix = '_MULTI_SUFFIX') {
+  // 使用正则表达式匹配双花括号内的内容
+  return text.replace(/\{\{([^}]+)\}\}/g, (match, content) => {
+    // 递归处理嵌套函数的函数
+    function processExpression(expr) {
+      // 去除首尾空格
+      expr = expr.trim()
+
+      // 检查是否为函数调用（包含括号）
+      const funcMatch = expr.match(/^([^(]+)\((.*)\)$/)
+
+      if (funcMatch) {
+        // 是函数调用
+        const funcName = funcMatch[1].trim()
+        const params = funcMatch[2]
+
+        // 解析参数
+        const processedParams = parseAndProcessParams(params)
+
+        return `${funcName}(${processedParams})`
+      } else {
+        // 简单变量，添加后缀
+        return addSuffixToVariable(expr)
+      }
+    }
+
+    // 解析和处理参数的函数
+    function parseAndProcessParams(paramsStr) {
+      if (!paramsStr.trim()) {
+        return ''
+      }
+
+      const params = []
+      let currentParam = ''
+      let parentheses = 0
+      let inQuotes = false
+      let quoteChar = ''
+
+      for (let i = 0; i < paramsStr.length; i++) {
+        const char = paramsStr[i]
+
+        // 处理引号
+        if ((char === '"' || char === "'") && !inQuotes) {
+          inQuotes = true
+          quoteChar = char
+          currentParam += char
+        } else if (char === quoteChar && inQuotes) {
+          inQuotes = false
+          quoteChar = ''
+          currentParam += char
+        } else if (inQuotes) {
+          currentParam += char
+        } else if (char === '(') {
+          parentheses++
+          currentParam += char
+        } else if (char === ')') {
+          parentheses--
+          currentParam += char
+        } else if (char === ',' && parentheses === 0) {
+          // 找到参数分隔符
+          params.push(currentParam.trim())
+          currentParam = ''
+        } else {
+          currentParam += char
+        }
+      }
+
+      // 添加最后一个参数
+      if (currentParam.trim()) {
+        params.push(currentParam.trim())
+      }
+
+      // 处理每个参数
+      return params
+        .map(param => {
+          param = param.trim()
+
+          // 检查是否为数字
+          if (/^\d+(\.\d+)?$/.test(param)) {
+            return param
+          }
+
+          // 检查是否为字符串字面量
+          if (/^["'].*["']$/.test(param)) {
+            return param
+          }
+
+          // 检查是否为布尔值
+          if (param === 'true' || param === 'false') {
+            return param
+          }
+
+          // 检查是否为null或undefined
+          if (param === 'null' || param === 'undefined') {
+            return param
+          }
+
+          // 递归处理（可能是嵌套函数或变量）
+          return processExpression(param)
+        })
+        .join(', ')
+    }
+
+    // 为变量添加后缀的函数
+    function addSuffixToVariable(variable) {
+      variable = variable.trim()
+
+      // 检查是否已经有后缀
+      if (variable.endsWith(suffix)) {
+        return variable
+      }
+
+      // 检查是否为保留字、数字或特殊值
+      const reservedWords = ['true', 'false', 'null', 'undefined', 'this']
+      if (reservedWords.includes(variable) || /^\d+(\.\d+)?$/.test(variable)) {
+        return variable
+      }
+
+      // 检查是否为字符串字面量
+      if (/^["'].*["']$/.test(variable)) {
+        return variable
+      }
+
+      return variable + suffix
+    }
+
+    const processedContent = processExpression(content)
+    return `{{${processedContent}}}`
+  })
+}
+
 export {
   getPageHeight,
   getWidth,
@@ -401,5 +532,6 @@ export {
   caclSingleDetailsPageHeight,
   getOverallOrderTrHeight,
   regExp,
-  getAutoFillingConfig
+  getAutoFillingConfig,
+  addVariableSuffix
 }
