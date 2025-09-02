@@ -33,6 +33,11 @@ const parseFloatFun = a => {
   return parseFloat(+a)
 }
 
+const coverParseFloat = num => {
+  if (num === '' || num === undefined || num === null) return ''
+  return parseFloat(num)
+}
+
 /**
  *
  * @param num 处理小数点末尾零
@@ -1210,7 +1215,7 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: parseFloatFun
+        parseFloat: coverParseFloat
       })
     } catch (err) {
       return text
@@ -1234,7 +1239,7 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: parseFloatFun
+        parseFloat: coverParseFloat
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1262,7 +1267,7 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: parseFloatFun
+        parseFloat: coverParseFloat
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1292,7 +1297,7 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: parseFloatFun
+        parseFloat: coverParseFloat
       })
     } catch (err) {
       return text
