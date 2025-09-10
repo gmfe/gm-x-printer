@@ -1,7 +1,7 @@
 import i18next from '../../locales'
 import React from 'react'
 import { observer, inject, Observer } from 'mobx-react'
-import { Flex, Option, Select, TagSelect } from '../components'
+import { Flex, Option, Select, TagSelect, ToolTip } from '../components'
 import { InputWithUnit } from '../common/component'
 import { pageTypeMap, printDirectionList } from '../config'
 import _ from 'lodash'
@@ -22,6 +22,10 @@ class EditorSelector extends React.Component {
 
   handlePageSize(field, value) {
     this.props.editStore.setPageSize(field, value)
+  }
+
+  handleDip(val) {
+    this.props.editStore.setDpi(val)
   }
 
   handlePrintDirection = value => {
@@ -45,6 +49,7 @@ class EditorSelector extends React.Component {
   }
 
   render() {
+    const { isTicket } = this.props
     const {
       config: { name, page, batchPrintConfig, templateType },
       computedRegionList,
@@ -102,6 +107,25 @@ class EditorSelector extends React.Component {
               value={page.size.height}
               onChange={this.handlePageSize.bind(this, 'height')}
             />
+          </Flex>
+        )}
+        {isTicket && (
+          <Flex alignCenter className='gm-padding-top-5'>
+            <div
+              style={{
+                marginLeft: 12
+              }}
+            >
+              {i18next.t('dpi')}：<ToolTip text='dpi是指打印分辨率' />
+            </div>
+            <Select
+              className='gm-printer-edit-select'
+              value={page.dpi || 200}
+              onChange={this.handleDip.bind(this)}
+            >
+              <Option value={200}>200</Option>
+              <Option value={180}>180</Option>
+            </Select>
           </Flex>
         )}
 
