@@ -112,7 +112,7 @@ class EditorStore {
   isShowAllOrderSummaryPer = false
 
   // 默认table的dataKey
-  setTableDataKeyEffect() { } // 改变dataKey后,做的副作用操作
+  setTableDataKeyEffect() {} // 改变dataKey后,做的副作用操作
 
   defaultTableSubtotal = { show: false }
 

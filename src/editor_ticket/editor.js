@@ -83,7 +83,7 @@ class Editor extends React.Component {
               bill={templateType}
             />
             <Gap height='5px' />
-            <EditorSelect />
+            <EditorSelect bill={templateType} isTicket />
             {/* <SpecialField addFields={addFields} mockData={mockData} /> */}
             <EditorCutomizedConfig />
             <Gap height='5px' />
