@@ -1312,7 +1312,13 @@ class PrinterStore {
 
   templateSpecialDetails(col, dataKey, index) {
     // 做好保护，出错就返回 text
-    const { specialDetailsKey, text, detailLastColType, separator } = col
+    const {
+      specialDetailsKey,
+      text,
+      detailLastColType,
+      separator,
+      _columnKey
+    } = col
     try {
       const row = this.data._table[dataKey][index]
       const compiled = _.template(text, { interpolate: /{{([\s\S]+?)}}/g })
@@ -1320,12 +1326,16 @@ class PrinterStore {
 
       /** 简单处理下数据 */
       const filterList = (list, type = '') => {
-        if (type === 'noLineBreak') {
-          const details = list.map(d => `${compiled(d)}`).join(separator)
+        const currentList = _columnKey
+          ? list.filter(_item => _item._receive_customer_id === _columnKey)
+          : list
+
+        if (type === 'noLineBreak' || !type) {
+          const details = currentList.map(d => `${compiled(d)}`).join(separator)
 
           return `<div class='b-table-details'>${details}</div>`
         }
-        return list
+        return currentList
           .map(d => `<div class='b-table-details'> ${compiled(d)} </div>`)
           .join('')
       }
