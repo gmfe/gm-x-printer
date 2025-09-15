@@ -25,6 +25,12 @@ class TableDetailEditor extends React.Component {
     editStore.setPurchaseTableKey(dataKey)
   }
 
+  handleIsOpenMergeByDemandChange = isOpen => {
+    const { editStore } = this.props
+    console.log(isOpen)
+    editStore.setIsOpenMergeByDemand(isOpen)
+  }
+
   handleDetailAddField = value => {
     const { editStore } = this.props
     editStore.specialTextAddField('*' + value)
@@ -55,7 +61,8 @@ class TableDetailEditor extends React.Component {
     } = this.props
     const {
       dataKey,
-      specialConfig: { template_text, style }
+      specialConfig: { template_text, style },
+      isOpenMergeByDemand = false
     } = this.props.config
 
     return (
@@ -79,6 +86,58 @@ class TableDetailEditor extends React.Component {
         </Flex>
         {dataKey !== 'purchase_no_detail' && (
           <>
+            <div className='gm-padding-top-5'>
+              <div>{i18next.t('添加字段')}：</div>
+              <Flex wrap>
+                {_.map(detailFields, o => (
+                  <FieldBtn
+                    key={o.key}
+                    name={o.key}
+                    onClick={this.handleDetailAddField.bind(this, o.value)}
+                  />
+                ))}
+              </Flex>
+            </div>
+
+            <div className='gm-padding-top-5'>
+              <div>{i18next.t('字段设置')}：</div>
+              <Fonter style={style} onChange={this.handleSpecialStyleChange} />
+              <Separator />
+              <TextAlign
+                style={style}
+                onChange={this.handleSpecialStyleChange}
+              />
+              <Gap />
+              <Textarea
+                onChange={this.handleSpecialTextChange}
+                value={template_text}
+                placeholder={i18next.t('请输入明细字段')}
+              />
+            </div>
+            <TipInfo
+              text={i18next.t(
+                '说明：在字段之间自行设置间隔符号,但谨慎修改{}中的内容,避免出现数据异常'
+              )}
+            />
+          </>
+        )}
+
+        {dataKey === 'purchase_no_detail' && (
+          <>
+            <div className='gm-padding-top-5'>
+              <Flex row className='gm-margin-top-5'>
+                <Flex style={{ width: '140px' }}>下单数拆分展示: </Flex>
+                <Flex column className='gm-margin-left-5'>
+                  <Flex>
+                    <Switch
+                      checked={isOpenMergeByDemand}
+                      onChange={this.handleIsOpenMergeByDemandChange}
+                    />
+                  </Flex>
+                  开启后，同一客户下单的相同商品，需求数将不再汇总展示
+                </Flex>
+              </Flex>
+            </div>
             <div className='gm-padding-top-5'>
               <div>{i18next.t('添加字段')}：</div>
               <Flex wrap>
