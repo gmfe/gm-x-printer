@@ -191,7 +191,6 @@ class Table extends React.Component {
       for (let i = 2; i <= colNumber; i++) {
         const colNum = i > 2 ? i : '' // 栏数
         const columnsI = newColumns.map((val, index) => {
-
           const data = {
             ...val,
             index,

@@ -1,4 +1,4 @@
-import { action } from 'mobx'
+import { action, set } from 'mobx'
 import {
   SORTING_DETAIL,
   SORTING_DETAIL_NO_BREAK,
@@ -70,6 +70,7 @@ class Store extends EditorStore {
       tableConfig.dataKey === 'purchase_last_col_noLineBreak'
     ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
+      console.log(value, '123')
       specialCol.text = value
     }
   }
@@ -104,6 +105,15 @@ class Store extends EditorStore {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
       specialCol.text += fieldText
     }
+  }
+
+  @action.bound
+  setIsOpenMergeByDemand(flag) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    set(tableConfig, {
+      isOpenMergeByDemand: flag
+    })
   }
 }
 
