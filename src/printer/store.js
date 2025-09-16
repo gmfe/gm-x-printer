@@ -1312,7 +1312,8 @@ class PrinterStore {
       text,
       detailLastColType,
       separator,
-      _columnKey
+      _columnKey,
+      specialDetailsColumnKey
     } = col
     try {
       const row = this.data._table[dataKey][index]
@@ -1321,9 +1322,12 @@ class PrinterStore {
 
       /** 简单处理下数据 */
       const filterList = (list, type = '') => {
-        const currentList = _columnKey
-          ? list.filter(_item => _item._receive_customer_id === _columnKey)
-          : list
+        const currentList =
+          _columnKey && specialDetailsColumnKey
+            ? list.filter(
+                _item => _item[specialDetailsColumnKey] === _columnKey
+              )
+            : list
 
         if (currentList.length === 0) {
           return '-'
