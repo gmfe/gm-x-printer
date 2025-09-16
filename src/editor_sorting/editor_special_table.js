@@ -27,7 +27,6 @@ class TableDetailEditor extends React.Component {
 
   handleIsOpenMergeByDemandChange = isOpen => {
     const { editStore } = this.props
-    console.log(isOpen)
     editStore.setIsOpenMergeByDemand(isOpen)
   }
 
@@ -54,7 +53,7 @@ class TableDetailEditor extends React.Component {
 
   render() {
     const {
-      addFields: { detailFields },
+      addFields: { detailFields, customerDetailFields },
       editStore: {
         config: { isSheetUnitSummary }
       }
@@ -138,39 +137,46 @@ class TableDetailEditor extends React.Component {
                 </Flex>
               </Flex>
             </div>
-            <div className='gm-padding-top-5'>
-              <div>{i18next.t('添加字段')}：</div>
-              <Flex wrap>
-                {_.map(detailFields, o => (
-                  <FieldBtn
-                    key={o.key}
-                    name={o.key}
-                    onClick={this.handleDetailAddField.bind(this, o.value)}
-                  />
-                ))}
-              </Flex>
-            </div>
+            {isOpenMergeByDemand && (
+              <>
+                <div className='gm-padding-top-5'>
+                  <div>{i18next.t('添加字段')}：</div>
+                  <Flex wrap>
+                    {_.map(customerDetailFields, o => (
+                      <FieldBtn
+                        key={o.key}
+                        name={o.key}
+                        onClick={this.handleDetailAddField.bind(this, o.value)}
+                      />
+                    ))}
+                  </Flex>
+                </div>
 
-            <div className='gm-padding-top-5'>
-              <div>{i18next.t('字段设置')}：</div>
-              <Fonter style={style} onChange={this.handleSpecialStyleChange} />
-              <Separator />
-              <TextAlign
-                style={style}
-                onChange={this.handleSpecialStyleChange}
-              />
-              <Gap />
-              <Textarea
-                onChange={this.handleSpecialTextChange}
-                value={template_text}
-                placeholder={i18next.t('请输入明细字段')}
-              />
-            </div>
-            <TipInfo
-              text={i18next.t(
-                '说明：在字段之间自行设置间隔符号,但谨慎修改{}中的内容,避免出现数据异常'
-              )}
-            />
+                <div className='gm-padding-top-5'>
+                  <div>{i18next.t('字段设置')}：</div>
+                  <Fonter
+                    style={style}
+                    onChange={this.handleSpecialStyleChange}
+                  />
+                  <Separator />
+                  <TextAlign
+                    style={style}
+                    onChange={this.handleSpecialStyleChange}
+                  />
+                  <Gap />
+                  <Textarea
+                    onChange={this.handleSpecialTextChange}
+                    value={template_text}
+                    placeholder={i18next.t('请输入明细字段')}
+                  />
+                </div>
+                <TipInfo
+                  text={i18next.t(
+                    '说明：在字段之间自行设置间隔符号,但谨慎修改{}中的内容,避免出现数据异常'
+                  )}
+                />
+              </>
+            )}
           </>
         )}
       </div>
