@@ -1325,6 +1325,10 @@ class PrinterStore {
           ? list.filter(_item => _item._receive_customer_id === _columnKey)
           : list
 
+        if (currentList.length === 0) {
+          return '-'
+        }
+
         if (type === 'noLineBreak' || !type) {
           const details = currentList.map(d => `${compiled(d)}`).join(separator)
 
