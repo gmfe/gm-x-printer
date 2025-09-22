@@ -222,6 +222,71 @@ class Store extends EditorStore {
         ]
         break
       }
+      case 'afterSale': {
+        target.columns = [
+          {
+            head: i18next.t('序号'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.序号}}')
+          },
+          {
+            head: i18next.t('商品编码'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.商品自定义编码}}')
+          },
+          {
+            head: i18next.t('商品名'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.商品名}}')
+          },
+          {
+            head: i18next.t('下单数'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.下单数}}{{列.下单单位}}')
+          },
+          {
+            head: i18next.t('下单单位'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.下单单位}}')
+          },
+          {
+            head: i18next.t('下单金额'),
+            headStyle: {
+              textAlign: 'center'
+            },
+            style: {
+              textAlign: 'center'
+            },
+            text: i18next.t('{{列.下单金额}}')
+          }
+        ]
+        break
+      }
       case 'allprod': {
         target.columns = [
           {
