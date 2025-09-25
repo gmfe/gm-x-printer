@@ -1,4 +1,4 @@
-import { action, set } from 'mobx'
+import { action, set, extendObservable } from 'mobx'
 import {
   SORTING_DETAIL,
   SORTING_DETAIL_NO_BREAK,
@@ -50,6 +50,11 @@ class Store extends EditorStore {
           ].detailLastColType = 'purchase_last_col_noLineBreak')
     } else {
       tableConfig.columns.push(SORTING_NO_DETAIL)
+      if (typeof tableConfig.isOpenMergeByDemand === 'undefined') {
+        extendObservable(tableConfig, {
+          isOpenMergeByDemand: false
+        })
+      }
     }
   }
 
