@@ -3,6 +3,7 @@
   "version": "1.13.11-beta.3",
   "description": "diy printer",
   "main": "lib/main.js",
+  "main-dev": "src/index.js",
   "scripts": {
     "precommit": "lint-staged",
     "start": "webpack-dev-server --hot",
