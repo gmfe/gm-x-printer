@@ -47,7 +47,7 @@ const Footer = props => (
       left: 0,
       right: 0,
       // 开启自适应的话，则重置bottom
-      bottom: 0
+      bottom: props?.isAdaptive ? undefined : 0
     }}
     name='footer'
     placeholder={i18next.t('页脚')}
