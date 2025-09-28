@@ -24,6 +24,9 @@ gm-x-printer 是新架构 erp 使用的打印库
 - [Git](https://git-scm.com/downloads)
 - [VSCode](https://code.visualstudio.com/download)（推荐）
 
+## node 
+版本： 16.17.1
+
 ## 运行 gm-x-printer
 
 ```JS
