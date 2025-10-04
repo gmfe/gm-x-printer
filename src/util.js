@@ -144,7 +144,7 @@ function getSumTrHeight(SumTr) {
 
 // eslint-disable-next-line
 const coverDigit2Uppercase = n => {
-  if (_.isNil(n) || _.isNaN(n)) {
+  if (_.isNil(n) || _.isNaN(n) || _.isNaN(+n)) {
     return '-'
   }
 
