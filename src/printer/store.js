@@ -8,7 +8,8 @@ import {
   caclSingleDetailsPageHeight,
   getOverallOrderTrHeight,
   getDataKey,
-  getAutoFillingConfig
+  getAutoFillingConfig,
+  coverDigit2Uppercase
 } from '../util'
 import _ from 'lodash'
 import batchPrinterStore from './batch_printer_store'
@@ -1216,7 +1217,8 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: coverParseFloat
+        parseFloat: coverParseFloat,
+        coverDigit2Uppercase: coverDigit2Uppercase
       })
     } catch (err) {
       return text
@@ -1240,7 +1242,8 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: coverParseFloat
+        parseFloat: coverParseFloat,
+        coverDigit2Uppercase: coverDigit2Uppercase
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1268,7 +1271,8 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: coverParseFloat
+        parseFloat: coverParseFloat,
+        coverDigit2Uppercase: coverDigit2Uppercase
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1298,7 +1302,8 @@ class PrinterStore {
         parseFloatFun: parseFloatFun,
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
-        parseFloat: coverParseFloat
+        parseFloat: coverParseFloat,
+        coverDigit2Uppercase: coverDigit2Uppercase
       })
     } catch (err) {
       return text
