@@ -116,9 +116,16 @@ class Store extends EditorStore {
   setIsOpenMergeByDemand(flag) {
     const arr = this.selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
-    set(tableConfig, {
-      isOpenMergeByDemand: flag
-    })
+    /** 如果当前模版没有这个字段的话，该字段不是observer，会导致修改不了 */
+    if (typeof tableConfig.isOpenMergeByDemand === 'undefined') {
+      extendObservable(tableConfig, {
+        isOpenMergeByDemand: flag
+      })
+    } else {
+      set(tableConfig, {
+        isOpenMergeByDemand: flag
+      })
+    }
   }
 }
 
