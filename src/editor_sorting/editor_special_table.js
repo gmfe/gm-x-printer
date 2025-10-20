@@ -22,7 +22,9 @@ import { SORTING_DETAIL_SHOW_OPTIONS } from './constants'
 class TableDetailEditor extends React.Component {
   handleDataKeyChange = dataKey => {
     const { editStore } = this.props
-    editStore.setPurchaseTableKey(dataKey)
+    editStore.setPurchaseTableKey(dataKey, {
+      addFields: this.props.addFields
+    })
   }
 
   handleIsOpenMergeByDemandChange = isOpen => {
