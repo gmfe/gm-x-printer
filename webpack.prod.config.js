@@ -19,8 +19,6 @@ module.exports = {
     : {
         react: 'react',
         'react-dom': 'react-dom',
-        mobx: 'mobx',
-        'mobx-react': 'mobx-react',
         lodash: 'lodash'
       },
   module: {
