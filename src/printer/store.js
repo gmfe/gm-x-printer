@@ -1338,7 +1338,7 @@ class PrinterStore {
           return '-'
         }
 
-        if (type === 'noLineBreak' || !type) {
+        if (type === 'noLineBreak') {
           const details = currentList.map(d => `${compiled(d)}`).join(separator)
 
           return `<div class='b-table-details'>${details}</div>`
