@@ -164,16 +164,19 @@ const coverDigit2Uppercase = n => {
   let left = ''
   let right = ''
   let i = 0
+
   for (i; i < fraction.length; i++) {
-    right +=
-      digit[
-        Math.floor(
-          Big(n)
-            .times(Big(10).pow(i + 1))
-            .mod(10)
-            .toString()
-        )
-      ] + fraction[i]
+    const num = Math.floor(
+      Big(n)
+        .times(Big(10).pow(i + 1))
+        .mod(10)
+        .toString()
+    )
+    if (num === 0 && fraction[i] === '角') {
+      right += digit[num]
+    } else {
+      right += digit[num] + fraction[i]
+    }
   }
 
   right = right.replace(/(零分)/, '整').replace(/(零角整)/, '') || '整'
