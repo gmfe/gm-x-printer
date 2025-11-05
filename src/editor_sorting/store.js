@@ -1,4 +1,4 @@
-import { action } from 'mobx'
+import { action, set, extendObservable, toJS } from 'mobx'
 import {
   SORTING_DETAIL,
   SORTING_DETAIL_NO_BREAK,
@@ -14,7 +14,7 @@ class Store extends EditorStore {
 
   /* start---------设置采购明细相关--------- */
   @action.bound
-  setPurchaseTableKey(dataKey) {
+  setPurchaseTableKey(dataKey, options) {
     // 先移除选中项,安全第一
     this.selected = null
     this.setTableDataKey(dataKey)
@@ -50,6 +50,17 @@ class Store extends EditorStore {
           ].detailLastColType = 'purchase_last_col_noLineBreak')
     } else {
       tableConfig.columns.push(SORTING_NO_DETAIL)
+      const { customerDetailFields } = options.addFields
+      tableConfig.specialConfig.template_text = customerDetailFields
+        ?.map(_item => {
+          return _item.value
+        })
+        .join(' ')
+      if (typeof tableConfig.isOpenMergeByDemand === 'undefined') {
+        extendObservable(tableConfig, {
+          isOpenMergeByDemand: false
+        })
+      }
     }
   }
 
@@ -62,7 +73,6 @@ class Store extends EditorStore {
   setSpecialText(value) {
     const arr = this.selectedRegion.split('.')
     const tableConfig = this.config.contents[arr[2]]
-
     tableConfig.specialConfig.template_text = value
     // 单列-总表最后一列,在columns上修改
     if (
@@ -70,6 +80,7 @@ class Store extends EditorStore {
       tableConfig.dataKey === 'purchase_last_col_noLineBreak'
     ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
+      console.log(value, '123')
       specialCol.text = value
     }
   }
@@ -103,6 +114,22 @@ class Store extends EditorStore {
     ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
       specialCol.text += fieldText
+    }
+  }
+
+  @action.bound
+  setIsOpenMergeByDemand(flag) {
+    const arr = this.selectedRegion.split('.')
+    const tableConfig = this.config.contents[arr[2]]
+    /** 如果当前模版没有这个字段的话，该字段不是observer，会导致修改不了 */
+    if (typeof tableConfig.isOpenMergeByDemand === 'undefined') {
+      extendObservable(tableConfig, {
+        isOpenMergeByDemand: flag
+      })
+    } else {
+      set(tableConfig, {
+        isOpenMergeByDemand: flag
+      })
     }
   }
 }

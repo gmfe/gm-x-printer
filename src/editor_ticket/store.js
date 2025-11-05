@@ -1,3 +1,4 @@
+import { action } from 'mobx'
 import EditorStore from '../common/editor_store'
 import i18next from '../../locales'
 
@@ -256,6 +257,14 @@ class Store extends EditorStore {
         break
       }
       default:
+    }
+  }
+
+  @action.bound
+  setDpi(value) {
+    this.config.page = {
+      ...this.config.page,
+      dpi: value
     }
   }
 }
