@@ -331,7 +331,6 @@ class SummarySetting extends React.Component {
       orderLowerCaseText,
       isShowOrderSummaryPer
     } = allOrderSummaryConfig
-    console.log(allOrderSummaryConfig)
     // 由于初始末班没有summary 这个object，为了UI响应数据，只能这么写了
     const hasAllOrderSummaryConfig = has(
       editStore.computedTableSpecialConfig,
@@ -614,11 +613,11 @@ class SummarySetting extends React.Component {
   }
 
   render() {
-    const { hideOrderSummary } = this.props
+    const { hideOrderSummary, hidePageSummary } = this.props
     return (
       <div>
         {/* 每页合计 */}
-        {this.renderPageSummary()}
+        {!hidePageSummary && this.renderPageSummary()}
         <div style={{ height: 5, width: '100%' }} />
         {/* 整单合计 */}
         {!hideOrderSummary && this.renderOrderSummary()}
@@ -631,6 +630,8 @@ SummarySetting.propTypes = {
   editStore: PropTypes.object,
   orderPerSummaryFields: PropTypes.array.isRequired,
   /** 是否隐藏 “整单合计” */
+  hidePageSummary: PropTypes.bool,
+  /** 是否隐藏 “每页合计” */
   hideOrderSummary: PropTypes.bool
 }
 
@@ -638,12 +639,18 @@ SummarySetting.propTypes = {
 @observer
 class EditorSummary extends React.Component {
   render() {
-    const { editStore, orderPerSummaryFields, hideOrderSummary } = this.props
+    const {
+      editStore,
+      orderPerSummaryFields,
+      hideOrderSummary,
+      hidePageSummary
+    } = this.props
     if (editStore.computedRegionIsTable) {
       return (
         <SummarySetting
           orderPerSummaryFields={orderPerSummaryFields}
           hideOrderSummary={hideOrderSummary}
+          hidePageSummary={hidePageSummary}
         />
       )
     } else {
@@ -656,7 +663,9 @@ EditorSummary.propTypes = {
   editStore: PropTypes.object,
   orderPerSummaryFields: PropTypes.array.isRequired,
   /** 是否隐藏 “整单合计” */
-  hideOrderSummary: PropTypes.bool
+  hideOrderSummary: PropTypes.bool,
+  /** 是否隐藏 “每页合计” */
+  hidePageSummary: PropTypes.bool
 }
 
 export default EditorSummary
