@@ -1,5 +1,5 @@
 import i18next from '../../locales'
-import { action, observable, computed, runInAction } from 'mobx'
+import { action, observable, computed, runInAction, toJS } from 'mobx'
 import {
   getSumTrHeight,
   isMultiTable,
@@ -450,6 +450,7 @@ class PrinterStore {
           table.body.heights,
           dataKey
         )
+        console.log(toJS(heights))
         if (this.isDeliverType) {
           heights = [
             ...this.getNormalTableBodyHeights(
@@ -827,7 +828,6 @@ class PrinterStore {
             /* 遍历表格每一行，填充表格内容 */
 
             while (end < heightsLength) {
-              debugger
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
@@ -840,7 +840,11 @@ class PrinterStore {
                   // 因为超过，所以要退回上一个
                   end--
                 }
-                /** 当前页table渲染完后剩余的高度 */
+                /**
+                 * 当前页table渲染完后剩余的高度？？
+                 * 这里计算有点诡异，当前table的高度 < 可容纳高度的话， 才有剩余的table高度吧
+                 * 如果当前table的高度 > 可容纳高度的话， 那么剩余的高度都直接是负数了，可以直接开下一页了吧
+                 */
                 const currentRemainTableHeight = +Big(pageAccomodateTableHeight)
                   .minus(currentTableHeight)
                   .plus(overHeight)
@@ -849,11 +853,13 @@ class PrinterStore {
                  * 说明： 1. currentRemainTableHeight至少要是minHeight的 2倍，不然每次到这都进入if，同时留下一点空白距离
                  * 2. heights[end]至少要是currentRemainTableHeight的 1倍，怕出现打印时最后一行文字显示一半的情况
                  * 3. heights[end] 高度超过了 pageAccomodateTableHeight
+                 * 4. 如果当前table 都要比可容纳的高度都要高，那么也要进入分割明细中
                  */
                 if (
                   (currentRemainTableHeight / minHeight > 1.5 &&
                     overHeight / currentRemainTableHeight > 1) ||
-                  overHeight > pageAccomodateTableHeight
+                  overHeight > pageAccomodateTableHeight ||
+                  currentTableHeight > pageAccomodateTableHeight
                 ) {
                   // debugger
                   if (currentRemainTableHeight >= 23) {
@@ -865,30 +871,22 @@ class PrinterStore {
                     )
                     // 拆分明细后，同时也要更新body.heights 不能影响后续计算
                     if (detailsPageHeight.length > 0) {
-                      // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
-                      detailsPageHeight[1] = Math.max(
-                        minHeight,
-                        detailsPageHeight[1]
-                      )
-                      heights.splice(end, 1, ...detailsPageHeight)
+                      /**  如果当前table 都要比可容纳的高度都要高， 那么他的值应该改成详情高度，以为详情被分割了 */
+                      if (currentTableHeight > pageAccomodateTableHeight) {
+                        heights.splice(end, 1, ...detailsPageHeight)
+                      } else {
+                        // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
+                        detailsPageHeight[1] = Math.max(
+                          minHeight,
+                          detailsPageHeight[1]
+                        )
+                      }
                       end++
                     }
                   }
                 }
                 // 第一条极端会有问题
                 if (end !== 0) {
-                  const lastPageTable = page[page.length - 1]
-                  /** 这里会可能死循环，增加了这个判断，如果加的是相同的数据，那么就表示进入了死循环，这个时候end 要加一下，不然就死循环了 */
-                  if (
-                    lastPageTable &&
-                    lastPageTable.type === 'table' &&
-                    lastPageTable.end === end &&
-                    lastPageTable.begin === begin &&
-                    lastPageTable.index === index
-                  ) {
-                    end++
-                    continue
-                  }
                   page.push({
                     type: 'table',
                     index,
