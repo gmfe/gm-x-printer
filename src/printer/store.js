@@ -527,11 +527,14 @@ class PrinterStore {
               ? Number(this.config.linesPerPage)
               : undefined
             // 页面 cell 数
+            // eslint-disable-next-line no-unused-vars
             const pageCellCounts = []
+            // eslint-disable-next-line no-unused-vars
             const tableCellCounts = []
             const isVertical =
               isMultiPage && arrange === 'vertical' && this.isFirstLeftThenRight
             // 当前真实的 cell index
+            // eslint-disable-next-line no-unused-vars
             let cellIndex = 0
             // 当前 table 渲染了多少行
             let tableCellCount = 0
@@ -540,6 +543,7 @@ class PrinterStore {
             // 上一页的 table 渲染了几行
             let lastPageTableCellCount = 0
             // 截止到上一页的总行数
+            // eslint-disable-next-line no-unused-vars
             let lastPageTableCellCountAll = 0
             // 正确的 begin, 用于双栏纵向情况
             let trueBegin = 0
@@ -729,7 +733,6 @@ class PrinterStore {
                   if (isVertical) {
                     nowPageSize = currentPageTableCellCount + 1
                   }
-                  const emptyCellCount = 0
                   const nowPage = {
                     type: 'table',
                     index,
@@ -822,7 +825,9 @@ class PrinterStore {
               continue
             }
             /* 遍历表格每一行，填充表格内容 */
+
             while (end < heightsLength) {
+              debugger
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
@@ -872,6 +877,18 @@ class PrinterStore {
                 }
                 // 第一条极端会有问题
                 if (end !== 0) {
+                  const lastPageTable = page[page.length - 1]
+                  /** 这里会可能死循环，增加了这个判断，如果加的是相同的数据，那么就表示进入了死循环，这个时候end 要加一下，不然就死循环了 */
+                  if (
+                    lastPageTable &&
+                    lastPageTable.type === 'table' &&
+                    lastPageTable.end === end &&
+                    lastPageTable.begin === begin &&
+                    lastPageTable.index === index
+                  ) {
+                    end++
+                    continue
+                  }
                   page.push({
                     type: 'table',
                     index,
@@ -976,7 +993,6 @@ class PrinterStore {
     if (allPagesHaveThisHeight > this.pageHeight) {
       return
     }
-
     // 某一page的累计高度
     let currentPageHeight = allPagesHaveThisHeight
     /** 区域1的高度 */
