@@ -1,3 +1,4 @@
+import moment from 'moment'
 import i18next from '../../locales'
 import { action, observable, computed, runInAction, toJS } from 'mobx'
 import {
@@ -1232,7 +1233,12 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: (date, day, format = 'YYYY-MM-DD') =>
+          moment(date)
+            .add(day, 'day')
+            .format(format),
+        formatDate: (date, format) => moment(date).format(format)
       })
     } catch (err) {
       return text
@@ -1257,7 +1263,12 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: (date, day, format = 'YYYY-MM-DD') =>
+          moment(date)
+            .add(day, 'day')
+            .format(format),
+        formatDate: (date, format) => moment(date).format(format)
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1286,7 +1297,12 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: (date, day, format = 'YYYY-MM-DD') =>
+          moment(date)
+            .add(day, 'day')
+            .format(format),
+        formatDate: (date, format) => moment(date).format(format)
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1317,7 +1333,12 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: (date, day, format = 'YYYY-MM-DD') =>
+          moment(date)
+            .add(day, 'day')
+            .format(format),
+        formatDate: (date, format) => moment(date).format(format)
       })
     } catch (err) {
       return text
