@@ -307,7 +307,7 @@ class SummarySetting extends React.Component {
   }
 
   renderOrderSummary = () => {
-    const { editStore, orderPerSummaryFields } = this.props
+    const { editStore, orderPerSummaryFields, hideAllOrderSummary } = this.props
     const newSummaryFields = orderPerSummaryFields.filter(
       item => item.type !== 'select'
     )
@@ -521,17 +521,19 @@ class SummarySetting extends React.Component {
             )}
           </>
         )}
-        <Observer>
-          {() => (
-            <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('分单打印时显示总单合计')}：</div>
-              <Switch
-                checked={allOrderSummaryShow}
-                onChange={this.handleAllOrderSummaryShow}
-              />
-            </Flex>
-          )}
-        </Observer>
+        {!hideAllOrderSummary && (
+          <Observer>
+            {() => (
+              <Flex alignCenter className='gm-padding-top-5'>
+                <div>{i18next.t('分单打印时显示总单合计')}：</div>
+                <Switch
+                  checked={allOrderSummaryShow}
+                  onChange={this.handleAllOrderSummaryShow}
+                />
+              </Flex>
+            )}
+          </Observer>
+        )}
 
         <Observer>
           {() =>
@@ -632,7 +634,9 @@ SummarySetting.propTypes = {
   /** 是否隐藏 “整单合计” */
   hidePageSummary: PropTypes.bool,
   /** 是否隐藏 “每页合计” */
-  hideOrderSummary: PropTypes.bool
+  hideOrderSummary: PropTypes.bool,
+  /** 是否隐藏 “总单合计” */
+  hideAllOrderSummary: PropTypes.bool
 }
 
 @inject('editStore')
@@ -643,7 +647,8 @@ class EditorSummary extends React.Component {
       editStore,
       orderPerSummaryFields,
       hideOrderSummary,
-      hidePageSummary
+      hidePageSummary,
+      hideAllOrderSummary
     } = this.props
     if (editStore.computedRegionIsTable) {
       return (
@@ -651,6 +656,7 @@ class EditorSummary extends React.Component {
           orderPerSummaryFields={orderPerSummaryFields}
           hideOrderSummary={hideOrderSummary}
           hidePageSummary={hidePageSummary}
+          hideAllOrderSummary={hideAllOrderSummary}
         />
       )
     } else {
@@ -665,7 +671,9 @@ EditorSummary.propTypes = {
   /** 是否隐藏 “整单合计” */
   hideOrderSummary: PropTypes.bool,
   /** 是否隐藏 “每页合计” */
-  hidePageSummary: PropTypes.bool
+  hidePageSummary: PropTypes.bool,
+  /** 是否隐藏 “总单合计” */
+  hideAllOrderSummary: PropTypes.bool
 }
 
 export default EditorSummary
