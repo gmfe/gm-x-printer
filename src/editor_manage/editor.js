@@ -77,6 +77,7 @@ class Editor extends React.Component {
             {!!addFields?.orderPerSummaryFields && (
               <EditorPageSummary
                 hidePageSummary
+                hideAllOrderSummary
                 orderPerSummaryFields={addFields.orderPerSummaryFields}
               />
             )}
