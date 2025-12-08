@@ -498,7 +498,7 @@ class Printer extends React.Component {
       ...rest
     } = this.props
     const {
-      size: { width },
+      size: { width, height },
       className,
       style
     } = printerStore.config.page
@@ -511,6 +511,7 @@ class Printer extends React.Component {
         className={classNames('gm-printer', className)}
         style={Object.assign({}, style, {
           width,
+          height,
           breakAfter: batchPrintConfig === 2 ? 'auto' : 'always'
         })}
       >
