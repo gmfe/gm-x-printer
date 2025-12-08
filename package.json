@@ -1,8 +1,8 @@
 {
   "name": "gm-x-printer",
-  "version": "1.14.1-beta.1",
+  "version": "1.14.1-beta.2",
   "description": "diy printer",
-  "main": "lib/main.js",
+  "main": "src/index.js",
   "main-dev": "src/index.js",
   "scripts": {
     "precommit": "lint-staged",
