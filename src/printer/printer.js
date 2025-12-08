@@ -225,10 +225,10 @@ class Printer extends React.Component {
             case 'table': {
               const dataKey = printerStore.isDeliverType
                 ? getDataKey(
-                    content.dataKey,
-                    content.arrange,
-                    printerStore.tableVerticalStyle
-                  )
+                  content.dataKey,
+                  content.arrange,
+                  printerStore.tableVerticalStyle
+                )
                 : content.dataKey
               // eslint-disable-next-line no-case-declarations
               const list = printerStore.data._table[dataKey]
@@ -317,11 +317,11 @@ class Printer extends React.Component {
                   if (!printerStore.linesPerPage) {
                     size = isAutofillConfig
                       ? panel.size +
-                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                       : panel.size
                     end = isAutofillConfig
                       ? panel.end +
-                        Math.floor(remainPageHeight / TR_BASE_HEIGHT)
+                      Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                       : panel.end
                   }
                 } else {
@@ -341,10 +341,10 @@ class Printer extends React.Component {
                         if (
                           (showIngredientDetail &&
                             config.contents[panel.index].dataKey ===
-                              'combine_withoutIg') ||
+                            'combine_withoutIg') ||
                           (!showIngredientDetail &&
                             config.contents[panel.index].dataKey ===
-                              'combine_withIg')
+                            'combine_withIg')
                         ) {
                           return null
                         }
@@ -356,9 +356,9 @@ class Printer extends React.Component {
                               c =>
                                 c.id === 'combine' &&
                                 c.dataKey ===
-                                  (showIngredientDetail
-                                    ? 'combine_withIg'
-                                    : 'combine_withoutIg')
+                                (showIngredientDetail
+                                  ? 'combine_withIg'
+                                  : 'combine_withoutIg')
                             )}
                             range={{
                               begin: panel.begin,
@@ -498,20 +498,18 @@ class Printer extends React.Component {
       ...rest
     } = this.props
     const {
-      size: { width, height },
+      size: { width, },
       className,
       style
     } = printerStore.config.page
     // batchPrintConfig: 1 不连续打印（纸张会间断）2 连续打印（纸张连续打，不间断）
     const batchPrintConfig = config.batchPrintConfig
-
     return (
       <div
         {...rest}
         className={classNames('gm-printer', className)}
         style={Object.assign({}, style, {
           width,
-          height,
           breakAfter: batchPrintConfig === 2 ? 'auto' : 'always'
         })}
       >

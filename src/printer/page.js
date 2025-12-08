@@ -30,7 +30,7 @@ class Page extends React.Component {
       size: { width, height },
       pageStyle
     } = printerStore.config.page
-
+    console.log(width, height, '=====66622===')
     // 统一减2毫米,防止计算误差溢出
     const x = '- 2mm'
     return (
@@ -44,6 +44,9 @@ class Page extends React.Component {
           height: `calc(${height} - ${paddingTop} - ${paddingBottom} ${x})`,
           padding: `${paddingTop} ${paddingRight} ${paddingBottom} ${paddingLeft}`
         }}
+        width={width}
+        height={height}
+        no-page-turning='true'
       >
         <div
           className='gm-printer-page-inner'
