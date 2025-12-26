@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import _ from 'lodash'
+import EditorPageSummary from '../common/editor_page_summary'
 import { Flex } from '../components'
 import { Gap, Title } from '../common/component'
 import EditStore from './store'
@@ -73,6 +74,13 @@ class Editor extends React.Component {
             <EditorAdaptive />
             <EditorSubtotal templateType={templateType} />
 
+            {!!addFields?.orderPerSummaryFields && (
+              <EditorPageSummary
+                hidePageSummary
+                hideAllOrderSummary
+                orderPerSummaryFields={addFields.orderPerSummaryFields}
+              />
+            )}
             <div id='gm-printer-tip' />
 
             <div id='gm-printer-modal' />

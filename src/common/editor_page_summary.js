@@ -307,7 +307,7 @@ class SummarySetting extends React.Component {
   }
 
   renderOrderSummary = () => {
-    const { editStore, orderPerSummaryFields } = this.props
+    const { editStore, orderPerSummaryFields, hideAllOrderSummary } = this.props
     const newSummaryFields = orderPerSummaryFields.filter(
       item => item.type !== 'select'
     )
@@ -331,7 +331,6 @@ class SummarySetting extends React.Component {
       orderLowerCaseText,
       isShowOrderSummaryPer
     } = allOrderSummaryConfig
-    console.log(allOrderSummaryConfig)
     // 由于初始末班没有summary 这个object，为了UI响应数据，只能这么写了
     const hasAllOrderSummaryConfig = has(
       editStore.computedTableSpecialConfig,
@@ -522,17 +521,19 @@ class SummarySetting extends React.Component {
             )}
           </>
         )}
-        <Observer>
-          {() => (
-            <Flex alignCenter className='gm-padding-top-5'>
-              <div>{i18next.t('分单打印时显示总单合计')}：</div>
-              <Switch
-                checked={allOrderSummaryShow}
-                onChange={this.handleAllOrderSummaryShow}
-              />
-            </Flex>
-          )}
-        </Observer>
+        {!hideAllOrderSummary && (
+          <Observer>
+            {() => (
+              <Flex alignCenter className='gm-padding-top-5'>
+                <div>{i18next.t('分单打印时显示总单合计')}：</div>
+                <Switch
+                  checked={allOrderSummaryShow}
+                  onChange={this.handleAllOrderSummaryShow}
+                />
+              </Flex>
+            )}
+          </Observer>
+        )}
 
         <Observer>
           {() =>
@@ -614,11 +615,11 @@ class SummarySetting extends React.Component {
   }
 
   render() {
-    const { hideOrderSummary } = this.props
+    const { hideOrderSummary, hidePageSummary } = this.props
     return (
       <div>
         {/* 每页合计 */}
-        {this.renderPageSummary()}
+        {!hidePageSummary && this.renderPageSummary()}
         <div style={{ height: 5, width: '100%' }} />
         {/* 整单合计 */}
         {!hideOrderSummary && this.renderOrderSummary()}
@@ -631,19 +632,31 @@ SummarySetting.propTypes = {
   editStore: PropTypes.object,
   orderPerSummaryFields: PropTypes.array.isRequired,
   /** 是否隐藏 “整单合计” */
-  hideOrderSummary: PropTypes.bool
+  hidePageSummary: PropTypes.bool,
+  /** 是否隐藏 “每页合计” */
+  hideOrderSummary: PropTypes.bool,
+  /** 是否隐藏 “总单合计” */
+  hideAllOrderSummary: PropTypes.bool
 }
 
 @inject('editStore')
 @observer
 class EditorSummary extends React.Component {
   render() {
-    const { editStore, orderPerSummaryFields, hideOrderSummary } = this.props
+    const {
+      editStore,
+      orderPerSummaryFields,
+      hideOrderSummary,
+      hidePageSummary,
+      hideAllOrderSummary
+    } = this.props
     if (editStore.computedRegionIsTable) {
       return (
         <SummarySetting
           orderPerSummaryFields={orderPerSummaryFields}
           hideOrderSummary={hideOrderSummary}
+          hidePageSummary={hidePageSummary}
+          hideAllOrderSummary={hideAllOrderSummary}
         />
       )
     } else {
@@ -656,7 +669,11 @@ EditorSummary.propTypes = {
   editStore: PropTypes.object,
   orderPerSummaryFields: PropTypes.array.isRequired,
   /** 是否隐藏 “整单合计” */
-  hideOrderSummary: PropTypes.bool
+  hideOrderSummary: PropTypes.bool,
+  /** 是否隐藏 “每页合计” */
+  hidePageSummary: PropTypes.bool,
+  /** 是否隐藏 “总单合计” */
+  hideAllOrderSummary: PropTypes.bool
 }
 
 export default EditorSummary
