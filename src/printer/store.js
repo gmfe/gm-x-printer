@@ -10,7 +10,8 @@ import {
   getOverallOrderTrHeight,
   getDataKey,
   getAutoFillingConfig,
-  coverDigit2Uppercase
+  coverDigit2Uppercase,
+  addMomentDay
 } from '../util'
 import _ from 'lodash'
 import batchPrinterStore from './batch_printer_store'
@@ -1234,10 +1235,7 @@ class PrinterStore {
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
         coverDigit2Uppercase: coverDigit2Uppercase,
-        addDay: (date, day, format = 'YYYY-MM-DD') =>
-          moment(date)
-            .add(day, 'day')
-            .format(format),
+        addDay: addMomentDay,
         formatDate: (date, format) => moment(date).format(format)
       })
     } catch (err) {
@@ -1264,10 +1262,7 @@ class PrinterStore {
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
         coverDigit2Uppercase: coverDigit2Uppercase,
-        addDay: (date, day, format = 'YYYY-MM-DD') =>
-          moment(date)
-            .add(day, 'day')
-            .format(format),
+        addDay: addMomentDay,
         formatDate: (date, format) => moment(date).format(format)
       })
       // 特殊处理配送单双栏打印出现  '元/'
@@ -1298,10 +1293,7 @@ class PrinterStore {
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
         coverDigit2Uppercase: coverDigit2Uppercase,
-        addDay: (date, day, format = 'YYYY-MM-DD') =>
-          moment(date)
-            .add(day, 'day')
-            .format(format),
+        addDay: addMomentDay,
         formatDate: (date, format) => moment(date).format(format)
       })
       // 特殊处理配送单双栏打印出现  '元/'
@@ -1334,10 +1326,7 @@ class PrinterStore {
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
         coverDigit2Uppercase: coverDigit2Uppercase,
-        addDay: (date, day, format = 'YYYY-MM-DD') =>
-          moment(date)
-            .add(day, 'day')
-            .format(format),
+        addDay: addMomentDay,
         formatDate: (date, format) => moment(date).format(format)
       })
     } catch (err) {

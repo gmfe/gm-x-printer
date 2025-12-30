@@ -1,5 +1,6 @@
 import _ from 'lodash'
 import Big from 'big.js'
+import moment from 'moment'
 
 function getPageHeight(el) {
   const styles = window.getComputedStyle(el)
@@ -510,6 +511,16 @@ function addVariableSuffix(text, suffix = '_MULTI_SUFFIX') {
   })
 }
 
+function addMomentDay(date, day, format = 'YYYY-MM-DD') {
+  console.log(date, day, format)
+  if (!date || date === '-') {
+    return ''
+  }
+  return moment(date)
+    .add(day, 'days')
+    .format(format)
+}
+
 export {
   getPageHeight,
   getWidth,
@@ -536,5 +547,6 @@ export {
   getOverallOrderTrHeight,
   regExp,
   getAutoFillingConfig,
-  addVariableSuffix
+  addVariableSuffix,
+  addMomentDay
 }
