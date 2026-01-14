@@ -141,6 +141,10 @@ class EditorField extends React.Component {
             {_.map(DiyTimeType, (v, k) => (
               <TipInfo text={`${k + 1}。${v.text}`} />
             ))}
+            <TipInfo
+              text={`${DiyTimeType.length +
+                +1}、指定日期后7天，输入“单据日期：{{addDay(单据日期, 7)}}”；`}
+            />
           </div>
         )}
       </div>
@@ -339,6 +343,21 @@ class EditorField extends React.Component {
                 onChange={this.handleChangeTable.bind(this, 'text')}
               />
             </div>
+            {(_.includes(text, i18next.t('时间')) ||
+              _.includes(text, i18next.t('日期'))) && (
+              <div>
+                <TipInfo
+                  text={i18next.t('注：可通过修改“{{}}”中的内容更改时间格式。')}
+                />
+                {_.map(DiyTimeType, (v, k) => (
+                  <TipInfo text={`${k + 1}。${v.text}`} />
+                ))}
+                <TipInfo
+                  text={`${DiyTimeType.length +
+                    +1}、指定日期后7天，输入“单据日期：{{addDay(单据日期, 7)}}”；`}
+                />
+              </div>
+            )}
           </div>
         </Flex>
       </div>

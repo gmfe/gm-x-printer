@@ -1,3 +1,4 @@
+import moment from 'moment'
 import i18next from '../../locales'
 import { action, observable, computed, runInAction, toJS } from 'mobx'
 import {
@@ -9,7 +10,8 @@ import {
   getOverallOrderTrHeight,
   getDataKey,
   getAutoFillingConfig,
-  coverDigit2Uppercase
+  coverDigit2Uppercase,
+  addMomentDay
 } from '../util'
 import _ from 'lodash'
 import batchPrinterStore from './batch_printer_store'
@@ -1232,7 +1234,9 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: addMomentDay,
+        formatDate: (date, format) => moment(date).format(format)
       })
     } catch (err) {
       return text
@@ -1257,7 +1261,9 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: addMomentDay,
+        formatDate: (date, format) => moment(date).format(format)
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1286,7 +1292,9 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: addMomentDay,
+        formatDate: (date, format) => moment(date).format(format)
       })
       // 特殊处理配送单双栏打印出现  '元/'
       if (result === '元/') {
@@ -1317,7 +1325,9 @@ class PrinterStore {
         removeTrailingZeros: removeTrailingZeros,
         /** 直接覆盖他，parseFloat("") => 出现NAN  */
         parseFloat: coverParseFloat,
-        coverDigit2Uppercase: coverDigit2Uppercase
+        coverDigit2Uppercase: coverDigit2Uppercase,
+        addDay: addMomentDay,
+        formatDate: (date, format) => moment(date).format(format)
       })
     } catch (err) {
       return text
