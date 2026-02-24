@@ -35,8 +35,8 @@ const AllOrderSummary = props => {
       list,
       (a, b) => {
         let result = a
-        // 子商品不能计算合计
-        if (b['子商品'] && isAllProduct) {
+        // 子商品不能计算合计， 全部商品的时候也要算上子商品
+        if (b['子商品'] && !isAllProduct) {
           return a
         }
         result = a.plus(parseFloat(b[field]) || 0)
@@ -80,6 +80,7 @@ const AllOrderSummary = props => {
     _.each(fields, v => {
       sum[v.name] = sumData(list, v.valueField, isAllProduct)
     })
+
     for (const name in sum) {
       // 子商品不能计算合计
       const price = sum[name]

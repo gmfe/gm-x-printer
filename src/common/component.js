@@ -132,7 +132,6 @@ Textarea.propTypes = {
 class TextPX extends React.Component {
   handleChange = value => {
     const { onChange } = this.props
-    console.log(value === '')
     if (value === '') {
       onChange('')
     } else if (value.endsWith('%')) {
