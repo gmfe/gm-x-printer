@@ -29,16 +29,20 @@ const AllOrderSummary = props => {
         ? 'allprod'
         : getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
     ] || []
+
   // 计算合计
   const sumData = (list, field, isAllProduct) => {
-    return _.reduce(
+    let currentList = list
+
+    // 如果是全部商品，已组合商品为准。但感觉只需要计算子商品就可以了
+    currentList = _.filter(
       list,
+      item => item['子商品'] || (!item['组合商品'] && !item['子商品'])
+    )
+    return _.reduce(
+      currentList,
       (a, b) => {
         let result = a
-        // 子商品不能计算合计
-        if (b['子商品'] && isAllProduct) {
-          return a
-        }
         result = a.plus(parseFloat(b[field]) || 0)
         if (b[field + MULTI_SUFFIX]) {
           result = result.plus(parseFloat(b[field + MULTI_SUFFIX]))
@@ -80,6 +84,7 @@ const AllOrderSummary = props => {
     _.each(fields, v => {
       sum[v.name] = sumData(list, v.valueField, isAllProduct)
     })
+
     for (const name in sum) {
       // 子商品不能计算合计
       const price = sum[name]

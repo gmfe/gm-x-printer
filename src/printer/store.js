@@ -452,7 +452,6 @@ class PrinterStore {
           table.body.heights,
           dataKey
         )
-        console.log(toJS(heights))
         if (this.isDeliverType) {
           heights = [
             ...this.getNormalTableBodyHeights(
@@ -483,10 +482,8 @@ class PrinterStore {
               isShowAllOrderSummary = true
             }
           }
-          console.log('都有吗')
         } else if (allOrderSummaryConfig?.orderSummaryShow) {
           /** 整单合计，不是是每页显示整单合计且在每页底部显示 且开启每页显示在每页底部显示 */
-          console.log('整单合计')
           if (
             !allOrderSummaryConfig?.isShowOrderSummaryPer &&
             summaryConfig.showPageType === 'bottom'

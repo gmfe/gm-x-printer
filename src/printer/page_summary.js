@@ -99,7 +99,6 @@ const PageSummary = props => {
   const isMulti = isMultiTable(_dataKey)
 
   const renderColumns = () => {
-    console.log('每页合计')
     return (
       <>
         {_.map(columns, (col, index) => {

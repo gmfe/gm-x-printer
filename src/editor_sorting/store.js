@@ -80,7 +80,6 @@ class Store extends EditorStore {
       tableConfig.dataKey === 'purchase_last_col_noLineBreak'
     ) {
       const specialCol = tableConfig.columns.find(o => o.isSpecialColumn)
-      console.log(value, '123')
       specialCol.text = value
     }
   }
