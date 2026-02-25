@@ -35,17 +35,10 @@ const AllOrderSummary = props => {
     let currentList = list
 
     // 如果是全部商品，已组合商品为准。但感觉只需要计算子商品就可以了
-    if (isAllProduct) {
-      currentList = _.filter(
-        list,
-        item => item['组合商品'] || (!item['组合商品'] && !item['子商品'])
-      )
-    } else {
-      currentList = _.filter(
-        list,
-        item => item['子商品'] || (!item['组合商品'] && !item['子商品'])
-      )
-    }
+    currentList = _.filter(
+      list,
+      item => item['子商品'] || (!item['组合商品'] && !item['子商品'])
+    )
     return _.reduce(
       currentList,
       (a, b) => {
