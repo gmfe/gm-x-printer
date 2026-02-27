@@ -49,12 +49,20 @@ class Table extends React.Component {
     }
   }
 
+  // 防止 setTimeout 堆积
+  _tableHeightTimer = null
+
   componentDidUpdate(prevProps) {
     if (!this.props.printerStore.tableReady[this.props.name]) {
+      // 清除之前的 timer，防止堆积导致浏览器崩溃
+      if (this._tableHeightTimer) {
+        clearTimeout(this._tableHeightTimer)
+      }
       // TODO 增加定时器，页面渲染完成后再获取高度 因为如果不设置定时器，页面渲染完成后，table的高度还没有计算出来
-      setTimeout(async () => {
+      this._tableHeightTimer = setTimeout(async () => {
         await this.getTableHeight()
         this.props.printerStore.setTableReady(this.props.name, true)
+        this._tableHeightTimer = null
       }, 100)
     }
   }
