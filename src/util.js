@@ -149,8 +149,6 @@ const coverDigit2Uppercase = n => {
     return '-'
   }
 
-  const fraction = ['角', '分']
-
   const digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖']
 
   const unit = [
@@ -165,22 +163,42 @@ const coverDigit2Uppercase = n => {
   let left = ''
   let right = ''
   let i = 0
+  // 小数位：分别取“角”“分”
+  const jiao = Math.floor(
+    Big(n)
+      .times(10)
+      .mod(10)
+      .toString()
+  )
+  const fen = Math.floor(
+    Big(n)
+      .times(100)
+      .mod(10)
+      .toString()
+  )
 
-  for (i; i < fraction.length; i++) {
-    const num = Math.floor(
-      Big(n)
-        .times(Big(10).pow(i + 1))
-        .mod(10)
-        .toString()
-    )
-    if (num === 0 && fraction[i] === '角') {
-      right += digit[num]
-    } else {
-      right += digit[num] + fraction[i]
-    }
+  // 金额大写规则（元后小数位）：
+  // 1. 元以后无角、分（写“整”）
+  //    金额：¥100.00
+  //    大写：人民币壹佰元整
+  // 2. 元以后有角、无分（“角”后可不写“整”，通常不写）
+  //    金额：¥100.10
+  //    大写：人民币壹佰元壹角
+  // 3. 角位为“0”，分位不为“0”（必须写“零”）
+  //    金额：¥100.09
+  //    大写：人民币壹佰元零玖分
+  // 4. 既有角，又有分（分后不写“整”）
+  //    金额：¥100.18
+  //    大写：人民币壹佰元壹角捌分
+  if (jiao === 0 && fen === 0) {
+    right = '整'
+  } else if (jiao !== 0 && fen === 0) {
+    right = `${digit[jiao]}角`
+  } else if (jiao === 0 && fen !== 0) {
+    right = `零${digit[fen]}分`
+  } else {
+    right = `${digit[jiao]}角${digit[fen]}分`
   }
-
-  right = right.replace(/(零分)/, '整').replace(/(零角整)/, '') || '整'
 
   n = Math.floor(n)
 
