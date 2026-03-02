@@ -352,7 +352,6 @@ class PrinterStore {
 
   @action
   computedPages() {
-    // debugger
     // 每次先初始化置空
     this.pages = []
     const isAutoFillingAuto =
@@ -589,7 +588,18 @@ class PrinterStore {
             }
 
             /* 遍历表格每一行，填充表格内容 */
+            // 防止高度过小导致死循环的保护
+            let deliverTableIteration = 0
+            const MAX_DELIVER_TABLE_ITERATIONS = Math.max(
+              dataIndex * 10 + 1000,
+              10000
+            )
             while (dataIndex > end) {
+              deliverTableIteration++
+              if (deliverTableIteration > MAX_DELIVER_TABLE_ITERATIONS) {
+                console.warn('分页计算超过最大迭代次数，可能纸张高度过小')
+                break
+              }
               if (end > dataIndex) {
                 break
               }
@@ -825,8 +835,18 @@ class PrinterStore {
               continue
             }
             /* 遍历表格每一行，填充表格内容 */
-
+            // 防止高度过小导致死循环的保护
+            let normalTableIteration = 0
+            const MAX_NORMAL_TABLE_ITERATIONS = Math.max(
+              heightsLength * 10 + 1000,
+              10000
+            )
             while (end < heightsLength) {
+              normalTableIteration++
+              if (normalTableIteration > MAX_NORMAL_TABLE_ITERATIONS) {
+                console.warn('分页计算超过最大迭代次数，可能纸张高度过小')
+                break
+              }
               currentTableHeight += heights[end]
               // 用于计算最后一页有footer情况的高度
               currentPageHeight += heights[end]
@@ -959,11 +979,11 @@ class PrinterStore {
 
           index++
         } else {
-          // 此页空间不足，此页完成任务
+          // 此页空间不足，创建新页面并把当前 panel 放到新页面
           this.pages.push(page)
-          // 为下一页做准备
-          page = []
-          currentPageHeight = allPagesHaveThisHeight
+          page = [{ type: 'panel', index }]
+          currentPageHeight = allPagesHaveThisHeight + panelHeight
+          index++
         }
       }
     }
@@ -1044,8 +1064,16 @@ class PrinterStore {
           currentPageHeight += allTableHaveThisHeight
           // 合并单元格 开始的tr，计算合并单元格的起始值
           let start = 0
+          // 防止高度过小导致死循环的保护
+          let rowTableIteration = 0
+          const MAX_ROW_TABLE_ITERATIONS = table.body.heights.length * 10 + 1000
           /* 遍历表格每一行 */
           while (end < table.body.heights.length) {
+            rowTableIteration++
+            if (rowTableIteration > MAX_ROW_TABLE_ITERATIONS) {
+              console.warn('分页计算超过最大迭代次数，可能纸张高度过小')
+              break
+            }
             // 加上每一行的高度
             currentPageHeight += table.body.heights[end]
 
