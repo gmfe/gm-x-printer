@@ -22,7 +22,6 @@ import classNames from 'classnames'
 // ‼️‼️🚸🚸 注意: value的命名不要用下划线! 原因是 computedTableDataKeyOfSelectedRegion 会split('_')下划线做一些事情‼️
 // 📚hasSubtotalBtn 这种表格是否支持  双栏,分类,合计  功能
 const tableDataKeyList = [
-
   {
     value: 'orders',
     text: i18next.t('非组合/子商品'),
@@ -68,11 +67,13 @@ class Editor extends React.Component {
       config: { templateType = i18next.t('商户模板') },
       uploadQiniuImage
     } = this.props
+
+    console.log('link成功link成功link成功link成功link成功link成功link成功')
     return (
       <div className={classNames('gm-printer-edit', className)}>
         <Flex className='gm-printer-edit-title-fixed'>
           <Title
-            title={i18next.t('模板预览')}
+            title={i18next.t('模板预览13131231')}
             text={
               <span className='gm-text-desc gm-padding-left-5'>
                 {i18next.t(

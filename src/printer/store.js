@@ -673,7 +673,8 @@ class PrinterStore {
                       )
                       heights.splice(end, 1, ...detailsPageHeight)
                       dataHeights.splice(end, 1, ...detailsPageHeight)
-                      end++
+                      // 重要修复：splice 后 end 需要增加 detailsPageHeight.length，而不是只增加 1
+                      end += detailsPageHeight.length
                     }
                   }
                 }
@@ -697,6 +698,15 @@ class PrinterStore {
                   page = []
                   pageIndex++
                   tablePageComplete()
+                } else {
+                  // end === 0 时，第一行就超过页面高度，强制处理
+                  // 把第一行单独放到新页面
+                  page.push(nowPage)
+                  this.pages.push(page)
+                  page = []
+                  pageIndex++
+                  tablePageComplete()
+                  end++ // 必须增加 end，否则会无限循环
                 }
                 // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
                 // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
@@ -893,14 +903,17 @@ class PrinterStore {
                       /**  如果当前table 都要比可容纳的高度都要高， 那么他的值应该改成详情高度，以为详情被分割了 */
                       if (currentTableHeight > pageAccomodateTableHeight) {
                         heights.splice(end, 1, ...detailsPageHeight)
+                        // 重要修复：splice 后 end 需要增加 detailsPageHeight.length，而不是只增加 1
+                        // 否则当 detailsPageHeight 很长时， heightsLength 增长远快于 end，导致无限循环
+                        end += detailsPageHeight.length
                       } else {
                         // 比较剩余高度和minHeight的大小，取最大（防止剩余一条明细时，第二页撑开的高度远大于一条明细的高度）
                         detailsPageHeight[1] = Math.max(
                           minHeight,
                           detailsPageHeight[1]
                         )
+                        end++
                       }
-                      end++
                     }
                   }
                 }
@@ -915,6 +928,18 @@ class PrinterStore {
                   // 此页完成任务
                   this.pages.push(page)
                   page = []
+                } else {
+                  // end === 0 时，第一行就超过页面高度，强制处理
+                  // 把第一行单独放到新页面
+                  page.push({
+                    type: 'table',
+                    index,
+                    begin: 0,
+                    end: 1
+                  })
+                  this.pages.push(page)
+                  page = []
+                  end = 1 // 必须增加 end，否则会无限循环
                 }
                 // 页面有多个表格时，当同一页的第二个表格的第一行高度加上第一个表格的高度大于页面的高度，需要生成新的一页
                 // 因为是第二个表格，重新走了遍历，end重置0，没有进入到上面的判断（end !== 0），不会生成新的一页
