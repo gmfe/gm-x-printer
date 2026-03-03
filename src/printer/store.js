@@ -675,7 +675,13 @@ class PrinterStore {
                       dataHeights.splice(end, 1, ...detailsPageHeight)
                       // 重要修复：splice 后 end 需要增加 detailsPageHeight.length，而不是只增加 1
                       end += detailsPageHeight.length
+                    } else {
+                      // 没有明细可拆分时，强制跳过当前行，避免死循环
+                      end++
                     }
+                  } else {
+                    // 剩余空间不足，强制跳过当前行
+                    end++
                   }
                 }
                 const nowPage = {
@@ -914,7 +920,13 @@ class PrinterStore {
                         )
                         end++
                       }
+                    } else {
+                      // 没有明细可拆分时，强制跳过当前行，避免死循环
+                      end++
                     }
+                  } else {
+                    // 剩余空间不足，强制跳过当前行
+                    end++
                   }
                 }
                 // 第一条极端会有问题
