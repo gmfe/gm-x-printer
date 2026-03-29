@@ -1,263 +1,269 @@
 # gm-x-printer
 
-gm-x-printer 是新架构 erp 使用的打印库
+<div align="center">
 
-## 目录简要
+可配置的 React 打印组件库，支持可视化模板编辑和多种业务场景。
+
+[![npm version](https://img.shields.io/npm/v/gm-x-printer.svg)](https://www.npmjs.com/package/gm-x-printer)
+[![License](https://img.shields.io/npm/l/gm-x-printer.svg)](https://github.com/gmfe/gm-x-printer/blob/master/LICENSE)
+
+</div>
+
+## 特性
+
+- 🎨 **可视化编辑** - 提供模板编辑器，支持拖拽和实时预览
+- 📄 **灵活配置** - 支持自定义模板配置，适应各种打印需求
+- 🏢 **多业务场景** - 内置 20+ 种业务场景编辑器（入库、出库、采购、结算等）
+- 🖨️ **多种打印方式** - 支持单个打印、批量打印、编程式打印
+- 📐 **多种纸张规格** - 支持 A4、A5、A6 等多种纸张，支持横向/纵向
+- 🌐 **多语言支持** - 支持中英文切换
+
+## 快速开始
+
+### 安装
 
 ```bash
-├── src
-│   ├── config.js # 一些printer配置信息
-│   ├── data_to_key # 原始数据转换成打印数据
-│   ├── editor # 右侧打印编辑界面
-│   ├── index.js
-│   ├── mock_data # 模拟数据
-│   ├── printer # 打印区域
-│   ├── template_config # 打印模板配置文件
-│   └── util.js
-├── locales # 多语言文件
+npm install gm-x-printer
+# 或
+yarn add gm-x-printer
 ```
 
-## 预安装
+### 基础使用
 
-- [NodeJS](https://nodejs.org/en/)
-- [yarn](https://yarnpkg.com/getting-started/install)
-- [Git](https://git-scm.com/downloads)
-- [VSCode](https://code.visualstudio.com/download)（推荐）
+#### 1. 编辑模板
 
-## node 
-版本： 16.17.1
+```jsx
+import { Editor } from 'gm-x-printer'
+import 'gm-x-printer/lib/main.css' // 引入样式
 
-## 运行 gm-x-printer
+function TemplateEditor() {
+  const handleSave = (config) => {
+    console.log('保存的模板配置:', config)
+    // 保存到服务器或本地存储
+  }
 
-```JS
-1. yarn（安装依赖）
-2. yarn start（启动项目）
-3. 启动项目后可以看到文件夹的目录，选择demo文件夹，就会显示常用的打印模板
+  return (
+    <Editor
+      config={initialConfig}      // 初始模板配置
+      mockData={mockData}         // 模拟数据用于预览
+      onSave={handleSave}         // 保存回调
+      showEditor={true}           // 显示编辑器
+      addFields={addFields}       // 可添加的字段列表
+    />
+  )
+}
 ```
 
-## 与 erp 进行连接测试
+#### 2. 打印
 
-1. 在 gm-x-printer 中，使用`yarn link`
-2. 在 gm-static-x-erp 中使用`yarn link 'gm-x-printer'`,这样就连接上了 gm-x-printer 组件库，改动组件库的时候，就可以在 gm-static-x-erp 看到效果
-3. 断开连接，先在 gm-x-printer 中使用`yarn unlink`,在 gm-static-x-erp 中运行`yarn unlink 'gm-x-printer'`,重新 yarn 和 yarn start 一下
-4. 可能断开连接不太好用，不好用的时候，删除 node_modeles，关闭 gm-x-printer，重新 yarn
-5. yarn link 不太稳定
+```jsx
+import { Printer, doPrint } from 'gm-x-printer'
 
-**注意：** 在erp 调试时可以把`package.json`中的`"main": "lib/main.js"`改为`"main": "src/index.js"`, 然后运行 `npm run build:watch`
+// 方式一：使用 Printer 组件
+function PrintPage() {
+  return (
+    <Printer
+      data={printData}       // 打印数据
+      config={templateConfig} // 模板配置
+      onReady={() => {
+        console.log('打印准备完成')
+      }}
+    />
+  )
+}
 
+// 方式二：使用 doPrint 函数（编程式打印）
+async function handlePrint() {
+  await doPrint({
+    data: printData,
+    config: templateConfig
+  })
+}
+```
 
+#### 3. 批量打印
 
-## 与 pnpm 进行连接测试
-1. 在 gm-x-printer 执行 `yarn build:watch`
-2. 在 gm-x-printer 中，执行 `pnpm link --global`
-3. 在需要连接的项目中执行 `pnpm link --global gm-x-printer`
+```jsx
+import { BatchPrinter, doBatchPrint } from 'gm-x-printer'
 
-## 版本命名规则
+// 方式一：使用 BatchPrinter 组件
+function BatchPrintPage() {
+  const printList = [
+    { data: data1, config: config1 },
+    { data: data2, config: config2 },
+  ]
 
-1. GNU 风格的版本号命名格式：主版本号 . 子版本号 [. 修正版本号 [. 编译版本号 ]]，示例 : 1.2.1 （正式版本）, 1.2.1-beta.0(测试版本)
-2. 版本号管理策略:
-   1. 项目最初版本为 1.0.0（npm 上最初的 10.11.3-beta0 的原因是 gm-x-printer 是从 gm-printer 上 feature/迁移出来的，没有影响不用在乎）
-   2. 当项目在进行了局部修改或 bug 修正时，主版本号和子版本号都不变，修正版本号加 1；示例：1.0.1
-   3. 当项目在原有的基础上增加了部分功能时，主版本号不变，子版本号加 1，修正版本号复位为 0。示例：1.1.0
-   4. 当项目在进行了重大修改或局部修正累积较多，而导致项目整体发生全局变化时，主版本号加 1.示例：2.1.0
+  return (
+    <BatchPrinter
+      list={printList}
+      onReady={() => {
+        console.log('批量打印准备完成')
+      }}
+    />
+  )
+}
+
+// 方式二：使用 doBatchPrint 函数
+async function handleBatchPrint() {
+  await doBatchPrint([
+    { data: data1, config: config1 },
+    { data: data2, config: config2 },
+  ])
+}
+```
+
+## 业务场景编辑器
+
+gm-x-printer 提供了 20+ 种业务场景的专用编辑器：
+
+| 业务场景 | 组件 | 说明 |
+|---------|------|------|
+| 通用 | `Editor` | 通用模板编辑器 |
+| 入库 | `EditorStockIn` | 入库单编辑器 |
+| 出库 | `EditorStockOut` | 出库单编辑器 |
+| 调拨 | `EditorCannibalize` | 调拨单编辑器 |
+| 领料 | `EditorMaterialRequisition` | 领料单编辑器 |
+| 采购 | `EditorPurchase` | 采购单编辑器 |
+| 采购需求 | `EditorPurchaseDemand` | 采购需求编辑器 |
+| 结算 | `EditorSettle` | 结算单编辑器 |
+| 账单 | `EditorStatement` | 对账单编辑器 |
+| 账户账单 | `EditorAccoutStatement` | 账户对账单编辑器 |
+| 账户 | `EditorAccount` | 账户编辑器 |
+| 供应商结算 | `EditorSupplierSettleSheet` | 供应商结算编辑器 |
+| 菜单 | `EditorSaleMenus` | 销售菜单编辑器 |
+| 售后 | `EditorAfterSales` | 售后单编辑器 |
+| 电商 | `EditEshop` | 电商订单编辑器 |
+| 生产 | `EditorProduction` | 生产单编辑器 |
+| 分拣 | `EditorSorting` | 分拣单编辑器 |
+| 箱标签 | `EditorBoxLabel` | 箱标签编辑器 |
+| 票据 | `EditorTicket` | 票据编辑器 |
+| 管理 | `EditorManage` | 管理单编辑器 |
+
+## 文档
+
+### 快速开始
+- [安装指南](docs/getting-started/installation.md)
+- [创建第一个模板](docs/getting-started/first-template.md)
+- [完成第一次打印](docs/getting-started/first-print.md)
+
+### 核心概念
+- [模板配置详解](docs/guides/template-config.md) - 了解如何配置打印模板
+- [数据格式说明](docs/guides/data-format.md) - 了解打印数据的格式
+- [区域系统](docs/guides/regions.md) - 了解页眉、页脚、签名等区域
+- [业务场景总览](docs/guides/business-scenarios.md) - 了解各种业务场景
+
+### 组件文档
+- [编辑器组件](docs/components/) - 所有编辑器组件的详细文档
+- [打印组件](docs/components/printers.md) - Printer 和 BatchPrinter 文档
+
+### API 参考
+- [TypeScript 类型](docs/api/types.md) - 类型定义
+- [工具函数](docs/api/utilities.md) - doPrint、getCSS 等工具函数
+
+## 本地开发
+
+### 环境要求
+- Node.js 16.17.1+
+- yarn
+
+### 运行
+
+```bash
+# 安装依赖
+yarn
+
+# 启动开发服务器
+yarn start
+
+# 构建生产版本
+yarn build
+
+# 监听模式构建（用于 link 调试）
+yarn build:watch
+```
+
+### 与其他项目联调
+
+使用 yarn link 进行本地调试：
+
+```bash
+# 在 gm-x-printer 中
+yarn link
+
+# 在需要使用的项目中
+yarn link 'gm-x-printer'
+
+# 断开连接
+yarn unlink
+```
 
 ## 版本发布
 
-gm-x-printer 是一个单独的打印库，使用 github action 发布版本
+本项目使用 GitHub Actions 自动发布。
 
-1. beta版本包的版本发布(在自己的feature|fix分支)，执行yarn release 后选择beta版本
+### Beta 版本
+1. 在 feature/fix 分支执行 `yarn release`，选择 beta 版本
+2. 自动创建 tag 并推送，触发 GitHub Actions
 
-   ![image-20230509125111428](./assets/image-20230509125111428.png)
+### 正式版本
+1. 提 PR 到 master
+2. 合并后，在 master 分支执行 `yarn release`，选择正式版本
+3. 自动创建 tag、生成 changelog 并发布
 
-2. 正式版本的发布
+详细说明请参考现有 README 中的版本发布流程部分。
 
-   1. 提pr到master
-   2. 切换到master，之后执行yarn release选择正式版本（注意minor和patch的区别)![image-20230509125629476](./assets/image-20230509125629476.png)
+## 技术栈
 
-3. 选择后版本后再输入y，会自动生成tag和push，触发github action的release.yml，且生成changelog![image-20230509125812166](./assets/image-20230509125812166.png)
+- React 16.14
+- MobX 4.3
+- Less
+- Webpack 4
+- jsbarcode (条形码)
+- qrcode.react (二维码)
 
-![image-20230509125922115](./assets/image-20230509125922115.png)
+## 项目结构
 
-![image-20230509130332523](./assets/image-20230509130332523.png)
-
-自此自动发包完成！
-
-## 模板文件(template_config)
-
-config 主要是有下面 6 大部分组成
-
-```js
-export default {
-  name: '模板名称', // 模板名称
-  page: {}, // 模板整体的配置信息
-  header: {}, // 页眉(每页都会渲染)
-  contents: {}, // 主要内容(contents只渲染一次!第一页放不下,会顺延到次页继续渲染,直至全部渲染)
-  sign: {}, // 签名(只在最后一页渲染)
-  footer: {} // 页脚(每页都会渲染)
-}
+```
+gm-x-printer/
+├── src/
+│   ├── index.js           # 组件导出
+│   ├── editor/            # 编辑器组件
+│   ├── printer/           # 打印组件
+│   ├── template_config/   # 模板配置示例
+│   ├── mock_data/         # 模拟数据
+│   ├── data_to_key/       # 数据转换
+│   ├── config.js          # 配置
+│   └── util.js            # 工具函数
+├── lib/                   # 构建产物
+├── demo/                  # 演示文件
+├── locales/               # 多语言文件
+└── docs/                  # 文档
 ```
 
-一个简单模板配置如下
+## 常见问题
 
-```js
-export default {
-  name: '模板名称',
-  page: {
-    name: 'A4', // 打印纸张名称
-    type: 'A4', // 打印纸张规格(如:A5,A6...)
-    size: {
-      width: '210mm', // 纸张宽度
-      height: '297mm' // 纸张高度
-    },
-    printDirection: 'vertical', // 打印布局方向(两种: vertical, horizontal)
-    gap: {
-      // 纸张内边距
-      paddingRight: '5mm',
-      paddingLeft: '5mm',
-      paddingBottom: '5mm',
-      paddingTop: '5mm'
-    }
-  },
-  header: {
-    // 页眉
-    blocks: [
-      // blocks数组,里面元素
-      {
-        text: '收货人: {{收货人}}', // 文本块
-        style: {
-          // 文本块样式
-          right: '',
-          left: '450px',
-          position: 'absolute',
-          top: '6px'
-        }
-      }
-    ],
-    style: {
-      // header 的样式
-      height: '97px'
-    }
-  },
-  contents: [
-    // contents数组,元素是object.
-    {
-      blocks: [
-        {
-          text: '收货人: {{收货人}}', // 模板字符串用{{}}表示
-          style: {
-            right: '',
-            left: '450px',
-            position: 'absolute',
-            top: '6px'
-          }
-        }
-      ],
-      style: {
-        height: '78px'
-      }
-    },
-    {
-      blocks: [
-        {
-          type: 'counter', //  type类型为 'counter'是表格上面的类别和商品数小表格
-          style: {}
-        }
-      ],
-      style: {
-        height: 'auto'
-      }
-    },
-    {
-      className: '',
-      type: 'table', // type 表明是table
-      dataKey: 'orders_category', // table的接受哪些数据. dataKey详细看下文
-      subtotal: {
-        // 是否显示table每页合计
-        show: false
-      },
-      columns: [
-        // 表单列配置
-        {
-          head: '序号',
-          headStyle: {
-            // 表头样式
-            textAlign: 'center'
-          },
-          style: {
-            // 表格样式
-            textAlign: 'center'
-          },
-          text: '{{列.序号}}' // 表格内容
-        }
-      ]
-    }
-  ],
-  sign: {
-    // 签名(只在最后一页打印)
-    blocks: [
-      {
-        text: '签收人：',
-        style: {
-          left: '600px',
-          position: 'absolute',
-          top: '5px'
-        }
-      }
-    ],
-    style: {
-      height: '46px'
-    }
-  },
-  footer: {
-    // 页脚
-    blocks: [
-      {
-        text: '页码： {{当前页码}} / {{页码总数}}',
-        style: {
-          right: '',
-          left: '48%',
-          position: 'absolute',
-          top: '0px'
-        }
-      }
-    ],
-    style: {
-      height: '15px'
-    }
-  }
-}
-```
+### 如何选择合适的编辑器？
+根据你的业务场景选择对应的编辑器。如果不确定，可以先使用通用 `Editor` 组件。
 
-## addFields
+### 如何自定义模板？
+参考 [模板配置详解](docs/guides/template-config.md)，了解如何配置各个区域和样式。
 
-右侧的添加字段数据
+### 打印时数据格式不对？
+确保数据格式符合要求，参考 [数据格式说明](docs/guides/data-format.md)。
 
-```js
-├── commonFields # 块区域的添加字段
-├── summaryFields # 合计汇总字段
-├── tableFields # 表格区域的添加字段
-```
+### 如何实现批量打印？
+使用 `BatchPrinter` 组件或 `doBatchPrint` 函数，详见 [打印组件文档](docs/components/printers.md)。
 
-## data 数据
+## 贡献指南
 
-1. common：非表格数据
-2. \_origin:原始数据
-3. \_table：表格数据（根据模板的不同，进行整理数据）
-   1. orders: kOrders, // 普通
-   2. orders_multi: kOrdersMulti, // 双栏
-   3. orders_multi_vertical: kOrdersMultiVertical, // 双栏（纵向）
-   4. orders_category: kCategory, // 分类
-   5. orders_category_multi: kCategoryMulti, // 分类 + 双栏
-   6. orders_category_multi_vertical: kCategoryMultiVertical, // 分类+双栏（纵向）
-   7. .......
+欢迎提交 Issue 和 Pull Request！
 
-## 区域表示
+## License
 
-```js
-// header
-// header.block.0
-// contents.panel.0 //区域块
-// contents.panel.0.block.0 //区域块的每一个块
-// contents.table.0 //区域表格
-// contents.table.0.column.0 // 区域表格的每一个表格
-```
+ISC
+
+## 相关链接
+
+- [GitHub](https://github.com/gmfe/gm-x-printer)
+- [NPM](https://www.npmjs.com/package/gm-x-printer)
+- [问题反馈](https://github.com/gmfe/gm-x-printer/issues)
