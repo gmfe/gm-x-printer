@@ -148,13 +148,26 @@ class Printer extends React.Component {
         config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
           ? printerStore.computedRowTablePages()
           : printerStore.computedPages()
+
         /** @decscription 空白行填充补充 */
-        printerStore.computedPages()
         if (config.autoFillConfig?.checked) {
           this.props.printerStore.setAutofillConfig(
             config.autoFillConfig?.checked || false
           )
+          const beforeLength = this.props.printerStore.data._table[
+            config.autoFillConfig?.dataKey
+          ]?.length
           this.props.printerStore.changeTableData()
+          const afterLength = this.props.printerStore.data._table[
+            config.autoFillConfig?.dataKey
+          ]?.length
+
+          // 只有数据真正变化时才重新计算分页，避免重复计算导致的渲染问题
+          if (afterLength !== beforeLength) {
+            config?.productionMergeType
+              ? printerStore.computedRowTablePages()
+              : printerStore.computedPages()
+          }
         }
         // 获取剩余空白高度，传到editor
         getremainpageHeight &&
@@ -290,6 +303,26 @@ class Printer extends React.Component {
         {_.map(printerStore.pages, (page, i) => {
           const pagesLength = pages.length - 1
           const isLastPage = i === pagesLength // 最后一页
+          console.log(`🔍 渲染第${i + 1}页`, {
+            isLastPage,
+            pagesLength,
+            totalPages: pages.length,
+            panels: page.map(p => {
+              if (p.type === 'table') {
+                return {
+                  type: 'table',
+                  index: p.index,
+                  begin: p.begin,
+                  end: p.end,
+                  range: `[${p.begin}, ${p.end})`,
+                  行数: p.end - p.begin,
+                  渲染行: `第 ${p.begin} 到 ${p.end - 1} 行（序号 ${p.begin +
+                    1} 到 ${p.end}）`
+                }
+              }
+              return { type: p.type, index: p.index }
+            })
+          })
           const lastSecond = i === pagesLength - 1 // 倒数第二页
           let isLastPageHasTable = false
           const hasTable = arr =>
@@ -313,6 +346,7 @@ class Printer extends React.Component {
                 // 如果设置了linesPerPage，则只填充linesPerPage行
                 let end = panel.end
                 let size = panel.size
+                const originalEnd = panel.end // 保存原始 end
                 if (isDeliverType) {
                   if (!printerStore.linesPerPage) {
                     size = isAutofillConfig
@@ -328,6 +362,17 @@ class Printer extends React.Component {
                   end = isAutofillConfig
                     ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                     : panel.end
+                }
+                if (isAutofillConfig && end !== originalEnd) {
+                  console.log('🔧 自动填充扩展 end', {
+                    页码: i + 1,
+                    panel索引: ii,
+                    原始end: originalEnd,
+                    扩展后end: end,
+                    增加行数: end - originalEnd,
+                    剩余高度: remainPageHeight,
+                    每行高度: TR_BASE_HEIGHT
+                  })
                 }
 
                 switch (panel.type) {
