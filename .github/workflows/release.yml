@@ -28,10 +28,10 @@ jobs:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Setup
-        run: npm i -g @antfu/ni
+        run: npm i -g @antfu/ni@0.21.12
 
       - name: Install
-        run: nci
+        run: ni
 
       - name: Build
         run: npm run build
