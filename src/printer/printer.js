@@ -303,26 +303,6 @@ class Printer extends React.Component {
         {_.map(printerStore.pages, (page, i) => {
           const pagesLength = pages.length - 1
           const isLastPage = i === pagesLength // 最后一页
-          console.log(`🔍 渲染第${i + 1}页`, {
-            isLastPage,
-            pagesLength,
-            totalPages: pages.length,
-            panels: page.map(p => {
-              if (p.type === 'table') {
-                return {
-                  type: 'table',
-                  index: p.index,
-                  begin: p.begin,
-                  end: p.end,
-                  range: `[${p.begin}, ${p.end})`,
-                  行数: p.end - p.begin,
-                  渲染行: `第 ${p.begin} 到 ${p.end - 1} 行（序号 ${p.begin +
-                    1} 到 ${p.end}）`
-                }
-              }
-              return { type: p.type, index: p.index }
-            })
-          })
           const lastSecond = i === pagesLength - 1 // 倒数第二页
           let isLastPageHasTable = false
           const hasTable = arr =>
@@ -362,17 +342,6 @@ class Printer extends React.Component {
                   end = isAutofillConfig
                     ? panel.end + Math.floor(remainPageHeight / TR_BASE_HEIGHT)
                     : panel.end
-                }
-                if (isAutofillConfig && end !== originalEnd) {
-                  console.log('🔧 自动填充扩展 end', {
-                    页码: i + 1,
-                    panel索引: ii,
-                    原始end: originalEnd,
-                    扩展后end: end,
-                    增加行数: end - originalEnd,
-                    剩余高度: remainPageHeight,
-                    每行高度: TR_BASE_HEIGHT
-                  })
                 }
 
                 switch (panel.type) {

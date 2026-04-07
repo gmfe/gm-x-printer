@@ -992,29 +992,6 @@ class PrinterStore {
     }
     this.pages.push(page)
 
-    // 检查是否有重叠
-    let hasOverlap = false
-    const tablePanels = this.pages.flatMap((page, pageIndex) =>
-      page.filter(p => p.type === 'table').map(p => ({ ...p, pageIndex }))
-    )
-    for (let i = 1; i < tablePanels.length; i++) {
-      const prev = tablePanels[i - 1]
-      const curr = tablePanels[i]
-      if (prev.index === curr.index && prev.end > curr.begin) {
-        console.error('❌ 检测到分页重叠！', {
-          前一页: `第${prev.pageIndex + 1}页`,
-          前一页范围: `[${prev.begin}, ${prev.end})`,
-          当前页: `第${curr.pageIndex + 1}页`,
-          当前页范围: `[${curr.begin}, ${curr.end})`,
-          重叠行: `第 ${curr.begin} 到 ${Math.min(prev.end, curr.end) - 1} 行`
-        })
-        hasOverlap = true
-      }
-    }
-    if (!hasOverlap) {
-      console.log('✅ 分页检查通过，没有重叠')
-    }
-
     const safeCurrentPageHeight = Number.isNaN(currentPageHeight)
       ? 0
       : currentPageHeight
