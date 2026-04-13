@@ -245,6 +245,12 @@ const getDataKey = (dataKey, arrange, verticalStyle) =>
  * @returns {ranges, detailsPageHeight} detailsPageHeight 每页高度合集
  */
 const caclSingleDetailsPageHeight = (detailsHeights, curRemainPageHeight) => {
+  if (!detailsHeights?.length) {
+    return {
+      ranges: [],
+      detailsPageHeight: []
+    }
+  }
   let [end, deadline] = [0, 0]
   const begin = 0
   /** 当前明细高度，默认为tr的border+padding的height */

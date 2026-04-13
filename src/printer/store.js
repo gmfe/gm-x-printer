@@ -1,6 +1,6 @@
 import moment from 'moment'
 import i18next from '../../locales'
-import { action, observable, computed, runInAction, toJS } from 'mobx'
+import { action, observable, computed, runInAction } from 'mobx'
 import {
   getSumTrHeight,
   isMultiTable,
@@ -325,7 +325,7 @@ class PrinterStore {
     const detailsData = tableData[end]?.__details
     // 如果没有details 和 明细不换行, 就不用计算了
 
-    if (!detailsData || dataKey.includes('noLineBreak')) {
+    if (!detailsData?.length || dataKey.includes('noLineBreak')) {
       return []
     }
     const detailsHeights = table.body.children?.slice(
@@ -336,6 +336,9 @@ class PrinterStore {
       detailsHeights,
       currentRemainTableHeight
     )
+    if (!ranges.length) {
+      return []
+    }
     // 分局明细拆分后的数据
     const splitTableData = _.map(ranges, range => {
       const _tableData = Object.assign({}, tableData[end])

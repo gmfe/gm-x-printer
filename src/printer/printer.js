@@ -148,13 +148,26 @@ class Printer extends React.Component {
         config?.productionMergeType // productionMergeType有值的时候，是生产打印单，需要合并单元格的，分开计算
           ? printerStore.computedRowTablePages()
           : printerStore.computedPages()
+
         /** @decscription 空白行填充补充 */
-        printerStore.computedPages()
         if (config.autoFillConfig?.checked) {
           this.props.printerStore.setAutofillConfig(
             config.autoFillConfig?.checked || false
           )
+          const beforeLength = this.props.printerStore.data._table[
+            config.autoFillConfig?.dataKey
+          ]?.length
           this.props.printerStore.changeTableData()
+          const afterLength = this.props.printerStore.data._table[
+            config.autoFillConfig?.dataKey
+          ]?.length
+
+          // 只有数据真正变化时才重新计算分页，避免重复计算导致的渲染问题
+          if (afterLength !== beforeLength) {
+            config?.productionMergeType
+              ? printerStore.computedRowTablePages()
+              : printerStore.computedPages()
+          }
         }
         // 获取剩余空白高度，传到editor
         getremainpageHeight &&
@@ -313,6 +326,7 @@ class Printer extends React.Component {
                 // 如果设置了linesPerPage，则只填充linesPerPage行
                 let end = panel.end
                 let size = panel.size
+                const originalEnd = panel.end // 保存原始 end
                 if (isDeliverType) {
                   if (!printerStore.linesPerPage) {
                     size = isAutofillConfig
