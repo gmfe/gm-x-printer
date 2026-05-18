@@ -30,6 +30,7 @@ class Editor extends React.Component {
       uploadQiniuImage,
       batchPrintSettingKey,
       showPurchaseDetailSetting = true,
+      hideSheetUnitSummary,
       hideDetailBottomOptions = false,
       config: { templateType }
     } = this.props
@@ -68,6 +69,7 @@ class Editor extends React.Component {
             <EditorSpecialTable
               showPurchaseDetailSetting={showPurchaseDetailSetting}
               hideDetailBottomOptions={hideDetailBottomOptions}
+              hideSheetUnitSummary={hideSheetUnitSummary}
               addFields={addFields}
             />
             {!!addFields?.orderPerSummaryFields && (
@@ -103,6 +105,8 @@ Editor.propTypes = {
   showPurchaseDetailSetting: PropTypes.bool,
   // 是否隐藏采购明细"总表下方"布局选项
   hideDetailBottomOptions: PropTypes.bool
+  // 是否隐藏按下单单位汇总
+  hideSheetUnitSummary: PropTypes.bool
 }
 
 Editor.deaultProps = {
