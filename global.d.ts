@@ -36,7 +36,7 @@ declare module 'gm-x-printer' {
 
   class EditorStockOut<T extends EditorProps> extends React.Component<T, any> {}
 
-  class EditorPurchase<T extends EditorProps> extends React.Component<T, any> {}
+  class EditorPurchase<T extends EditorProps & { hideSheetUnitSummary?: boolean }> extends React.Component<T, any> {}
 
   class EditorSettle<T extends EditorProps> extends React.Component<T, any> {}
 

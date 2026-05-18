@@ -51,7 +51,8 @@ class TableDetailEditor extends React.Component {
       addFields: { detailFields },
       editStore: {
         config: { isSheetUnitSummary }
-      }
+      },
+      hideSheetUnitSummary
     } = this.props
     const {
       dataKey,
@@ -78,16 +79,17 @@ class TableDetailEditor extends React.Component {
           </Select>
         </Flex>
         {/* 选择单列-总表最后一列时，支持按下单单位汇总 */}
-        {(dataKey === 'purchase_last_col' ||
-          dataKey === 'purchase_last_col_noLineBreak') && (
-          <Flex alignCenter className='gm-padding-top-5'>
-            <div>{i18next.t('按下单单位汇总')}：</div>
-            <Switch
-              checked={isSheetUnitSummary}
-              onChange={this.handleSheetUnitSummaryChange}
-            />
-          </Flex>
-        )}
+        {!hideSheetUnitSummary &&
+          (dataKey === 'purchase_last_col' ||
+            dataKey === 'purchase_last_col_noLineBreak') && (
+            <Flex alignCenter className='gm-padding-top-5'>
+              <div>{i18next.t('按下单单位汇总')}：</div>
+              <Switch
+                checked={isSheetUnitSummary}
+                onChange={this.handleSheetUnitSummaryChange}
+              />
+            </Flex>
+          )}
         {dataKey !== 'purchase_no_detail' && (
           <>
             <div className='gm-padding-top-5'>
@@ -149,6 +151,7 @@ class EditorSpecialTable extends React.Component {
       <TableDetailEditor
         config={tableConfig}
         addFields={this.props.addFields}
+        hideSheetUnitSummary={this.props.hideSheetUnitSummary}
       />
     )
   }
