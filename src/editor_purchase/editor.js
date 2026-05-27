@@ -70,6 +70,7 @@ class Editor extends React.Component {
               showPurchaseDetailSetting={showPurchaseDetailSetting}
               hideDetailBottomOptions={hideDetailBottomOptions}
               hideSheetUnitSummary={hideSheetUnitSummary}
+              hideDetailBottomOptions={hideDetailBottomOptions}
               addFields={addFields}
             />
             {!!addFields?.orderPerSummaryFields && (
@@ -106,7 +107,9 @@ Editor.propTypes = {
   // 是否隐藏采购明细"总表下方"布局选项
   hideDetailBottomOptions: PropTypes.bool
   // 是否隐藏按下单单位汇总
-  hideSheetUnitSummary: PropTypes.bool
+  hideSheetUnitSummary: PropTypes.bool,
+  // 是否隐藏采购明细"总表下方"布局选项
+  hideDetailBottomOptions: PropTypes.bool
 }
 
 Editor.deaultProps = {

@@ -54,6 +54,7 @@ class TableDetailEditor extends React.Component {
       },
       hideSheetUnitSummary
       hideDetailBottomOptions
+      hideDetailBottomOptions
     } = this.props
     const {
       dataKey,
