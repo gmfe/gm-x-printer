@@ -63,11 +63,20 @@ export const BLOCK_TYPE_LIST = [
 /** 设置采购明细显示 options */
 
 export const PURCHASE_DETAIL_SHOW_OPTIONS = [
-  { value: 'purchase_no_detail', text: i18next.t('不打印明细') },
-  { value: 'purchase_last_col', text: i18next.t('单列-总表最后一列（换行）') },
+  {
+    value: 'purchase_no_detail',
+    text: i18next.t('不打印明细'),
+    showInLite: true
+  },
+  {
+    value: 'purchase_last_col',
+    text: i18next.t('单列-总表最后一列（换行）'),
+    showInLite: true
+  },
   {
     value: 'purchase_last_col_noLineBreak',
-    text: i18next.t('单列-总表最后一列（不换行）')
+    text: i18next.t('单列-总表最后一列（不换行）'),
+    showInLite: true
   },
   { value: 'purchase_one_row', text: i18next.t('单列-总表下方一行') },
   { value: 'purchase_flex_2', text: i18next.t('双栏-总表下方一行两栏') },

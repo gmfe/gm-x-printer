@@ -51,12 +51,17 @@ class TableDetailEditor extends React.Component {
       addFields: { detailFields },
       editStore: {
         config: { isSheetUnitSummary }
-      }
+      },
+      hideDetailBottomOptions
     } = this.props
     const {
       dataKey,
       specialConfig: { template_text, style }
     } = this.props.config
+
+    const detailShowOptions = hideDetailBottomOptions
+      ? PURCHASE_DETAIL_SHOW_OPTIONS.filter(o => o.showInLite)
+      : PURCHASE_DETAIL_SHOW_OPTIONS
 
     return (
       <div>
@@ -70,7 +75,7 @@ class TableDetailEditor extends React.Component {
             value={dataKey}
             onChange={this.handleDataKeyChange}
           >
-            {_.map(PURCHASE_DETAIL_SHOW_OPTIONS, v => (
+            {_.map(detailShowOptions, v => (
               <Option key={v.value} value={v.value}>
                 {v.text}
               </Option>
@@ -134,7 +139,11 @@ class TableDetailEditor extends React.Component {
 @observer
 class EditorSpecialTable extends React.Component {
   render() {
-    const { editStore, showPurchaseDetailSetting } = this.props
+    const {
+      editStore,
+      showPurchaseDetailSetting,
+      hideDetailBottomOptions
+    } = this.props
     if (!editStore.computedRegionIsTable) return null
     const arr = editStore.selectedRegion.split('.')
     const tableConfig = editStore.config.contents[arr[2]]
@@ -149,6 +158,7 @@ class EditorSpecialTable extends React.Component {
       <TableDetailEditor
         config={tableConfig}
         addFields={this.props.addFields}
+        hideDetailBottomOptions={hideDetailBottomOptions}
       />
     )
   }
