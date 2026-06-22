@@ -33,18 +33,15 @@ class Store extends EditorStore {
       dataKey === 'purchase_last_col' ||
       dataKey === 'purchase_last_col_noLineBreak'
     ) {
-      tableConfig.columns.push(
+      const detail =
         dataKey === 'purchase_last_col'
-          ? PURCHASE_DETAIL
-          : PURCHASE_DETAIL_NO_BREAK
-      )
-      dataKey === 'purchase_last_col'
-        ? (tableConfig.columns[
-            tableConfig.columns?.length - 1
-          ].detailLastColType = 'purchase_last_col')
-        : (tableConfig.columns[
-            tableConfig.columns?.length - 1
-          ].detailLastColType = 'purchase_last_col_noLineBreak')
+          ? { ...PURCHASE_DETAIL }
+          : { ...PURCHASE_DETAIL_NO_BREAK }
+      if (tableConfig.specialConfig?.template_text) {
+        detail.text = tableConfig.specialConfig.template_text
+      }
+      detail.detailLastColType = dataKey
+      tableConfig.columns.push(detail)
     }
   }
 
@@ -67,19 +64,16 @@ class Store extends EditorStore {
     if (bool) {
       tableConfig.columns.push(...PURCHASE_DETAIL_BY_ORDER_UNIT(dataKey))
     } else {
-      tableConfig.columns.push(
+      const detail =
         dataKey === 'purchase_last_col'
-          ? PURCHASE_DETAIL
-          : PURCHASE_DETAIL_NO_BREAK
-      )
+          ? { ...PURCHASE_DETAIL }
+          : { ...PURCHASE_DETAIL_NO_BREAK }
+      if (tableConfig.specialConfig?.template_text) {
+        detail.text = tableConfig.specialConfig.template_text
+      }
+      detail.detailLastColType = dataKey
+      tableConfig.columns.push(detail)
     }
-    dataKey === 'purchase_last_col'
-      ? (tableConfig.columns[
-          tableConfig.columns?.length - 1
-        ].detailLastColType = 'purchase_last_col')
-      : (tableConfig.columns[
-          tableConfig.columns?.length - 1
-        ].detailLastColType = 'purchase_last_col_noLineBreak')
   }
 
   @action.bound
