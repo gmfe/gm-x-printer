@@ -16,7 +16,8 @@ const blockTypeList = [
   { value: 'barcode', text: i18next.t('插入订单条形码') },
   /** 没用了，erp那边好像跳转到老架构商城 */
   // { value: 'qrcode', text: i18next.t('插入订单详情二维码') },
-  { value: 'qrcode_trace', text: i18next.t('插入订单溯源二维码') }
+  { value: 'qrcode_trace', text: i18next.t('插入订单溯源二维码') },
+  { value: 'seal', text: i18next.t('插入印章') }
 ]
 
 @inject('editStore')

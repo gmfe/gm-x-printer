@@ -52,8 +52,7 @@ class TableDetailEditor extends React.Component {
       editStore: {
         config: { isSheetUnitSummary }
       },
-      hideSheetUnitSummary
-      hideDetailBottomOptions
+      hideSheetUnitSummary,
       hideDetailBottomOptions
     } = this.props
     const {

@@ -48,6 +48,18 @@ module.exports = {
         ]
       },
       {
+        test: /\.(png|jpe?g|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 100000,
+              esModule: false
+            }
+          }
+        ]
+      },
+      {
         test: /\/svg\/(\w|\W)+\.svg$/,
         use: [
           {

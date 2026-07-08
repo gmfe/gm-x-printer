@@ -8,6 +8,7 @@ import { dispatchMsg, getStyleWithDiff } from '../util'
 import BarCode from './barcode'
 import QrCode from './qrcode'
 import { Flex } from '../components'
+import yinzhang from '../../assets/yinzhang.png'
 
 @inject('printerStore')
 @observer
@@ -123,6 +124,12 @@ class Block extends React.Component {
       ...rest
     } = this.props
     const { isEdit } = this.state
+
+    // 印章定位块：打印态不渲染（仅用于送签 PDF 定位盖章坐标）
+    if (type === 'seal' && printerStore?.isInPrint) {
+      return null
+    }
+
     let content = null
     let specialStyle = null
     if (!type || type === 'text' || type === 'rise') {
@@ -185,6 +192,20 @@ class Block extends React.Component {
         <QrCode
           value={printerStore.template(text)}
           size={parseInt(style.height)}
+        />
+      )
+    } else if (type === 'seal') {
+      // 印章定位块：编辑态显示印章图，打印态已在上方提前 return null
+      content = (
+        <img
+          className='seal-block'
+          src={yinzhang}
+          style={{
+            width: '100%',
+            height: '100%'
+          }}
+          alt=''
+          data-name={name}
         />
       )
     } else if (type === 'remark') {

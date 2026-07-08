@@ -692,6 +692,21 @@ class EditorStore {
           text: `{{qrcode_trace}}`
         })
         break
+      // 印章定位块：仅用于送签 PDF 时定位盖章坐标，打印时不渲染
+      // 本期固定印章名；印章选择模块（功能点 14/15）预留，届时再加 sealId/sealName 编辑
+      case 'seal':
+        blocks.push({
+          type: 'seal',
+          sealName: i18next.t('印章'),
+          style: {
+            position: 'absolute',
+            left: '0px',
+            top: '0px',
+            width: '120px',
+            height: '120px'
+          }
+        })
+        break
 
       // 备注单元格
       case 'remark':

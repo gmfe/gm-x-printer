@@ -68,7 +68,6 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorSpecialTable
               showPurchaseDetailSetting={showPurchaseDetailSetting}
-              hideDetailBottomOptions={hideDetailBottomOptions}
               hideSheetUnitSummary={hideSheetUnitSummary}
               hideDetailBottomOptions={hideDetailBottomOptions}
               addFields={addFields}
@@ -105,11 +104,9 @@ Editor.propTypes = {
   // 是否显示采购明细设置
   showPurchaseDetailSetting: PropTypes.bool,
   // 是否隐藏采购明细"总表下方"布局选项
-  hideDetailBottomOptions: PropTypes.bool
+  hideDetailBottomOptions: PropTypes.bool,
   // 是否隐藏按下单单位汇总
-  hideSheetUnitSummary: PropTypes.bool,
-  // 是否隐藏采购明细"总表下方"布局选项
-  hideDetailBottomOptions: PropTypes.bool
+  hideSheetUnitSummary: PropTypes.bool
 }
 
 Editor.deaultProps = {
