@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import _ from 'lodash'
 import { MULTI_SUFFIX } from '../config'
 import Big from 'big.js'
-import { coverDigit2Uppercase, getDataKey } from '../util'
+import { coverDigit2Uppercase, getDataKey, isMultiTable } from '../util'
 import { observer } from 'mobx-react'
 import { get } from 'mobx'
 
@@ -35,19 +35,21 @@ const SubtotalSsuQuantityTr = props => {
     printerStore
   } = props
 
-  const tableData =
-    printerStore.data._table[
-      getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-    ] || []
+  const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+  const tableData = printerStore.data._table[_dataKey] || []
+  // 仅双栏(multi)table 的行会携带 _MULTI_SUFFIX 字段(右栏商品)，合计时才需要累加
+  const isMulti = isMultiTable(_dataKey)
   // 计算合计
-  const sumData = (list, field) => {
+  const sumData = (list, field, isMulti) => {
     return _.reduce(
       list,
       (a, b) => {
         let result = a
 
         result = a.plus(b[field] || 0)
-        if (b[field + MULTI_SUFFIX]) {
+        // 仅双栏(multi)table 的行会携带 _MULTI_SUFFIX 字段(右栏商品)，累加才是对的；
+        // 单栏明细行不显示该字段，无条件累加会把上游脏数据/历史残留算进合计，导致合计虚高
+        if (isMulti && b[field + MULTI_SUFFIX]) {
           result = result.plus(b[field + MULTI_SUFFIX])
         }
         return result
@@ -65,7 +67,7 @@ const SubtotalSsuQuantityTr = props => {
     let subtotalStr = ''
 
     _.each(fields, v => {
-      sum[v.name] = sumData(list, v.valueField)
+      sum[v.name] = sumData(list, v.valueField, isMulti)
     })
 
     for (const name in sum) {

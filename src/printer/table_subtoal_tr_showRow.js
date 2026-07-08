@@ -12,7 +12,7 @@ import _ from 'lodash'
 // eslint-disable-next-line import/named
 import { MULTI_SUFFIX, SHOW_WAY_ENUM, SHOW_PAGE_CASE_ENUM } from '../config'
 import Big from 'big.js'
-import { coverDigit2Uppercase, getDataKey } from '../util'
+import { coverDigit2Uppercase, getDataKey, isMultiTable } from '../util'
 import { observer } from 'mobx-react'
 import { get } from 'mobx'
 
@@ -32,12 +32,12 @@ const SubtotalTrShowRow = props => {
     printerStore
   } = props
 
-  const tableData =
-    printerStore.data._table[
-      getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-    ] || []
+  const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+  const tableData = printerStore.data._table[_dataKey] || []
+  // 仅双栏(multi)table 的行会携带 _MULTI_SUFFIX 字段(右栏商品)，合计时才需要累加
+  const isMulti = isMultiTable(_dataKey)
   // 计算合计
-  const sumData = (list, field, isAllProduct) => {
+  const sumData = (list, field, isAllProduct, isMulti) => {
     return _.reduce(
       list,
       (a, b) => {
@@ -49,7 +49,9 @@ const SubtotalTrShowRow = props => {
         }
 
         result = a.plus(parseFloat(b[field]) || 0)
-        if (b[field + MULTI_SUFFIX]) {
+        // 仅双栏(multi)table 的行会携带 _MULTI_SUFFIX 字段(右栏商品)，累加才是对的；
+        // 单栏明细行不显示该字段，无条件累加会把上游脏数据/历史残留算进合计，导致合计虚高
+        if (isMulti && b[field + MULTI_SUFFIX]) {
           const multiRes = parseFloat(b[field + MULTI_SUFFIX] || 0)
           // parseFloat:取值的时候可能返回来的值可能带有单位
           result = result.plus(_.isNaN(multiRes) ? 0 : multiRes)
@@ -104,7 +106,7 @@ const SubtotalTrShowRow = props => {
     let lowerCaseFont = ''
     let upperCaseFont = ''
     _.each(fields, v => {
-      sum[v.name] = sumData(list, v.valueField, isAllProduct)
+      sum[v.name] = sumData(list, v.valueField, isAllProduct, isMulti)
     })
     for (const name in sum) {
       const price = sum[name]

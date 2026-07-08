@@ -13,7 +13,7 @@ import { observer } from 'mobx-react'
 // eslint-disable-next-line no-unused-vars
 import { MULTI_SUFFIX, SHOW_WAY_ENUM, SHOW_ORDER_CASE_ENUM } from '../config'
 import Big from 'big.js'
-import { coverDigit2Uppercase, getDataKey } from '../util'
+import { coverDigit2Uppercase, getDataKey, isMultiTable } from '../util'
 import { get } from 'mobx'
 const AllOrderSummary = props => {
   const {
@@ -23,15 +23,15 @@ const AllOrderSummary = props => {
     printerStore
   } = props
 
-  const tableData =
-    printerStore.data._table[
-      isAll
-        ? 'allprod'
-        : getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-    ] || []
+  const _dataKey = isAll
+    ? 'allprod'
+    : getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
+  const tableData = printerStore.data._table[_dataKey] || []
+  // 仅双栏(multi)table 的 _table 行会携带 _MULTI_SUFFIX 字段(右栏商品)，合计时才需要累加
+  const isMulti = isMultiTable(_dataKey)
 
   // 计算合计
-  const sumData = (list, field, isAllProduct) => {
+  const sumData = (list, field, isAllProduct, isMulti) => {
     let currentList = list
 
     // 如果是全部商品，已组合商品为准。但感觉只需要计算子商品就可以了
@@ -44,7 +44,9 @@ const AllOrderSummary = props => {
       (a, b) => {
         let result = a
         result = a.plus(parseFloat(b[field]) || 0)
-        if (b[field + MULTI_SUFFIX]) {
+        // 仅双栏(multi)table 的行会携带 _MULTI_SUFFIX 字段(右栏商品)，累加才是对的；
+        // 单栏明细行不显示该字段，无条件累加会把上游脏数据/历史残留算进合计，导致合计虚高
+        if (isMulti && b[field + MULTI_SUFFIX]) {
           result = result.plus(parseFloat(b[field + MULTI_SUFFIX]))
         }
         return result
@@ -82,7 +84,7 @@ const AllOrderSummary = props => {
     // 打印全部商品不需要计算子商品
     const isAllProduct = get(config, 'dataKey') === 'allprod'
     _.each(fields, v => {
-      sum[v.name] = sumData(list, v.valueField, isAllProduct)
+      sum[v.name] = sumData(list, v.valueField, isAllProduct, isMulti)
     })
 
     for (const name in sum) {

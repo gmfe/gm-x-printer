@@ -19,7 +19,7 @@ import { MULTI_SUFFIX, SHOW_WAY_ENUM } from '../config'
  * @param dataList
  * @returns {*|string}
  */
-const sumCol = (key, dataList, isAllProduct) => {
+const sumCol = (key, dataList, isAllProduct, isMulti) => {
   let result
   const arr = []
   try {
@@ -32,7 +32,9 @@ const sumCol = (key, dataList, isAllProduct) => {
       }
 
       acc = acc.plus(parseFloat(item[key]) || 0)
-      if (item[key + MULTI_SUFFIX]) {
+      // 仅双栏(multi)table 的行会携带 _MULTI_SUFFIX 字段(右栏商品)，累加才是对的；
+      // 单栏明细行不显示该字段，无条件累加会把上游脏数据/历史残留算进合计，导致合计虚高
+      if (isMulti && item[key + MULTI_SUFFIX]) {
         acc = acc.plus(parseFloat(item[key + MULTI_SUFFIX]))
       }
       return acc
@@ -94,7 +96,7 @@ const PageSummary = props => {
               printerStore.ready &&
               summaryOrderColumns.map(text => regExp(text)).includes(key) &&
               key
-                ? sumCol(key, currentOrderTableData, isAllProduct)
+                ? sumCol(key, currentOrderTableData, isAllProduct, isMultiPage)
                 : ' '
           }
           return (
