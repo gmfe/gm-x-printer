@@ -274,10 +274,12 @@ class CommonContextMenu extends React.Component {
   }
 
   renderPanel = () => {
-    let { insertBlockList, uploadQiniuImage } = this.props
+    let { insertBlockList, uploadQiniuImage, editStore } = this.props
     const { name } = this.state
     const arr = name.split('.')
     const type = arr[0]
+    // config.seals 驱动的印章清单（各模板 template_config 配，配送单/结款凭证:企业+客户；采购单/对账单:企业+供应商）
+    const seals = editStore?.config?.seals || []
 
     // 在页眉插入抬头
     if (type !== 'header') {
@@ -311,6 +313,21 @@ class CommonContextMenu extends React.Component {
             </div>
           )
         })}
+
+        {/* 印章：从 config.seals 动态生成（各模板 template_config 配，不写死源码） */}
+        {seals.length > 0 && (
+          <>
+            <Hr />
+            {_.map(seals, seal => (
+              <div
+                key={seal.type}
+                onClick={this.handleInsertBlock.bind(this, seal.type)}
+              >
+                {seal.text}
+              </div>
+            ))}
+          </>
+        )}
 
         {arr[0] === 'contents' && (
           <>

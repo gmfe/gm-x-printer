@@ -217,12 +217,14 @@ class Printer extends React.Component {
       data,
       selected,
       selectedRegion,
-      isInPrint
+      isInPrint,
+      showSealInPrint
     } = this.props
     printerStore.init(config, data)
     printerStore.setSelected(selected)
     printerStore.setSelectedRegion(selectedRegion)
     printerStore.setIsInPrint(isInPrint)
+    printerStore.setShowSealInPrint(showSealInPrint)
   }
 
   renderBefore() {
@@ -551,7 +553,8 @@ Printer.propTypes = {
   isSomeSubtotalTr: PropTypes.bool,
   updateData: PropTypes.bool,
   getremainpageHeight: PropTypes.func,
-  isInPrint: PropTypes.bool
+  isInPrint: PropTypes.bool,
+  showSealInPrint: PropTypes.bool
 }
 
 Printer.defaultProps = {

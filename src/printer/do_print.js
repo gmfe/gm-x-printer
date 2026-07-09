@@ -68,7 +68,7 @@ function init({ isTest, isPreview, isElectronPrint, isTipZoom = true }) {
   }
 }
 
-function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
+function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint, showSealInPrint }) {
   return new window.Promise(resolve => {
     let $app
     if (isElectronPrint) {
@@ -82,6 +82,7 @@ function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
         config={config}
         data={data}
         isInPrint
+        showSealInPrint={showSealInPrint}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
             if (isPrint) {
@@ -138,6 +139,7 @@ function doPrint({ data, config }, isTest, extraConfig, onReady) {
     config,
     isPrint: extraConfig?.isPrint,
     isElectronPrint: extraConfig?.isElectronPrint,
+    showSealInPrint: extraConfig?.showSealInPrint,
     onReady
   })
 }
