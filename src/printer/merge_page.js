@@ -6,7 +6,7 @@ import { inject, observer } from 'mobx-react'
 @observer
 class MergePage extends React.Component {
   render() {
-    const { children, printerStore } = this.props
+    const { children, overlay, printerStore } = this.props
     const {
       paddingTop,
       paddingRight,
@@ -35,12 +35,15 @@ class MergePage extends React.Component {
         >
           {children}
         </div>
+        {overlay}
       </div>
     )
   }
 }
 
 MergePage.propTypes = {
+  children: PropTypes.node,
+  overlay: PropTypes.node,
   printerStore: PropTypes.object
 }
 

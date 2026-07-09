@@ -17,11 +17,12 @@ class BatchPrinter extends React.Component {
   }
 
   render() {
-    const { list } = this.props
+    const { list, showSealInPrint } = this.props
 
     return _.map(list, ({ config, data }, i) => (
       <Printer
         isInPrint
+        showSealInPrint={showSealInPrint}
         key={i}
         batchKey={`${(data?.batchKey || '') + '-' + i}`}
         data={data}
@@ -34,11 +35,14 @@ class BatchPrinter extends React.Component {
 
 BatchPrinter.propTypes = {
   list: PropTypes.array.isRequired,
-  onReady: PropTypes.func
+  onReady: PropTypes.func,
+  // 印章定位块在打印态(isInPrint)是否渲染（电子签量坐标用，见 block.js isSeal 分支）
+  showSealInPrint: PropTypes.bool
 }
 
 BatchPrinter.defaultProps = {
-  onReady: _.noop
+  onReady: _.noop,
+  showSealInPrint: false
 }
 
 export default BatchPrinter

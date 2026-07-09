@@ -68,7 +68,14 @@ function init({ isTest, isPreview, isElectronPrint, isTipZoom = true }) {
   }
 }
 
-function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
+function toDoPrint({
+  data,
+  config,
+  isPrint = true,
+  onReady,
+  isElectronPrint,
+  showSealInPrint
+}) {
   return new window.Promise(resolve => {
     let $app
     if (isElectronPrint) {
@@ -82,6 +89,7 @@ function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint }) {
         config={config}
         data={data}
         isInPrint
+        showSealInPrint={showSealInPrint}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
             if (isPrint) {
@@ -138,6 +146,7 @@ function doPrint({ data, config }, isTest, extraConfig, onReady) {
     config,
     isPrint: extraConfig?.isPrint,
     isElectronPrint: extraConfig?.isElectronPrint,
+    showSealInPrint: extraConfig?.showSealInPrint,
     onReady
   })
 }
@@ -168,9 +177,22 @@ function doBatchPrint(
   )
 }
 
-function renderBatchPrintToDom(list, container) {
-  // ReactDOM.unmountComponentAtNode(container)
-  ReactDOM.render(<BatchPrinter list={list} />, container)
+function renderBatchPrintToDom(list, container, extraConfig) {
+  // 重复渲染同一 container 前必须先 unmount：否则 React 复用旧树只更新 props，
+  // 内部 Printer 不重挂载 → onReady（仅 componentDidMount 触发）不再回调 →
+  // 电子签场景切换打印模板后 ready 永远为 false，无法发起签署（P0）
+  // 行为对齐本文件 toDoPrint / toDoPrintBatch（都是先 unmount 再 render）
+  ReactDOM.unmountComponentAtNode(container)
+  // extraConfig.showSealInPrint / onReady：电子签场景（WMS govern_web 签署 PDF 生成）
+  // 需要印章定位块进 DOM 量坐标 + 渲染完成回调，见 sign_modal
+  ReactDOM.render(
+    <BatchPrinter
+      list={list}
+      showSealInPrint={extraConfig?.showSealInPrint}
+      onReady={extraConfig?.onReady}
+    />,
+    container
+  )
 }
 
 function getHtml(list) {

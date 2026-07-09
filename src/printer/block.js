@@ -8,7 +8,9 @@ import { dispatchMsg, getStyleWithDiff } from '../util'
 import BarCode from './barcode'
 import QrCode from './qrcode'
 import { Flex } from '../components'
-import yinzhang from '../../assets/yinzhang.png'
+import group from '../../assets/group.png'
+import customer from '../../assets/customer.png'
+import supplier from '../../assets/supplier.png'
 
 @inject('printerStore')
 @observer
@@ -124,9 +126,11 @@ class Block extends React.Component {
       ...rest
     } = this.props
     const { isEdit } = this.state
+    const isSeal =
+      type === 'seal' || type === 'seal_customer' || type === 'seal_supplier'
 
-    // 印章定位块：打印态不渲染（仅用于送签 PDF 定位盖章坐标）
-    if (type === 'seal' && printerStore?.isInPrint) {
+    // 印章定位块：打印态默认不渲染（仅定位盖章坐标，送签用）；showSealInPrint=true 时打印也显示 assets 印章图（将来需求）
+    if (isSeal && printerStore?.isInPrint && !printerStore?.showSealInPrint) {
       return null
     }
 
@@ -194,12 +198,17 @@ class Block extends React.Component {
           size={parseInt(style.height)}
         />
       )
-    } else if (type === 'seal') {
-      // 印章定位块：编辑态显示印章图，打印态已在上方提前 return null
+    } else if (
+      type === 'seal' ||
+      type === 'seal_customer' ||
+      type === 'seal_supplier'
+    ) {
+      // 印章定位块：用 gm-x-printer 默认 assets（group/customer/supplier.png，按 type）；打印态由 showSealInPrint 控制（上方）
+      const sealImg = type === 'seal' ? group : type === 'seal_customer' ? customer : supplier
       content = (
         <img
           className='seal-block'
-          src={yinzhang}
+          src={sealImg}
           style={{
             width: '100%',
             height: '100%'

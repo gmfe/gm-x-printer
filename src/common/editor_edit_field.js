@@ -117,7 +117,9 @@ class EditorField extends React.Component {
         {(type === 'image' ||
           type === 'qrcode' ||
           type === 'qrcode_trace' ||
-          type === 'seal') && (
+          type === 'seal' ||
+          type === 'seal_customer' ||
+          type === 'seal_supplier') && (
           <div>
             <Size
               style={style}
@@ -347,7 +349,9 @@ class EditorField extends React.Component {
               />
             </div>
             {(_.includes(text, i18next.t('时间')) ||
-              _.includes(text, i18next.t('日期'))) && (
+              _.includes(text, i18next.t('日期')) ||
+              _.includes(text, 'Time') ||
+              _.includes(text, 'Date')) && (
               <div>
                 <TipInfo
                   text={i18next.t('注：可通过修改“{{}}”中的内容更改时间格式。')}

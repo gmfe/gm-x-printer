@@ -133,6 +133,21 @@ declare module 'gm-x-printer' {
     onReady?: () => void
   ): (list: []) => Promise<any>
 
+  /**
+   * 用 gm-x-printer 自己的 ReactDOM 把 BatchPrinter 渲染到指定容器（独立 React 树）
+   * 适用：umi mfsu 等双 React 实例场景（如 govern_web），不能 JSX 内联渲染 Printer
+   */
+  function renderBatchPrintToDom(
+    list: any[],
+    container: HTMLElement,
+    extraConfig?: {
+      /** 打印态下印章定位块是否渲染（电子签量坐标用） */
+      showSealInPrint?: boolean
+      /** 渲染完成回调 */
+      onReady?: () => void
+    }
+  ): void
+
   export {
     Editor,
     EditorStockIn,
@@ -159,6 +174,7 @@ declare module 'gm-x-printer' {
     getCSS,
     doPrint,
     doBatchPrint,
+    renderBatchPrintToDom,
     EditorSupplierSettleSheet
   }
 }
