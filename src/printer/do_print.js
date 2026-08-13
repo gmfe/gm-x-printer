@@ -178,7 +178,11 @@ function doBatchPrint(
 }
 
 function renderBatchPrintToDom(list, container, extraConfig) {
-  // ReactDOM.unmountComponentAtNode(container)
+  // 重复渲染同一 container 前必须先 unmount：否则 React 复用旧树只更新 props，
+  // 内部 Printer 不重挂载 → onReady（仅 componentDidMount 触发）不再回调 →
+  // 电子签场景切换打印模板后 ready 永远为 false，无法发起签署（P0）
+  // 行为对齐本文件 toDoPrint / toDoPrintBatch（都是先 unmount 再 render）
+  ReactDOM.unmountComponentAtNode(container)
   // extraConfig.showSealInPrint / onReady：电子签场景（WMS govern_web 签署 PDF 生成）
   // 需要印章定位块进 DOM 量坐标 + 渲染完成回调，见 sign_modal
   ReactDOM.render(
