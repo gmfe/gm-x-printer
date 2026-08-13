@@ -68,7 +68,14 @@ function init({ isTest, isPreview, isElectronPrint, isTipZoom = true }) {
   }
 }
 
-function toDoPrint({ data, config, isPrint = true, onReady, isElectronPrint, showSealInPrint }) {
+function toDoPrint({
+  data,
+  config,
+  isPrint = true,
+  onReady,
+  isElectronPrint,
+  showSealInPrint
+}) {
   return new window.Promise(resolve => {
     let $app
     if (isElectronPrint) {
@@ -170,9 +177,18 @@ function doBatchPrint(
   )
 }
 
-function renderBatchPrintToDom(list, container) {
+function renderBatchPrintToDom(list, container, extraConfig) {
   // ReactDOM.unmountComponentAtNode(container)
-  ReactDOM.render(<BatchPrinter list={list} />, container)
+  // extraConfig.showSealInPrint / onReady：电子签场景（WMS govern_web 签署 PDF 生成）
+  // 需要印章定位块进 DOM 量坐标 + 渲染完成回调，见 sign_modal
+  ReactDOM.render(
+    <BatchPrinter
+      list={list}
+      showSealInPrint={extraConfig?.showSealInPrint}
+      onReady={extraConfig?.onReady}
+    />,
+    container
+  )
 }
 
 function getHtml(list) {
