@@ -18,7 +18,7 @@ class Page extends React.Component {
   }
 
   render() {
-    const { children, printerStore } = this.props
+    const { children, overlay, printerStore } = this.props
     const {
       paddingTop,
       paddingRight,
@@ -54,13 +54,16 @@ class Page extends React.Component {
         >
           {children}
         </div>
+        {overlay}
       </div>
     )
   }
 }
 
 Page.propTypes = {
-  printerStore: PropTypes.number
+  children: PropTypes.node,
+  overlay: PropTypes.node,
+  printerStore: PropTypes.object
 }
 
 export default Page

@@ -698,10 +698,11 @@ class EditorStore {
       case 'seal_supplier':
         blocks.push({
           type,
+          pageAnchor: true,
           style: {
             position: 'absolute',
-            left: '0px',
-            top: '0px',
+            left: pos.left || '0px',
+            top: pos.top || '0px',
             width: '100px',
             height: '100px'
           }

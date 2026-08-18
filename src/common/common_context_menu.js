@@ -20,6 +20,10 @@ class CommonContextMenu extends React.Component {
       block: {
         left: 0,
         top: 0
+      },
+      pageBlock: {
+        left: 0,
+        top: 0
       }
     }
 
@@ -91,6 +95,8 @@ class CommonContextMenu extends React.Component {
     e.preventDefault()
 
     const rect = e.target.getBoundingClientRect()
+    const page = e.target.closest?.('.gm-printer-page')
+    const pageRect = page?.getBoundingClientRect()
 
     this.setState({
       name,
@@ -101,20 +107,28 @@ class CommonContextMenu extends React.Component {
       block: {
         left: clientX - rect.x,
         top: clientY - rect.y
-      }
+      },
+      pageBlock: pageRect
+        ? {
+            left: clientX - pageRect.left,
+            top: clientY - pageRect.top
+          }
+        : { left: 0, top: 0 }
     })
   }
 
   handleInsertBlock = (type, link) => {
     const { editStore } = this.props
-    const { name, block } = this.state
+    const { name, block, pageBlock } = this.state
+    const isSeal = ['seal', 'seal_customer', 'seal_supplier'].includes(type)
+    const position = isSeal ? pageBlock : block
 
     editStore.addConfigBlock(
       name,
       type,
       {
-        left: block.left + 'px',
-        top: block.top + 'px'
+        left: position.left + 'px',
+        top: position.top + 'px'
       },
       link
     )
