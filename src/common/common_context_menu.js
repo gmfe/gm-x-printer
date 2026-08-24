@@ -20,6 +20,10 @@ class CommonContextMenu extends React.Component {
       block: {
         left: 0,
         top: 0
+      },
+      pageBlock: {
+        left: 0,
+        top: 0
       }
     }
 
@@ -91,6 +95,8 @@ class CommonContextMenu extends React.Component {
     e.preventDefault()
 
     const rect = e.target.getBoundingClientRect()
+    const page = e.target.closest?.('.gm-printer-page')
+    const pageRect = page?.getBoundingClientRect()
 
     this.setState({
       name,
@@ -101,20 +107,28 @@ class CommonContextMenu extends React.Component {
       block: {
         left: clientX - rect.x,
         top: clientY - rect.y
-      }
+      },
+      pageBlock: pageRect
+        ? {
+            left: clientX - pageRect.left,
+            top: clientY - pageRect.top
+          }
+        : { left: 0, top: 0 }
     })
   }
 
   handleInsertBlock = (type, link) => {
     const { editStore } = this.props
-    const { name, block } = this.state
+    const { name, block, pageBlock } = this.state
+    const isSeal = ['seal', 'seal_customer', 'seal_supplier'].includes(type)
+    const position = isSeal ? pageBlock : block
 
     editStore.addConfigBlock(
       name,
       type,
       {
-        left: block.left + 'px',
-        top: block.top + 'px'
+        left: position.left + 'px',
+        top: position.top + 'px'
       },
       link
     )
@@ -274,10 +288,12 @@ class CommonContextMenu extends React.Component {
   }
 
   renderPanel = () => {
-    let { insertBlockList, uploadQiniuImage } = this.props
+    let { insertBlockList, uploadQiniuImage, editStore } = this.props
     const { name } = this.state
     const arr = name.split('.')
     const type = arr[0]
+    // config.seals 驱动的印章清单（各模板 template_config 配，配送单/结款凭证:企业+客户；采购单/对账单:企业+供应商）
+    const seals = editStore?.config?.seals || []
 
     // 在页眉插入抬头
     if (type !== 'header') {
@@ -311,6 +327,21 @@ class CommonContextMenu extends React.Component {
             </div>
           )
         })}
+
+        {/* 印章：从 config.seals 动态生成（各模板 template_config 配，不写死源码） */}
+        {seals.length > 0 && (
+          <>
+            <Hr />
+            {_.map(seals, seal => (
+              <div
+                key={seal.type}
+                onClick={this.handleInsertBlock.bind(this, seal.type)}
+              >
+                {seal.text}
+              </div>
+            ))}
+          </>
+        )}
 
         {arr[0] === 'contents' && (
           <>

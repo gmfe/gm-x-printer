@@ -116,6 +116,9 @@ class PrinterStore {
 
   @observable
   isInPrint = false
+  /** 打印时是否显示印章（本期 false 仅定位盖章，将来 true 显示 assets 印章图） */
+  @observable
+  showSealInPrint = false
 
   @action
   init(config, data) {
@@ -191,6 +194,11 @@ class PrinterStore {
   @action
   setIsInPrint(isInPrint) {
     this.isInPrint = isInPrint || false
+  }
+
+  @action
+  setShowSealInPrint(showSealInPrint) {
+    this.showSealInPrint = showSealInPrint || false
   }
 
   @computed

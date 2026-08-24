@@ -1,4 +1,4 @@
-import { getAutoFillingConfig, getDataKey } from '../../src/util'
+import { getAutoFillingConfig, getBlockName, getDataKey } from '../../src/util'
 import i18next from '../../locales'
 import React from 'react'
 import { reaction } from 'mobx'
@@ -11,6 +11,7 @@ import _ from 'lodash'
 import Panel from './panel'
 import Table from './table'
 import MergePage from './merge_page'
+import Block from './block'
 
 // Header Sign Footer 相对特殊，要单独处理
 const Header = props => (
@@ -217,12 +218,14 @@ class Printer extends React.Component {
       data,
       selected,
       selectedRegion,
-      isInPrint
+      isInPrint,
+      showSealInPrint
     } = this.props
     printerStore.init(config, data)
     printerStore.setSelected(selected)
     printerStore.setSelectedRegion(selectedRegion)
     printerStore.setIsInPrint(isInPrint)
+    printerStore.setShowSealInPrint(showSealInPrint)
   }
 
   renderBefore() {
@@ -285,6 +288,20 @@ class Printer extends React.Component {
     )
   }
 
+  renderPageAnchorBlocks = (regions, pageIndex) =>
+    _.flatMap(regions, region =>
+      _.map(region.config?.blocks || [], (block, blockIndex) =>
+        block.pageAnchor ? (
+          <Block
+            key={`${region.name}.block.${blockIndex}`}
+            name={getBlockName(region.name, blockIndex)}
+            config={block}
+            pageIndex={pageIndex}
+          />
+        ) : null
+      )
+    )
+
   renderPage() {
     const { printerStore, isSomeSubtotalTr } = this.props
     const isDeliverType = this.props?.config?.isDeliverType
@@ -311,8 +328,20 @@ class Printer extends React.Component {
           isLastPageHasTable = hasTable(pages?.[pagesLength])
             ? isLastPage
             : lastSecond && hasTable(pages?.[pagesLength - 1])
+          const pageAnchorRegions = [
+            { name: 'header', config: config.header },
+            ..._.uniqBy(page, 'index').map(panel => ({
+              name: `contents.panel.${panel.index}`,
+              config: config.contents[panel.index]
+            })),
+            ...(isLastPage ? [{ name: 'sign', config: config.sign }] : []),
+            { name: 'footer', config: config.footer }
+          ]
           return (
-            <Page key={i}>
+            <Page
+              key={i}
+              overlay={this.renderPageAnchorBlocks(pageAnchorRegions, i)}
+            >
               <Header config={config.header} pageIndex={i} />
               {_.map(page, (panel, ii) => {
                 const content = config.contents[panel.index]
@@ -452,7 +481,20 @@ class Printer extends React.Component {
     const { printerStore } = this.props
     const { config } = printerStore
     return (
-      <MergePage>
+      <MergePage
+        overlay={this.renderPageAnchorBlocks(
+          [
+            { name: 'header', config: config.header },
+            ...config.contents.map((content, index) => ({
+              name: `contents.panel.${index}`,
+              config: content
+            })),
+            { name: 'sign', config: config.sign },
+            { name: 'footer', config: config.footer }
+          ],
+          0
+        )}
+      >
         <Header config={config.header} pageIndex={0} />
         {_.map(config.contents, (content, index) => {
           switch (content.type) {
@@ -551,7 +593,8 @@ Printer.propTypes = {
   isSomeSubtotalTr: PropTypes.bool,
   updateData: PropTypes.bool,
   getremainpageHeight: PropTypes.func,
-  isInPrint: PropTypes.bool
+  isInPrint: PropTypes.bool,
+  showSealInPrint: PropTypes.bool
 }
 
 Printer.defaultProps = {

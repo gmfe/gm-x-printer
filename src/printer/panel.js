@@ -23,7 +23,28 @@ class Panel extends React.Component {
     if (!printerStore.ready) {
       const $dom = this.ref.current
 
-      printerStore.setHeight(name, getPageHeight($dom))
+      // 分页占位高度 = max(panel 盒高, 绝对定位 block 溢出的最大 bottom)。
+      // getPageHeight(offsetHeight) 感知不到 position:absolute 溢出 panel 的 block
+      // （典型：印章在编辑器里被拖到所在区域之外），只按盒高分页时，
+      // 长文档会把该 panel 排到页底附近，溢出 block 被挤出页底——
+      // 打印被纸张裁掉，电子签量出的印章 Y 坐标超过页高被腾讯拒绝（Y坐标不合法）。
+      // 取两者最大后，分页会为溢出 block 预留空间（放不下则整 panel 推入新页）。
+      let height = getPageHeight($dom)
+      const styles = window.getComputedStyle($dom)
+      const contentTop =
+        $dom.getBoundingClientRect().top +
+        parseFloat(styles.borderTopWidth) +
+        parseFloat(styles.paddingTop)
+      const blocks = $dom.querySelectorAll('.gm-printer-block')
+      for (let i = 0; i < blocks.length; i++) {
+        const blockBottom =
+          blocks[i].getBoundingClientRect().bottom - contentTop
+        if (blockBottom > height) {
+          height = blockBottom
+        }
+      }
+
+      printerStore.setHeight(name, height)
     }
   }
 
@@ -97,14 +118,16 @@ class Panel extends React.Component {
         style={Object.assign({}, style, config.style)}
         onClick={this.handleSelectedRegion}
       >
-        {_.map(config.blocks, (block, i) => (
-          <Block
-            key={i}
-            name={getBlockName(name, i)}
-            config={block}
-            pageIndex={pageIndex}
-          />
-        ))}
+        {_.map(config.blocks, (block, i) =>
+          block.pageAnchor ? null : (
+            <Block
+              key={i}
+              name={getBlockName(name, i)}
+              config={block}
+              pageIndex={pageIndex}
+            />
+          )
+        )}
         <div
           draggable
           onMouseUp={this.handleAutoHeight}
