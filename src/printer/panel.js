@@ -23,28 +23,10 @@ class Panel extends React.Component {
     if (!printerStore.ready) {
       const $dom = this.ref.current
 
-      // 分页占位高度 = max(panel 盒高, 绝对定位 block 溢出的最大 bottom)。
-      // getPageHeight(offsetHeight) 感知不到 position:absolute 溢出 panel 的 block
-      // （典型：印章在编辑器里被拖到所在区域之外），只按盒高分页时，
-      // 长文档会把该 panel 排到页底附近，溢出 block 被挤出页底——
-      // 打印被纸张裁掉，电子签量出的印章 Y 坐标超过页高被腾讯拒绝（Y坐标不合法）。
-      // 取两者最大后，分页会为溢出 block 预留空间（放不下则整 panel 推入新页）。
-      let height = getPageHeight($dom)
-      const styles = window.getComputedStyle($dom)
-      const contentTop =
-        $dom.getBoundingClientRect().top +
-        parseFloat(styles.borderTopWidth) +
-        parseFloat(styles.paddingTop)
-      const blocks = $dom.querySelectorAll('.gm-printer-block')
-      for (let i = 0; i < blocks.length; i++) {
-        const blockBottom =
-          blocks[i].getBoundingClientRect().bottom - contentTop
-        if (blockBottom > height) {
-          height = blockBottom
-        }
-      }
-
-      printerStore.setHeight(name, height)
+      // 历史模板允许绝对定位的 block 超出所属区域，分页高度必须仍以区域
+      // 自身配置为准。pageAnchor block 会在 Page overlay 中单独渲染，不应
+      // 反向撑高区域，否则表格变长时会把区域整体推到下一页并产生大段空白。
+      printerStore.setHeight(name, getPageHeight($dom))
     }
   }
 
