@@ -2,16 +2,32 @@ import EditorStore from '../common/editor_store'
 import i18next from '../../locales'
 import { action } from 'mobx'
 
-const Price = {
-  getUnit() {
-    return '元'
-  }
-}
-
 class Store extends EditorStore {
   // 复写父类方法
   setTableDataKeyEffect(target, dataKey) {
     switch (dataKey) {
+      case 'allprodGrouped': {
+        this.setTableDataKeyEffect(target, 'allprod')
+        target.columns.splice(
+          2,
+          0,
+          ...[
+            {
+              head: i18next.t('组合商品名称'),
+              text: '{{列.组合商品名称}}'
+            },
+            {
+              head: i18next.t('组合商品下单数'),
+              text: '{{列.组合商品下单数}}'
+            }
+          ].map(column => ({
+            ...column,
+            headStyle: { textAlign: 'center' },
+            style: { textAlign: 'center' }
+          }))
+        )
+        break
+      }
       case 'combination': {
         target.columns = [
           {

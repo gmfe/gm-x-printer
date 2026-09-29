@@ -7,13 +7,21 @@ class BatchPrinter extends React.Component {
   constructor(props) {
     super(props)
     this.ready = 0
+    this.failed = false
   }
 
   handleReady = () => {
+    if (this.failed) return
     this.ready++
     if (this.ready === this.props.list.length) {
       this.props.onReady()
     }
+  }
+
+  handleError = error => {
+    if (this.failed) return
+    this.failed = true
+    this.props.onError(error)
   }
 
   render() {
@@ -28,6 +36,7 @@ class BatchPrinter extends React.Component {
         data={data}
         config={config}
         onReady={this.handleReady}
+        onError={this.handleError}
       />
     ))
   }
@@ -36,12 +45,14 @@ class BatchPrinter extends React.Component {
 BatchPrinter.propTypes = {
   list: PropTypes.array.isRequired,
   onReady: PropTypes.func,
+  onError: PropTypes.func,
   // 印章定位块在打印态(isInPrint)是否渲染（电子签量坐标用，见 block.js isSeal 分支）
   showSealInPrint: PropTypes.bool
 }
 
 BatchPrinter.defaultProps = {
   onReady: _.noop,
+  onError: _.noop,
   showSealInPrint: false
 }
 

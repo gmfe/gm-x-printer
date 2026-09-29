@@ -3,6 +3,7 @@ import i18next from '../../locales'
 import { action, computed, extendObservable, observable, set } from 'mobx'
 import { pageTypeMap } from '../config'
 import _ from 'lodash'
+import { isGroupedDeliveryTable } from '../printer/grouped_delivery'
 import {
   dispatchMsg,
   getBlockName,
@@ -1087,6 +1088,14 @@ class EditorStore {
     if (this.selectedRegion) {
       const arr = this.selectedRegion.split('.')
       const table = this.config.contents[arr[2]]
+      // Re-selecting the grouped base option also preserves multi/arrange and
+      // the user's editable columns; only entering this mode initializes them.
+      if (
+        isGroupedDeliveryTable(dataKey) &&
+        isGroupedDeliveryTable(table.dataKey)
+      ) {
+        return
+      }
       // 修改要合并的单元格 productionMergeType控制了要合并的单元格是哪个，还控制config的切换
       if (this.config?.productionMergeType) {
         this.config.productionMergeType = dataKey

@@ -22,6 +22,10 @@ import SubtotalTrShowRow from './table_subtoal_tr_showRow'
 import AllOrderSummaryRow from './table_all_order_summary'
 import PageSummary from './page_summary'
 import PageOrderSummary from './page_order_bottom_summary'
+import {
+  getGroupedDeliveryRowSpans,
+  isGroupedDeliveryTable
+} from './grouped_delivery'
 
 @inject('printerStore')
 @observer
@@ -271,7 +275,12 @@ class Table extends React.Component {
         printerStore.isFirstLeftThenRight
       ) {
         // 当前页数 * 当前行数
-        const index = end + i - range.begin
+        // Measure every source row in both column widths before pagination.
+        // The final render maps the right lane using this page's actual size.
+        const index =
+          this.props.isRenderBefore && isGroupedDeliveryTable(dataKey)
+            ? i
+            : end + i - range.begin
         if (tableData.length > index) {
           data2 = tableData[index]
         }
@@ -302,7 +311,7 @@ class Table extends React.Component {
   renderDefault() {
     let {
       config,
-      config: { dataKey, arrange, customerRowHeight = 23, isPrintTableHeader },
+      config: { dataKey, arrange, customerRowHeight = 23 },
       name,
       range,
       pageIndex,
@@ -367,7 +376,11 @@ class Table extends React.Component {
     //   }
     // }
     if (printerStore.isDeliverType) {
-      if (arrange === 'vertical' && printerStore.isFirstLeftThenRight) {
+      if (
+        arrange === 'vertical' &&
+        printerStore.isFirstLeftThenRight &&
+        !(this.props.isRenderBefore && isGroupedDeliveryTable(dataKey))
+      ) {
         // begin = range.trueBegin
         end = Number(begin) + Number(range.size)
       }
@@ -375,6 +388,25 @@ class Table extends React.Component {
     // 不显示
     const isHiddenTableHeader =
       printerStore.config.isPrintTableHeader === false && pageIndex !== 0
+    // Merge after mapping actual visible rows, separately in each column lane.
+    // Initial measurement keeps all parent values to reserve enough space for
+    // a one-child continuation fragment, including long parent names.
+    const rowIndexes = _.range(begin, end)
+    const visibleRows = rowIndexes.map(i => this.getTableData(i))
+    const groupedSpans =
+      isGroupedDeliveryTable(dataKey) &&
+      printerStore.ready &&
+      !this.props.isRenderBefore
+        ? columns.map((col, index) =>
+            getGroupedDeliveryRowSpans(
+              visibleRows,
+              Math.floor(index / config.columns.length),
+              col.text,
+              dataKey,
+              MULTI_SUFFIX
+            )
+          )
+        : []
     return (
       <table>
         <thead
@@ -413,8 +445,8 @@ class Table extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {_.map(_.range(begin, end), i => {
-            const data = this.getTableData(i)
+          {_.map(rowIndexes, (i, rowIndex) => {
+            const data = visibleRows[rowIndex]
             const _special = data && data._special
             if (_special)
               return <SpecialTr key={i} config={config} data={_special} />
@@ -554,9 +586,12 @@ class Table extends React.Component {
                     <td colSpan='99' />
                   ) : (
                     _.map(columns, (col, j) => {
+                      const groupedSpan = groupedSpans[j]?.[rowIndex]
+                      if (groupedSpan === 0) return null
                       return (
                         <td
                           key={j}
+                          rowSpan={groupedSpan > 1 ? groupedSpan : undefined}
                           data-name={getTableColumnName(name, col.index)}
                           style={{
                             wordBreak: 'break-all',

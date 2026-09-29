@@ -176,6 +176,10 @@ class Printer extends React.Component {
       }
       // Printer 不是立马就呈现出最终样式，有个过程。这个过程需要时间，什么 ready，不太清楚，估借 setState 来获取过程结束时刻
       this.setState({}, () => {
+        if (printerStore.paginationError) {
+          this.props.onError(new Error(printerStore.paginationError))
+          return
+        }
         // 这里需要等计算完成渲染完成之后
         if (this.props?.printerStore?.isPrintedPageOrderAndTotal) {
           setTimeout(() => {
@@ -355,7 +359,6 @@ class Printer extends React.Component {
                 // 如果设置了linesPerPage，则只填充linesPerPage行
                 let end = panel.end
                 let size = panel.size
-                const originalEnd = panel.end // 保存原始 end
                 if (isDeliverType) {
                   if (!printerStore.linesPerPage) {
                     size = isAutofillConfig
@@ -533,6 +536,9 @@ class Printer extends React.Component {
 
   doRender() {
     const { printerStore, config } = this.props
+    if (printerStore.paginationError) {
+      return <div role='alert'>{printerStore.paginationError}</div>
+    }
     // batchPrintConfig: 1 不连续打印（纸张会间断）2 连续打印（纸张连续打，不间断）
     const batchPrintConfig = config.batchPrintConfig
     if (batchPrintConfig === 2) {
@@ -549,6 +555,7 @@ class Printer extends React.Component {
       selected,
       config,
       onReady,
+      onError,
       selectedRegion,
       printerStore,
       ...rest
@@ -588,6 +595,7 @@ Printer.propTypes = {
   data: PropTypes.object.isRequired,
   config: PropTypes.object.isRequired,
   onReady: PropTypes.func,
+  onError: PropTypes.func,
   showCombineSkuDetail: PropTypes.bool,
   showIngredientDetail: PropTypes.bool,
   isSomeSubtotalTr: PropTypes.bool,
@@ -598,7 +606,8 @@ Printer.propTypes = {
 }
 
 Printer.defaultProps = {
-  onReady: _.noop
+  onReady: _.noop,
+  onError: _.noop
 }
 
 class WithStorePrinter extends React.Component {
@@ -614,6 +623,10 @@ class WithStorePrinter extends React.Component {
       </Provider>
     )
   }
+}
+
+WithStorePrinter.propTypes = {
+  batchKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
 }
 
 export default WithStorePrinter
