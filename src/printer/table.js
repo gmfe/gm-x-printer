@@ -24,6 +24,7 @@ import PageSummary from './page_summary'
 import PageOrderSummary from './page_order_bottom_summary'
 import {
   getGroupedDeliveryRowSpans,
+  getGroupedMergeFields,
   isGroupedDeliveryTable
 } from './grouped_delivery'
 
@@ -403,7 +404,8 @@ class Table extends React.Component {
               Math.floor(index / config.columns.length),
               col.text,
               dataKey,
-              MULTI_SUFFIX
+              MULTI_SUFFIX,
+              getGroupedMergeFields(config)
             )
           )
         : []

@@ -31,7 +31,7 @@ const columns = [
 const row = (key, child) => ({
   _combineGroupKey: key,
   组合商品名称: '完整父商品名称',
-  组合商品下单数: '2份',
+  组合商品下单数: '2',
   商品名: child
 })
 const table = (rows, options = {}) => {
@@ -68,6 +68,9 @@ test('new mode initializes parent and child columns and retains edits on repeate
   assert.ok(current.columns.some(column => column.text === '{{列.组合商品名称}}'))
   assert.ok(current.columns.some(column => column.text === '{{列.组合商品下单数}}'))
   assert.ok(current.columns.some(column => column.text === '{{列.商品名}}'))
+  // 模式初始化写入合并字段配置，随模板持久化；重复选择不覆盖既有配置
+  assert.deepEqual(current.mergeFields, ['组合商品名称'])
+  current.mergeFields = ['组合商品名称', '组合商品下单数']
   current.columns[0].head = '编辑后的标题'
   current.columns[0].style = { fontSize: '18px' }
   current.columns.pop()
@@ -77,13 +80,29 @@ test('new mode initializes parent and child columns and retains edits on repeate
   assert.equal(JSON.stringify(current), before)
 })
 
-test('real rendering produces rowspan, omits covered tds and preserves child templates', () => {
+test('config mergeFields controls which columns span without library changes', () => {
+  const rows = [row('a', '子1'), row('a', '子2'), row('a', '子3')]
+  // 表 config 指定下单数参与合并：恢复跨行合并，无需改打印库
+  const merged = renderedRows(table(rows, {
+    config: { mergeFields: ['组合商品名称', '组合商品下单数'] }
+  }))
+  assert.equal(cells(merged[0])[1].props.rowSpan, 3)
+  assert.equal(cells(merged[1]).length, 1)
+  // 未配置 mergeFields（存量模板）：回退默认名单，下单数逐行
+  const fallback = renderedRows(table(rows))
+  assert.equal(cells(fallback[0])[1].props.rowSpan, undefined)
+  assert.equal(cells(fallback[1]).length, 2)
+})
+
+test('real rendering produces rowspan on name only, count renders per row', () => {
   const rows = [row('a', '子1'), row('a', '子2'), row('a', '子3')]
   const rendered = renderedRows(table(rows))
   assert.equal(cells(rendered[0])[0].props.rowSpan, 3)
-  assert.equal(cells(rendered[0])[1].props.rowSpan, 3)
-  assert.equal(cells(rendered[1]).length, 1)
-  assert.equal(cells(rendered[1])[0].props.dangerouslySetInnerHTML.__html, '子2')
+  // 2026-10-10 补充：组合商品下单数不合并，逐行渲染
+  assert.equal(cells(rendered[0])[1].props.rowSpan, undefined)
+  assert.equal(cells(rendered[1]).length, 2)
+  assert.equal(cells(rendered[1])[0].props.dangerouslySetInnerHTML.__html, '2')
+  assert.equal(cells(rendered[1])[1].props.dangerouslySetInnerHTML.__html, '子2')
 })
 
 test('mixed bracket child formulas preserve child values and pure bracket parents still print', () => {
@@ -108,7 +127,7 @@ test('page continuation renders complete parent contents on its first visible ch
   }))
   assert.equal(cells(rendered[0])[0].props.rowSpan, 2)
   assert.equal(cells(rendered[0])[0].props.dangerouslySetInnerHTML.__html, '完整父商品名称')
-  assert.equal(cells(rendered[0])[1].props.dangerouslySetInnerHTML.__html, '2份')
+  assert.equal(cells(rendered[0])[1].props.dangerouslySetInnerHTML.__html, '2')
 })
 
 test('first-left-then-right maps page-local right rows before independently merging', () => {
@@ -122,7 +141,10 @@ test('first-left-then-right maps page-local right rows before independently merg
   assert.equal(cells(rendered[0])[0].props.rowSpan, 2)
   assert.equal(cells(rendered[0])[3].props.rowSpan, 2)
   assert.equal(cells(rendered[0])[5].props.dangerouslySetInnerHTML.__html, '子3')
-  assert.equal(cells(rendered[1]).length, 2)
+  // 左栏下单数+子商品 + 右栏下单数+子商品（名称列合并被省略）
+  assert.equal(cells(rendered[1]).length, 4)
+  assert.equal(cells(rendered[1])[0].props.dangerouslySetInnerHTML.__html, '2')
+  assert.equal(cells(rendered[1])[2].props.dangerouslySetInnerHTML.__html, '2')
 })
 
 test('measurement renders every original first-left-then-right row without merging', () => {

@@ -43,8 +43,8 @@ const SubtotalTrShowRow = props => {
       (a, b) => {
         let result = a
 
-        // 子商品不能计算合计
-        if (b['子商品'] && isAllProduct) {
+        // 子商品不能计算合计；但子商品配比数量只在子行有值，跳过子行会让合计恒为 0
+        if (b['子商品'] && isAllProduct && field !== '子商品配比数量') {
           return a
         }
 

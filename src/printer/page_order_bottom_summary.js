@@ -26,8 +26,8 @@ const sumCol = (key, dataList, isAllProduct) => {
     result = dataList.reduce((acc, item) => {
       arr.push(item[key])
 
-      // 子商品不能计算合计
-      if (item['子商品'] && isAllProduct) {
+      // 子商品不能计算合计；但子商品配比数量只在子行有值，跳过子行会让合计恒为 0
+      if (item['子商品'] && isAllProduct && key !== '子商品配比数量') {
         return acc
       }
 
@@ -54,8 +54,7 @@ const PageSummary = props => {
     config,
     config: { dataKey, arrange, columns },
     printerStore,
-    isLastPage,
-    range
+    isLastPage
   } = props
   const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
   const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig')
@@ -124,4 +123,5 @@ const PageSummary = props => {
   }
 }
 
+export { sumCol }
 export default observer(PageSummary)

@@ -26,6 +26,10 @@ class Store extends EditorStore {
             style: { textAlign: 'center' }
           }))
         )
+        // 跨行合并字段随模板配置持久化；存量/自定义配置不覆盖（运行时缺失则回退默认名单）
+        if (!target.mergeFields) {
+          target.mergeFields = ['组合商品名称']
+        }
         break
       }
       case 'combination': {
