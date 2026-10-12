@@ -335,6 +335,17 @@ class Table extends React.Component {
       ] ||
       []
 
+    const isFinalGroupedRender =
+      isGroupedDeliveryTable(dataKey) &&
+      printerStore.ready &&
+      !this.props.isRenderBefore
+    // 固定列宽复刻测量布局：自动布局会把可换行的窄列压到测量宽度以下，
+    // 文字换行后实际行高大于分页预留高度，导致页尾内容被裁掉。
+    // fixed 布局按测量宽度精确分配，测量行高与最终行高保持一致。
+    const tableStyle = isFinalGroupedRender
+      ? { tableLayout: 'fixed', width: '100%' }
+      : undefined
+
     const getTdStyle = (index, style = {}, headerStyle = {}) => {
       const width = thWidths[index]
       const { fontSize } = style
@@ -351,12 +362,20 @@ class Table extends React.Component {
         tdStyle = {
           minWidth: minWidth
         }
+        // fixed 布局必须显式下发宽度，否则该列按剩余空间均分，
+        // 不再等于测量宽度
+        if (tableStyle) {
+          tdStyle.width = minWidth
+        }
         return tdStyle
       }
 
       if (width >= 150) {
         tdStyle = {
           minWidth: width
+        }
+        if (tableStyle) {
+          tdStyle.width = width
         }
       } else {
         tdStyle = {
@@ -394,23 +413,20 @@ class Table extends React.Component {
     // a one-child continuation fragment, including long parent names.
     const rowIndexes = _.range(begin, end)
     const visibleRows = rowIndexes.map(i => this.getTableData(i))
-    const groupedSpans =
-      isGroupedDeliveryTable(dataKey) &&
-      printerStore.ready &&
-      !this.props.isRenderBefore
-        ? columns.map((col, index) =>
-            getGroupedDeliveryRowSpans(
-              visibleRows,
-              Math.floor(index / config.columns.length),
-              col.text,
-              dataKey,
-              MULTI_SUFFIX,
-              getGroupedMergeFields(config)
-            )
+    const groupedSpans = isFinalGroupedRender
+      ? columns.map((col, index) =>
+          getGroupedDeliveryRowSpans(
+            visibleRows,
+            Math.floor(index / config.columns.length),
+            col.text,
+            dataKey,
+            MULTI_SUFFIX,
+            getGroupedMergeFields(config)
           )
-        : []
+        )
+      : []
     return (
-      <table>
+      <table style={tableStyle}>
         <thead
           style={
             isHiddenTableHeader
