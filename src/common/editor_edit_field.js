@@ -65,6 +65,14 @@ class EditorField extends React.Component {
     if (!editStore.computedIsSelectTable) {
       return
     }
+    // selected 与 selectedRegion 是两个独立 action：selected 可能仍指向 table 而
+    // selectedRegion 已被「选择区域」切走，解引用前必须校验 region 含 table
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
     if (val === editStore.computedTableBodyType) {
       return
     }
@@ -74,8 +82,7 @@ class EditorField extends React.Component {
         _.flatten(_.values(tableBodyTypeFields)),
         o => o.value
       ).filter(v => v)
-      const content =
-        editStore.config.contents[editStore.selectedRegion.split('.')[2]]
+      const content = editStore.config.contents[arr[2]]
       const removed = (content.columns || []).filter(
         c => c.text && !keepTexts.includes(c.text)
       )
