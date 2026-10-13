@@ -511,7 +511,7 @@ class PrinterStore {
           allOrderSummaryConfig?.isShowOrderSummaryPer
         ) {
           /** 这里不用减，好像有点奇怪 */
-          if (summaryConfig.showPageType === 'bottom') {
+          if (summaryConfig?.showPageType === 'bottom') {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
@@ -528,7 +528,7 @@ class PrinterStore {
           /** 整单合计，不是是每页显示整单合计且在每页底部显示 且开启每页显示在每页底部显示 */
           if (
             !allOrderSummaryConfig?.isShowOrderSummaryPer &&
-            summaryConfig.showPageType === 'bottom'
+            summaryConfig?.showPageType === 'bottom'
           ) {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
@@ -538,7 +538,7 @@ class PrinterStore {
           }
         } else if (summaryConfig?.pageSummaryShow) {
           /** 每页合计， 在每页底部显示 */
-          if (summaryConfig.showPageType === 'bottom') {
+          if (summaryConfig?.showPageType === 'bottom') {
             // 如果开了每页合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
