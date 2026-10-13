@@ -44,7 +44,11 @@ class Editor extends React.Component {
             <Gap height='5px' />
             <EditorCutomizedConfig />
             <Gap height='5px' />
-            <EditorField />
+            <EditorField
+              tableBodyTypeFields={
+                addFields && addFields.horizontalProductFields
+              }
+            />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
             <div id='gm-printer-tip' />

@@ -60,6 +60,39 @@ class EditorField extends React.Component {
     editStore.setConfigTable('headStyle', headStyle)
   }
 
+  handleSetTableBodyType = val => {
+    const { editStore, tableBodyTypeFields } = this.props
+    if (!editStore.computedIsSelectTable) {
+      return
+    }
+    if (val === editStore.computedTableBodyType) {
+      return
+    }
+    let keepTexts
+    if (val === 'horizontal_product') {
+      keepTexts = _.map(
+        _.flatten(_.values(tableBodyTypeFields)),
+        o => o.value
+      ).filter(v => v)
+      const content =
+        editStore.config.contents[editStore.selectedRegion.split('.')[2]]
+      const removed = (content.columns || []).filter(
+        c => c.text && !keepTexts.includes(c.text)
+      )
+      if (
+        removed.length &&
+        !window.confirm(
+          i18next.t(
+            '切换为商品横向表将移除不受支持的字段列（如 生产日期/保质期），确认切换？'
+          )
+        )
+      ) {
+        return
+      }
+    }
+    editStore.setTableBodyType(val, keepTexts)
+  }
+
   handleSetTableDataKey = dataKey => {
     const { editStore } = this.props
     editStore.setTableDataKey(dataKey)
@@ -164,7 +197,8 @@ class EditorField extends React.Component {
       isDeliverType,
       showMergeOption,
       showProductPermutation = true,
-      renderExtra
+      renderExtra,
+      tableBodyTypeFields
     } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
@@ -188,6 +222,28 @@ class EditorField extends React.Component {
                   </Option>
                 ))}
               </Select>
+            </Flex>
+            <Gap height='5px' />
+          </>
+        )}
+
+        {tableBodyTypeFields && (
+          <>
+            <Flex alignCenter>
+              <Flex alignCenter>{i18next.t('表体类型')}：</Flex>
+              <Select
+                className='gm-printer-edit-select'
+                value={editStore.computedTableBodyType}
+                onChange={this.handleSetTableBodyType}
+              >
+                <Option value='vertical'>{i18next.t('纵向明细表')}</Option>
+                <Option value='horizontal_product'>
+                  {i18next.t('商品横向表')}
+                </Option>
+              </Select>
+            </Flex>
+            <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+              {i18next.t('商品横向表仅支持按班级汇总打印')}
             </Flex>
             <Gap height='5px' />
           </>
@@ -392,6 +448,8 @@ EditorField.propTypes = {
   /** 是否显示商品排列 */
   showProductPermutation: PropTypes.bool,
   renderExtra: PropTypes.func,
+  /** 商品横向表白名单字段集合（传入才显示表体类型下拉） */
+  tableBodyTypeFields: PropTypes.object,
   isDeliverType: PropTypes.bool
 }
 
