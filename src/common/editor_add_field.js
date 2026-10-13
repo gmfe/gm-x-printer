@@ -54,11 +54,16 @@ class EditorAddField extends React.Component {
       content = null
     } else if (editStore.computedRegionIsTable) {
       const dataKey = editStore.selectedTableDataKey
+      let fields = rest?.[dataKey] ?? tableFields
+      // 商品横向表：字段集合切为 ERP 注入的白名单集合
+      if (
+        editStore.computedTableBodyType === 'horizontal_product' &&
+        this.props.addFields.horizontalProductFields
+      ) {
+        fields = this.props.addFields.horizontalProductFields
+      }
       content = (
-        <FieldList
-          fields={rest?.[dataKey] ?? tableFields}
-          handleAddField={editStore.addFieldToTable}
-        />
+        <FieldList fields={fields} handleAddField={editStore.addFieldToTable} />
       )
     } else {
       content = (
