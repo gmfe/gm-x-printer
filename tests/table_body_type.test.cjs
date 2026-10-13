@@ -5,7 +5,8 @@ const {
   TABLE_BODY_TYPE,
   DISH_ANCHOR_TEXT,
   isHorizontalProduct,
-  filterHorizontalColumns
+  filterHorizontalColumns,
+  sumColumnAll
 } = require('../src/common/table_body_type')
 
 const col = text => ({ head: text, text, headStyle: {}, style: {} })
@@ -46,4 +47,15 @@ test('filterHorizontalColumns: 不修改原数组', () => {
   Object.freeze(columns)
   filterHorizontalColumns(columns, ['{{列.班级名称}}'])
   // 不抛错即通过（实现须返回新数组）
+})
+
+test('sumColumnAll: 全量求和、小数两位、非数值容错', () => {
+  const rows = [{ 米饭: 3600 }, { 米饭: 4500 }, { 米饭: '-' }, { 米饭: '' }]
+  assert.equal(sumColumnAll('米饭', rows), '8100')
+  const decimal = [{ 肉排: 2160.5 }, { 肉排: 1080.25 }]
+  assert.equal(sumColumnAll('肉排', decimal), '3240.75')
+  assert.equal(sumColumnAll('不存在的列', rows), '0')
+  // 容错：空列表 / null
+  assert.equal(sumColumnAll('米饭', []), '0')
+  assert.equal(sumColumnAll('米饭', null), '0')
 })
