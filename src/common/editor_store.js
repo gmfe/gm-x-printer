@@ -1198,6 +1198,44 @@ class EditorStore {
     }
   }
 
+  // 商品横向表整单合计配置（show: 整单合计开关；perPage: 每页显示合计），均默认 false
+  @action.bound
+  setHorizontalSummaryConfig(patch) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        this.config.contents[arr[2]] = {
+          ...content,
+          orderSummary: {
+            show: false,
+            perPage: false,
+            ...content.orderSummary,
+            ...patch
+          }
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 商品横向表重量换算（除数），非法/非正数按 1（不换算）处理
+  @action.bound
+  setWeightDivisor(val) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        const n = Number(val)
+        this.config.contents[arr[2]] = {
+          ...content,
+          weightDivisor: Number.isFinite(n) && n > 0 ? n : 1
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
   @action
   removeContent(name) {
     const arr = name.split('.')

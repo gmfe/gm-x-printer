@@ -100,6 +100,47 @@ class EditorField extends React.Component {
     editStore.setTableBodyType(val, keepTexts)
   }
 
+  handleSetHorizontalSummary = patch => {
+    const { editStore } = this.props
+    if (!editStore.computedIsSelectTable) {
+      return
+    }
+    // 同 handleSetTableBodyType：selectedRegion 可能已被「选择区域」切走，写值前校验含 table
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setHorizontalSummaryConfig(patch)
+  }
+
+  handleSetWeightDivisor = val => {
+    const { editStore } = this.props
+    if (!editStore.computedIsSelectTable) {
+      return
+    }
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setWeightDivisor(val)
+  }
+
+  // 读取当前选中表体 content（selectedRegion 含 table 才有效），供横向表配置控件取值
+  getSelectedTableContent() {
+    const { editStore } = this.props
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (arr.includes('table')) {
+      return editStore.config.contents[arr[2]]
+    }
+    return null
+  }
+
   handleSetTableDataKey = dataKey => {
     const { editStore } = this.props
     editStore.setTableDataKey(dataKey)
@@ -209,6 +250,11 @@ class EditorField extends React.Component {
     } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
+    const selectedTableContent = this.getSelectedTableContent()
+    const orderSummary =
+      (selectedTableContent && selectedTableContent.orderSummary) || {}
+    const weightDivisor =
+      (selectedTableContent && selectedTableContent.weightDivisor) || 1
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -252,6 +298,48 @@ class EditorField extends React.Component {
             <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
               {i18next.t('商品横向表仅支持按班级汇总打印')}
             </Flex>
+            {editStore.computedTableBodyType === 'horizontal_product' && (
+              <>
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <Flex alignCenter>{i18next.t('整单合计')}：</Flex>
+                  <Select
+                    className='gm-printer-edit-select'
+                    value={orderSummary.show ? 'on' : 'off'}
+                    onChange={v =>
+                      this.handleSetHorizontalSummary({ show: v === 'on' })
+                    }
+                  >
+                    <Option value='off'>{i18next.t('关闭')}</Option>
+                    <Option value='on'>{i18next.t('开启')}</Option>
+                  </Select>
+                </Flex>
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <Flex alignCenter>{i18next.t('每页显示合计')}：</Flex>
+                  <Select
+                    className='gm-printer-edit-select'
+                    value={orderSummary.perPage ? 'on' : 'off'}
+                    onChange={v =>
+                      this.handleSetHorizontalSummary({
+                        perPage: v === 'on'
+                      })
+                    }
+                  >
+                    <Option value='off'>{i18next.t('仅末页')}</Option>
+                    <Option value='on'>{i18next.t('每页显示')}</Option>
+                  </Select>
+                </Flex>
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <Flex alignCenter>{i18next.t('重量换算')}：</Flex>
+                  <input
+                    value={weightDivisor}
+                    onChange={e => this.handleSetWeightDivisor(e.target.value)}
+                    type='number'
+                    className='gm-printer-edit-input-custom'
+                  />
+                  {i18next.t('除以该数（例 500 = 克转斤）')}
+                </Flex>
+              </>
+            )}
             <Gap height='5px' />
           </>
         )}
