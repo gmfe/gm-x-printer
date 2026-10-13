@@ -6,7 +6,7 @@ const {
   DISH_ANCHOR_TEXT,
   isHorizontalProduct,
   filterHorizontalColumns
-} = require('../src/editor_eshop/table_body_type')
+} = require('../src/common/table_body_type')
 
 const col = text => ({ head: text, text, headStyle: {}, style: {} })
 
