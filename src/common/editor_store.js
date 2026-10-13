@@ -10,6 +10,7 @@ import {
   regExp,
   getAutoFillingConfig
 } from '../util'
+import { filterHorizontalColumns } from './table_body_type'
 
 class EditorStore {
   @observable
@@ -1164,6 +1165,34 @@ class EditorStore {
           ...this.config.contents[arr[2]],
           arrange: val
         }
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 获得表体类型（学生餐配送单：纵向表 / 商品横向表），缺省 vertical
+  @computed
+  get computedTableBodyType() {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        return this.config.contents[arr[2]].tableType || 'vertical'
+      }
+    }
+  }
+
+  @action.bound
+  setTableBodyType(val, keepTexts) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        const next = { ...content, tableType: val }
+        // 切换到横向表时剔除非白名单列（空文本自定义列保留）
+        if (val === 'horizontal_product' && keepTexts && keepTexts.length) {
+          next.columns = filterHorizontalColumns(content.columns, keepTexts)
+        }
+        this.config.contents[arr[2]] = next
         this.changeUpdateData()
       }
     }
