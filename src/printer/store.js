@@ -1316,6 +1316,15 @@ class PrinterStore {
     // 做好保护，出错就返回 text
     try {
       const list = this.data._table[dataKey] || this.data._table.orders
+      // 属性名含特殊字符（如动态菜名）时 _.template 编译失败——先正则直查行数据兜底
+      const direct = text.replace(/\{\{列\.([^{}]+)\}\}/g, (m, key) =>
+        list[index] && list[index][key] !== undefined
+          ? String(list[index][key])
+          : m
+      )
+      if (direct !== text) {
+        return direct
+      }
       const result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
