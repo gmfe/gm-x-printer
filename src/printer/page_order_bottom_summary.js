@@ -67,8 +67,9 @@ const PageSummary = props => {
     style,
     orderSummaryText,
     summaryOrderColumns,
-    // 2026-10-14 用户口径：仅整单合计行做重量换算（单元格原值展示），如 500=克转斤
-    sumDivisor
+    // 2026-10-14 用户口径：仅整单合计行做重量换算（单元格原值展示），如 500=克转斤。
+    // per-key 映射：重量列配换算系数，配餐人数等非重量列不除
+    sumDivisorByField
   } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
@@ -107,12 +108,13 @@ const PageSummary = props => {
             if (!printerStore.ready) {
               html = ' '
             } else {
-              // 2026-10-14 用户口径：仅整单合计行做重量换算（单元格原值展示）
+              // 仅合计行换算（sumDivisorByField[key]，未配置则原样）
               const summed = sumCol(key, currentOrderTableData, isAllProduct)
+              const divisor = sumDivisorByField?.[key]
               html =
-                summed !== '' && sumDivisor > 1
+                summed !== '' && divisor > 1
                   ? new Big(summed)
-                      .div(sumDivisor)
+                      .div(divisor)
                       .round(2)
                       .toString()
                   : summed
