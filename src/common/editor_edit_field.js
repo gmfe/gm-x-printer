@@ -335,7 +335,7 @@ class EditorField extends React.Component {
         <Flex alignCenter>
           <Flex alignCenter>{i18next.t('设置列宽')}：</Flex>
           <ColumnWidth
-            style={headStyle}
+            style={headStyle || {}}
             onChange={this.handleChangeTableColumn}
           />
         </Flex>
@@ -451,13 +451,13 @@ class EditorField extends React.Component {
           <div>
             <div>
               <Fonter
-                style={headStyle}
+                style={headStyle || {}}
                 onChange={this.handleChangeTable.bind(this, 'headStyle')}
                 type='table'
               />
               <Separator />
               <TextAlign
-                style={headStyle}
+                style={headStyle || {}}
                 onChange={this.handleChangeTable.bind(this, 'headStyle')}
               />
               <Gap />
@@ -470,13 +470,13 @@ class EditorField extends React.Component {
             </div>
             <div>
               <Fonter
-                style={style}
+                style={style || {}}
                 onChange={this.handleChangeTable.bind(this, 'style')}
                 type='table'
               />
               <Separator />
               <TextAlign
-                style={style}
+                style={style || {}}
                 onChange={this.handleChangeTable.bind(this, 'style')}
               />
               <Gap />
