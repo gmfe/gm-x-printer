@@ -1352,6 +1352,14 @@ class PrinterStore {
   templateRowSpanTable(text, item) {
     // 做好保护，出错就返回 text
     try {
+      // 属性名含特殊字符（如学生餐横向表动态菜名「土豆（净）」）时 _.template 按 JS 表达式
+      // 编译会失败——先用正则直查行数据兜底，未命中再走 template（保留表达式/函数能力）
+      const direct = text.replace(/\{\{列\.([^{}]+)\}\}/g, (m, key) =>
+        item && item[key] !== undefined ? String(item[key]) : m
+      )
+      if (direct !== text) {
+        return direct
+      }
       return _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
