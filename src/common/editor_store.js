@@ -269,7 +269,8 @@ class EditorStore {
               // 横向表配置变化需重挂载 Printer 预览（表体类型/整单合计/换算——同 summaryConfig.pageSummaryShow 先例）
               vv.tableType +
               vv.orderSummary?.show +
-              vv.weightDivisor
+              vv.weightDivisor +
+              vv.weightOperator
             )
           } else {
             return vv.style ? vv.style.height : ''
@@ -1249,10 +1250,28 @@ class EditorStore {
       const arr = this.selectedRegion.split('.')
       if (arr.includes('table')) {
         const content = this.config.contents[arr[2]]
-        const n = Number(val)
+        // 2026-10-14 需求：输入可删空（存原样字符串），保存时 erp 归一为 0
+        const trimmed = String(val).trim()
+        const n = Number(trimmed)
         this.config.contents[arr[2]] = {
           ...content,
-          weightDivisor: Number.isFinite(n) && n > 0 ? n : 1
+          weightDivisor: trimmed === '' ? '' : Number.isFinite(n) ? n : ''
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 重量换算运算符：divide（÷，默认）| multiply（×）——2026-10-14 需求增补
+  @action.bound
+  setWeightOperator(val) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        this.config.contents[arr[2]] = {
+          ...content,
+          weightOperator: val === 'multiply' ? 'multiply' : 'divide'
         }
         this.changeUpdateData()
       }
