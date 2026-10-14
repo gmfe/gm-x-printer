@@ -280,7 +280,8 @@ class EditorField extends React.Component {
           </>
         )}
 
-        {tableBodyTypeFields && (
+        {/* 打印侧仅处理 dataKey '1'（学生餐常规表体），2/3/4（桶餐/净菜/调味品）不展示横向配置 */}
+        {tableBodyTypeFields && editStore.selectedTableDataKey === '1' && (
           <>
             <Flex alignCenter>
               <Flex alignCenter>{i18next.t('表体类型')}：</Flex>
@@ -318,6 +319,8 @@ class EditorField extends React.Component {
                   <Select
                     className='gm-printer-edit-select'
                     value={orderSummary.perPage ? 'on' : 'off'}
+                    // 设计 §4.7：整单合计主开关关闭时禁用每页显示合计
+                    disabled={!orderSummary.show}
                     onChange={v =>
                       this.handleSetHorizontalSummary({
                         perPage: v === 'on'
