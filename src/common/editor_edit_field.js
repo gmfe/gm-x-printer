@@ -129,6 +129,20 @@ class EditorField extends React.Component {
     editStore.setWeightDivisor(val)
   }
 
+  handleSetWeightOperator = val => {
+    const { editStore } = this.props
+    if (!editStore.computedIsSelectTable) {
+      return
+    }
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setWeightOperator(val)
+  }
+
   // 读取当前选中表体 content（selectedRegion 含 table 才有效），供横向表配置控件取值
   getSelectedTableContent() {
     const { editStore } = this.props
@@ -253,8 +267,11 @@ class EditorField extends React.Component {
     const selectedTableContent = this.getSelectedTableContent()
     const orderSummary =
       (selectedTableContent && selectedTableContent.orderSummary) || {}
+    // 2026-10-14 需求：输入框可删空（undefined 显示空，保存时归一为 0）
     const weightDivisor =
-      (selectedTableContent && selectedTableContent.weightDivisor) || 1
+      selectedTableContent && selectedTableContent.weightDivisor
+    const weightOperator =
+      selectedTableContent && selectedTableContent.weightOperator
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -316,15 +333,27 @@ class EditorField extends React.Component {
                 </Flex>
                 <Flex alignCenter className='gm-padding-top-5'>
                   <Flex alignCenter>{i18next.t('重量换算')}：</Flex>
+                  <Select
+                    className='gm-printer-edit-select'
+                    value={weightOperator || 'divide'}
+                    onChange={v => this.handleSetWeightOperator(v)}
+                  >
+                    <Option value='divide'>{i18next.t('÷ 除以')}</Option>
+                    <Option value='multiply'>{i18next.t('× 乘以')}</Option>
+                  </Select>
                   <input
-                    value={weightDivisor}
+                    value={
+                      weightDivisor === undefined ? '' : String(weightDivisor)
+                    }
                     onChange={e => this.handleSetWeightDivisor(e.target.value)}
                     type='number'
                     className='gm-printer-edit-input-custom'
                   />
                 </Flex>
                 <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
-                  {i18next.t('除以该数（例 500 = 克转斤）')}
+                  {(weightOperator || 'divide') === 'divide'
+                    ? i18next.t('合计除以该数（例 500 = 克转斤）；留空保存为 0')
+                    : i18next.t('合计乘以该数；留空保存为 0')}
                 </Flex>
               </>
             )}

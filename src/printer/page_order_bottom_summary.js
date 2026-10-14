@@ -67,9 +67,10 @@ const PageSummary = props => {
     style,
     orderSummaryText,
     summaryOrderColumns,
-    // 2026-10-14 用户口径：仅整单合计行做重量换算（单元格原值展示），如 500=克转斤。
-    // per-key 映射：重量列配换算系数，配餐人数等非重量列不除
-    sumDivisorByField
+    // 2026-10-14 口径：仅整单合计行做重量换算（单元格原值展示）。per-key 映射
+    // { value, operator: 'divide'|'multiply' }：重量列配系数，配餐人数等非重量列不换算；
+    // ÷0 或 ×0 结果为 0（空保存归一 0 的配套口径）
+    sumConvertByField
   } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
@@ -108,16 +109,26 @@ const PageSummary = props => {
             if (!printerStore.ready) {
               html = ' '
             } else {
-              // 仅合计行换算（sumDivisorByField[key]，未配置则原样）
+              // 仅合计行换算（sumConvertByField[key]，未配置则原样）
               const summed = sumCol(key, currentOrderTableData, isAllProduct)
-              const divisor = sumDivisorByField?.[key]
-              html =
-                summed !== '' && divisor > 1
-                  ? new Big(summed)
-                      .div(divisor)
-                      .round(2)
-                      .toString()
-                  : summed
+              const convert = sumConvertByField?.[key]
+              if (summed !== '' && convert && Number.isFinite(convert.value)) {
+                const bigSum = new Big(summed)
+                html =
+                  convert.operator === 'multiply'
+                    ? bigSum
+                        .times(convert.value)
+                        .round(2)
+                        .toString()
+                    : convert.value > 0
+                    ? bigSum
+                        .div(convert.value)
+                        .round(2)
+                        .toString()
+                    : new Big(0).toString()
+              } else {
+                html = summed
+              }
             }
           } else {
             html = ' '
