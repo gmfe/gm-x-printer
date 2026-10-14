@@ -10,7 +10,7 @@ import {
   regExp,
   getAutoFillingConfig
 } from '../util'
-import { filterHorizontalColumns } from './table_body_type'
+import { ensureDishAnchor, filterHorizontalColumns } from './table_body_type'
 
 class EditorStore {
   @observable
@@ -1194,7 +1194,9 @@ class EditorStore {
         const next = { ...content, tableType: val }
         // 切换到横向表时剔除非白名单列（空文本自定义列保留）
         if (val === 'horizontal_product' && keepTexts && keepTexts.length) {
-          next.columns = filterHorizontalColumns(content.columns, keepTexts)
+          next.columns = ensureDishAnchor(
+            filterHorizontalColumns(content.columns, keepTexts)
+          )
           // 选中列按索引寻址（computedSelectedInfo = columns[N]），剔除后索引悬空/错位
           // 会导致 Fonter/ColumnWidth 读 undefined 崩溃——照 removeField 先例清理选中态
           if (
