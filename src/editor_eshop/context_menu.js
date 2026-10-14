@@ -45,6 +45,8 @@ const buildPreviewConfig = config => {
               fields: summableKeys.map(name => ({ name, valueField: name })),
               // 组件对每项做 regExp 提取，需传模板串形式
               summaryOrderColumns: summableKeys.map(name => `{{列.${name}}}`),
+              // 仅整单合计行做重量换算
+              sumDivisor: content.weightDivisor > 0 ? content.weightDivisor : 1,
               style: { textAlign: 'center', fontSize: '12px' }
             }
           }
