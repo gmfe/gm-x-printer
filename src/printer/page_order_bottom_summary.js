@@ -66,7 +66,9 @@ const PageSummary = props => {
     showOrderType,
     style,
     orderSummaryText,
-    summaryOrderColumns
+    summaryOrderColumns,
+    // 2026-10-14 用户口径：仅整单合计行做重量换算（单元格原值展示），如 500=克转斤
+    sumDivisor
   } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
@@ -102,9 +104,19 @@ const PageSummary = props => {
           ) {
             html = orderSummaryText
           } else if (isSummable) {
-            html = printerStore.ready
-              ? sumCol(key, currentOrderTableData, isAllProduct)
-              : ' '
+            if (!printerStore.ready) {
+              html = ' '
+            } else {
+              // 2026-10-14 用户口径：仅整单合计行做重量换算（单元格原值展示）
+              const summed = sumCol(key, currentOrderTableData, isAllProduct)
+              html =
+                summed !== '' && sumDivisor > 1
+                  ? new Big(summed)
+                      .div(sumDivisor)
+                      .round(2)
+                      .toString()
+                  : summed
+            }
           } else {
             html = ' '
           }
