@@ -85,24 +85,26 @@ const PageSummary = props => {
     // 「整单合计」文案落在第一个非汇总列（如横向表的班级列）；
     // 无任何非汇总列时退回首列文案（兼容纯菜品列表体）
     const summableKeys = summaryOrderColumns.map(text => regExp(text))
-    const hasNonSummable = columns.some(col => {
+    const firstNonSummableIndex = columns.findIndex(col => {
       const key = regExp(col.text)
       return !key || !summableKeys.includes(key)
     })
-    let labelPlaced = false
+    const labelIndex = firstNonSummableIndex >= 0 ? firstNonSummableIndex : 0
     return (
       <tr>
         {_.map(columns, (col, index) => {
           let html
           const key = regExp(col.text)
           const isSummable = key && summableKeys.includes(key)
-          if (isSummable) {
+          if (
+            index === labelIndex &&
+            (!isSummable || firstNonSummableIndex < 0)
+          ) {
+            html = orderSummaryText
+          } else if (isSummable) {
             html = printerStore.ready
               ? sumCol(key, currentOrderTableData, isAllProduct)
               : ' '
-          } else if (!labelPlaced && (hasNonSummable || index === 0)) {
-            labelPlaced = true
-            html = orderSummaryText
           } else {
             html = ' '
           }
