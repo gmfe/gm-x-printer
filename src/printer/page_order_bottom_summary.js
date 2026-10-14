@@ -40,7 +40,8 @@ const sumCol = (key, dataList, isAllProduct) => {
   } catch (e) {
     result = ''
   }
-  const isInt = !arr?.find(item => item?.includes('.'))
+  // 单元格可能是数字（如学生餐横向表），String 化后判定小数位，避免 number.includes 崩溃
+  const isInt = !arr?.find(item => String(item ?? '').includes('.'))
   if (result) {
     return isInt ? result : result.toFixed(2)
   }
@@ -54,11 +55,11 @@ const PageSummary = props => {
     config,
     config: { dataKey, arrange, columns },
     printerStore,
-    isLastPage,
-    range
+    isLastPage
   } = props
   const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-  const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig')
+  // 未配置整单合计的表体容错，避免裸解构崩溃
+  const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig') || {}
 
   const {
     orderSummaryShow,
@@ -80,22 +81,30 @@ const PageSummary = props => {
     (config?.allOrderSummaryConfig?.isShowOrderSummaryPer || isLastPage) &&
     showOrderType === SHOW_WAY_ENUM.bottom
   ) {
+    // 可汇总列集合（模板串提取 key）；文案列自适应：汇总列显示合计值，
+    // 「整单合计」文案落在第一个非汇总列（如横向表的班级列）；
+    // 无任何非汇总列时退回首列文案（兼容纯菜品列表体）
+    const summableKeys = summaryOrderColumns.map(text => regExp(text))
+    const hasNonSummable = columns.some(col => {
+      const key = regExp(col.text)
+      return !key || !summableKeys.includes(key)
+    })
+    let labelPlaced = false
     return (
       <tr>
         {_.map(columns, (col, index) => {
           let html
-          // 第一列
-          if (index === 0) {
+          const key = regExp(col.text)
+          const isSummable = key && summableKeys.includes(key)
+          if (isSummable) {
+            html = printerStore.ready
+              ? sumCol(key, currentOrderTableData, isAllProduct)
+              : ' '
+          } else if (!labelPlaced && (hasNonSummable || index === 0)) {
+            labelPlaced = true
             html = orderSummaryText
           } else {
-            const key = regExp(col.text)
-
-            html =
-              printerStore.ready &&
-              summaryOrderColumns.map(text => regExp(text)).includes(key) &&
-              key
-                ? sumCol(key, currentOrderTableData, isAllProduct)
-                : ' '
+            html = ' '
           }
           return (
             <td

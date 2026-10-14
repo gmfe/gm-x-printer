@@ -315,23 +315,6 @@ class EditorField extends React.Component {
                   </Select>
                 </Flex>
                 <Flex alignCenter className='gm-padding-top-5'>
-                  <Flex alignCenter>{i18next.t('每页显示合计')}：</Flex>
-                  <Select
-                    className='gm-printer-edit-select'
-                    value={orderSummary.perPage ? 'on' : 'off'}
-                    // 设计 §4.7：整单合计主开关关闭时禁用每页显示合计
-                    disabled={!orderSummary.show}
-                    onChange={v =>
-                      this.handleSetHorizontalSummary({
-                        perPage: v === 'on'
-                      })
-                    }
-                  >
-                    <Option value='off'>{i18next.t('仅末页')}</Option>
-                    <Option value='on'>{i18next.t('每页显示')}</Option>
-                  </Select>
-                </Flex>
-                <Flex alignCenter className='gm-padding-top-5'>
                   <Flex alignCenter>{i18next.t('重量换算')}：</Flex>
                   <input
                     value={weightDivisor}
@@ -339,6 +322,8 @@ class EditorField extends React.Component {
                     type='number'
                     className='gm-printer-edit-input-custom'
                   />
+                </Flex>
+                <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
                   {i18next.t('除以该数（例 500 = 克转斤）')}
                 </Flex>
               </>

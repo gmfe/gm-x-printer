@@ -13,14 +13,13 @@ import { observer } from 'mobx-react'
 // eslint-disable-next-line no-unused-vars
 import { MULTI_SUFFIX, SHOW_WAY_ENUM, SHOW_ORDER_CASE_ENUM } from '../config'
 import Big from 'big.js'
-import { coverDigit2Uppercase, getDataKey, regExp } from '../util'
-import { sumColumnAll } from '../common/table_body_type'
+import { coverDigit2Uppercase, getDataKey } from '../util'
 import { get } from 'mobx'
 const AllOrderSummary = props => {
   const {
     isAll,
     config,
-    config: { dataKey, arrange, subtotal, columns },
+    config: { dataKey, arrange, subtotal },
     printerStore
   } = props
 
@@ -67,40 +66,6 @@ const AllOrderSummary = props => {
     style,
     orderSummaryText
   } = allOrderSummaryConfig
-  // 整单合计——底部逐列展现（bottom 式）：对齐 columns 逐列渲染，
-  // 首列显示合计文案，fields.valueField 命中的列显示全单合计，其余空白
-  if (
-    (orderSummaryShow || (isAll && config?.allOrderSummaryShow)) &&
-    showOrderType === SHOW_WAY_ENUM.bottom &&
-    printerStore.ready
-  ) {
-    const summableFields = (fields || []).map(f => f.valueField)
-    return (
-      <tr>
-        {_.map(columns, (col, index) => {
-          let html
-          if (index === 0) {
-            html = isAll
-              ? config?.allOrderSummaryText || '总单合计'
-              : orderSummaryText || '整单合计'
-          } else {
-            const key = regExp(col.text)
-            html = summableFields.includes(key)
-              ? sumColumnAll(key, tableData)
-              : ' '
-          }
-          return (
-            <td
-              key={index}
-              colSpan={1}
-              style={{ fontWeight: 'bold', textAlign: 'center', ...style }}
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
-          )
-        })}
-      </tr>
-    )
-  }
   // 每页小计
   if (
     (orderSummaryShow || (isAll && config?.allOrderSummaryShow)) &&

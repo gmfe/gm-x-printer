@@ -1,7 +1,5 @@
 // 学生餐配送单「表体类型」纯计算：商品横向表（行=班级、列=菜品动态生成）
 // 注意：本文件不得引入 mobx / React / JSX，保持 node --test 可测
-const Big = require('big.js')
-
 const TABLE_BODY_TYPE = {
   VERTICAL: 'vertical',
   HORIZONTAL_PRODUCT: 'horizontal_product'
@@ -17,17 +15,9 @@ const isHorizontalProduct = content =>
 const filterHorizontalColumns = (columns, keepTexts) =>
   (columns || []).filter(c => !c.text || keepTexts.includes(c.text))
 
-// 整单合计（bottom 式）：全单据该列求和；整数原样、小数保留两位、非数值容错为 0
-const sumColumnAll = (key, tableData) =>
-  (tableData || [])
-    .reduce((acc, row) => acc.plus(parseFloat(row[key]) || 0), Big(0))
-    .round(2)
-    .toString()
-
 module.exports = {
   TABLE_BODY_TYPE,
   DISH_ANCHOR_TEXT,
   isHorizontalProduct,
-  filterHorizontalColumns,
-  sumColumnAll
+  filterHorizontalColumns
 }

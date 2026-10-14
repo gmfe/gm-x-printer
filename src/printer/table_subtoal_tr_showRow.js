@@ -59,7 +59,8 @@ const SubtotalTrShowRow = props => {
       Big(0)
     ).toFixed(2)
   }
-  const summaryConfig = get(config, 'summaryConfig')
+  // 无每页合计配置的模板（如学生餐横向表）容错，避免裸解构崩溃
+  const summaryConfig = get(config, 'summaryConfig') || {}
   const { needUpperCase, needLowerCase } = subtotal
 
   const {

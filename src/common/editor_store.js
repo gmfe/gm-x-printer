@@ -264,7 +264,11 @@ class EditorStore {
               vv.dataKey +
               vv.subtotal.show +
               vv.summaryConfig?.pageSummaryShow +
-              vv.customerRowHeight
+              vv.customerRowHeight +
+              // 横向表配置变化需重挂载 Printer 预览（表体类型/整单合计/换算——同 summaryConfig.pageSummaryShow 先例）
+              vv.tableType +
+              vv.orderSummary?.show +
+              vv.weightDivisor
             )
           } else {
             return vv.style ? vv.style.height : ''
