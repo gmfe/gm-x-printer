@@ -341,6 +341,9 @@ class EditorField extends React.Component {
                     <Option value='divide'>{i18next.t('÷ 除以')}</Option>
                     <Option value='multiply'>{i18next.t('× 乘以')}</Option>
                   </Select>
+                </Flex>
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <Flex alignCenter>{i18next.t('换算数值')}：</Flex>
                   <input
                     value={
                       weightDivisor === undefined ? '' : String(weightDivisor)
@@ -348,6 +351,7 @@ class EditorField extends React.Component {
                     onChange={e => this.handleSetWeightDivisor(e.target.value)}
                     type='number'
                     className='gm-printer-edit-input-custom'
+                    style={{ width: '120px' }}
                   />
                 </Flex>
                 <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
