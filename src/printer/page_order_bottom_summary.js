@@ -113,19 +113,17 @@ const PageSummary = props => {
               const summed = sumCol(key, currentOrderTableData, isAllProduct)
               const convert = sumConvertByField?.[key]
               if (summed !== '' && convert && Number.isFinite(convert.value)) {
-                const bigSum = new Big(summed)
-                html =
+                const bigSum =
                   convert.operator === 'multiply'
-                    ? bigSum
-                        .times(convert.value)
-                        .round(2)
-                        .toString()
+                    ? new Big(summed).times(convert.value)
                     : convert.value > 0
-                    ? bigSum
-                        .div(convert.value)
-                        .round(2)
-                        .toString()
-                    : new Big(0).toString()
+                    ? new Big(summed).div(convert.value)
+                    : new Big(0)
+                const rounded = bigSum.round(2)
+                // 与 sumCol 展示风格一致：整数原样，小数保留两位
+                html = rounded.mod(1).eq(0)
+                  ? rounded.toString()
+                  : rounded.toFixed(2)
               } else {
                 html = summed
               }

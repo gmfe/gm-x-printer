@@ -25,6 +25,8 @@ const buildPreviewConfig = config => {
   ) {
     return config
   }
+  // weightDivisor 未配置（undefined）= 不换算，与打印侧 modifyTemplate 口径一致
+  const hasDivisor = content.weightDivisor !== undefined
   const excluded = ['班级名称', '配送内容', '备注']
   const summableKeys = (content.columns || [])
     .map(c => (c.text || '').match(/^\{\{列\.(.+)}}$/) && regExp(c.text))
@@ -46,18 +48,22 @@ const buildPreviewConfig = config => {
               // 组件对每项做 regExp 提取，需传模板串形式
               summaryOrderColumns: summableKeys.map(name => `{{列.${name}}}`),
               // 仅整单合计行做重量换算（重量列才配系数；÷0/×0 结果为 0）
-              sumConvertByField: summableKeys
-                .filter(name => name !== '配餐人数')
-                .reduce((acc, name) => {
-                  acc[name] = {
-                    value: Number(content.weightDivisor) || 0,
-                    operator:
-                      content.weightOperator === 'multiply'
-                        ? 'multiply'
-                        : 'divide'
+              ...(hasDivisor
+                ? {
+                    sumConvertByField: summableKeys
+                      .filter(name => name !== '配餐人数')
+                      .reduce((acc, name) => {
+                        acc[name] = {
+                          value: Number(content.weightDivisor) || 0,
+                          operator:
+                            content.weightOperator === 'multiply'
+                              ? 'multiply'
+                              : 'divide'
+                        }
+                        return acc
+                      }, {})
                   }
-                  return acc
-                }, {}),
+                : {}),
               style: { textAlign: 'center', fontSize: '12px' }
             }
           }

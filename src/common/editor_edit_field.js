@@ -2,6 +2,7 @@ import i18next from '../../locales'
 import React from 'react'
 import { Flex, Option, Select, Radio } from '../components'
 import { observer, inject } from 'mobx-react'
+import { DYNAMIC_DEMO_FLAG } from './table_body_type'
 import {
   Fonter,
   Gap,
@@ -84,7 +85,7 @@ class EditorField extends React.Component {
       ).filter(v => v)
       const content = editStore.config.contents[arr[2]]
       const removed = (content.columns || []).filter(
-        c => c.text && !keepTexts.includes(c.text)
+        c => c.text && !c[DYNAMIC_DEMO_FLAG] && !keepTexts.includes(c.text)
       )
       if (
         removed.length &&
