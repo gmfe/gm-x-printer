@@ -387,9 +387,9 @@ function getOverallOrderTrHeight(overallOrder) {
  * @returns 列名
  */
 function regExp(text) {
-  const match = /{{([^{}]+)}}/.exec(text)
-  const key = match ? match[1] : ''
-  return key ? key.split('.')[1] : ''
+  // {{列.x}} 提取列 key x（捕获至结尾，菜名含「.」如「土豆1.5kg」不再被 split 截断）
+  const match = /^{{列\.(.+)}}$/.exec(text)
+  return match ? match[1] : ''
 }
 
 // 兼容行数是否自动填充的旧数据

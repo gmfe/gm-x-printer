@@ -1316,14 +1316,16 @@ class PrinterStore {
     // 做好保护，出错就返回 text
     try {
       const list = this.data._table[dataKey] || this.data._table.orders
-      // 属性名含特殊字符（如动态菜名）时 _.template 编译失败——先正则直查行数据兜底
-      const direct = text.replace(/\{\{列\.([^{}]+)\}\}/g, (m, key) =>
-        list[index] && list[index][key] !== undefined
-          ? String(list[index][key])
-          : m
-      )
-      if (direct !== text) {
-        return direct
+      // 仅当单元格是「单一 {{列.x}} 占位符」时走正则直查——属性名含特殊字符（如动态菜名）
+      // 时 _.template 编译会失败。混排文本（如「{{列.商品单价}}元/{{列.定价单位}}」、页码、
+      // 函数表达式）仍走 _.template 旧逻辑，保留 '元/' 特判与表达式能力（存量模板零变化）。
+      const singleCol = /^\{\{列\.([^{}]+)\}\}$/.exec(text)
+      if (singleCol) {
+        const v = list[index] && list[index][singleCol[1]]
+        if (v !== undefined) {
+          // 与 _.template 插值对齐：null 渲染为空串
+          return v === null ? '' : String(v)
+        }
       }
       const result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
@@ -1361,13 +1363,15 @@ class PrinterStore {
   templateRowSpanTable(text, item) {
     // 做好保护，出错就返回 text
     try {
-      // 属性名含特殊字符（如学生餐横向表动态菜名「土豆（净）」）时 _.template 按 JS 表达式
-      // 编译会失败——先用正则直查行数据兜底，未命中再走 template（保留表达式/函数能力）
-      const direct = text.replace(/\{\{列\.([^{}]+)\}\}/g, (m, key) =>
-        item && item[key] !== undefined ? String(item[key]) : m
-      )
-      if (direct !== text) {
-        return direct
+      // 仅当单元格是「单一 {{列.x}} 占位符」时走正则直查（原因同 templateTable：
+      // 特殊字符菜名致 _.template 编译失败）；null 与 _.template 插值对齐渲染空串。
+      // 混排文本走 _.template 旧逻辑，保留表达式/函数能力（存量模板零变化）。
+      const singleCol = /^\{\{列\.([^{}]+)\}\}$/.exec(text)
+      if (singleCol) {
+        const v = item && item[singleCol[1]]
+        if (v !== undefined) {
+          return v === null ? '' : String(v)
+        }
       }
       return _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
