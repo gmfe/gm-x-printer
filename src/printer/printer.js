@@ -564,6 +564,7 @@ class Printer extends React.Component {
       onError,
       selectedRegion,
       printerStore,
+      isAutoFilling,
       ...rest
     } = this.props
     const {
