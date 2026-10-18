@@ -86,6 +86,23 @@ const buildPreviewConfig = config => {
 }))
 @observer
 class ContextMenu extends React.Component {
+  componentDidMount() {
+    // editor_store.init 会把 isAutoFilling 重置为 false，模板重新打开时需从
+    // config.autoFillConfig 恢复开关状态（照 editor/context_menu 先例），
+    // 否则 UI 显示关闭而 config.autoFillConfig.checked 仍为 true，
+    // 预览/打印仍会填充空白行（TAPD 1158798739001093058 / 1158798739001093059）
+    const {
+      editStore,
+      editStore: {
+        config: { autoFillConfig }
+      }
+    } = this.props
+
+    if (autoFillConfig?.checked) {
+      editStore.handleChangeTableData(autoFillConfig?.checked)
+    }
+  }
+
   render() {
     const { editStore, mockData, uploadQiniuImage } = this.props
     return (
@@ -98,6 +115,9 @@ class ContextMenu extends React.Component {
           key={editStore.computedPrinterKey}
           selected={editStore.selected}
           selectedRegion={editStore.selectedRegion}
+          // 传入 isAutoFilling 让预览即时响应填充开关（否则只有 tableType 变化
+          // 触发重挂载时才从 config 读到，表现为纵向表开启不生效、切横向表才生效）
+          isAutoFilling={editStore.isAutoFilling}
           config={buildPreviewConfig(editStore.config)}
           data={mockData}
         />

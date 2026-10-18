@@ -327,7 +327,11 @@ class EditorStore {
     const isAutoFillingBool =
       getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     if (isAutoFillingBool) {
-      table.push(...this.getFilledTableData(table))
+      // mock 数据可能不含该 dataKey（如学生餐打印选项关闭对应明细），
+      // 无表可填充时仅同步开关状态即可，避免 table.push 抛错
+      if (table) {
+        table.push(...this.getFilledTableData(table))
+      }
     } else {
       this.clearExtraTableData(dataKey)
       return

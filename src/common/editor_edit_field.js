@@ -63,7 +63,8 @@ class EditorField extends React.Component {
 
   handleSetTableBodyType = val => {
     const { editStore, tableBodyTypeFields } = this.props
-    if (!editStore.computedIsSelectTable) {
+    // 点击表格区域即可设置（无需精确选中列）
+    if (!editStore.computedRegionIsTable) {
       return
     }
     // selected 与 selectedRegion 是两个独立 action：selected 可能仍指向 table 而
@@ -103,7 +104,7 @@ class EditorField extends React.Component {
 
   handleSetHorizontalSummary = patch => {
     const { editStore } = this.props
-    if (!editStore.computedIsSelectTable) {
+    if (!editStore.computedRegionIsTable) {
       return
     }
     // 同 handleSetTableBodyType：selectedRegion 可能已被「选择区域」切走，写值前校验含 table
@@ -140,7 +141,7 @@ class EditorField extends React.Component {
 
   handleSetWeightDivisor = val => {
     const { editStore } = this.props
-    if (!editStore.computedIsSelectTable) {
+    if (!editStore.computedRegionIsTable) {
       return
     }
     const arr = editStore.selectedRegion
@@ -154,7 +155,7 @@ class EditorField extends React.Component {
 
   handleSetWeightOperator = val => {
     const { editStore } = this.props
-    if (!editStore.computedIsSelectTable) {
+    if (!editStore.computedRegionIsTable) {
       return
     }
     const arr = editStore.selectedRegion
@@ -431,13 +432,16 @@ class EditorField extends React.Component {
           </>
         )}
 
-        <Flex alignCenter>
-          <Flex alignCenter>{i18next.t('设置列宽')}：</Flex>
-          <ColumnWidth
-            style={headStyle || {}}
-            onChange={this.handleChangeTableColumn}
-          />
-        </Flex>
+        {/* 列级控件：需精确选中某一列（点击表头/列）才展示 */}
+        {editStore.computedIsSelectTable && (
+          <Flex alignCenter>
+            <Flex alignCenter>{i18next.t('设置列宽')}：</Flex>
+            <ColumnWidth
+              style={headStyle || {}}
+              onChange={this.handleChangeTableColumn}
+            />
+          </Flex>
+        )}
 
         <Gap height='5px' />
 
@@ -545,66 +549,71 @@ class EditorField extends React.Component {
 
         <Gap height='5px' />
 
-        <Flex>
-          <Flex>{i18next.t('字段设置')}：</Flex>
-          <div>
+        {/* 列级控件：需精确选中某一列（点击表头/列）才展示 */}
+        {editStore.computedIsSelectTable && (
+          <Flex>
+            <Flex>{i18next.t('字段设置')}：</Flex>
             <div>
-              <Fonter
-                style={headStyle || {}}
-                onChange={this.handleChangeTable.bind(this, 'headStyle')}
-                type='table'
-              />
-              <Separator />
-              <TextAlign
-                style={headStyle || {}}
-                onChange={this.handleChangeTable.bind(this, 'headStyle')}
-              />
-              <Gap />
-
-              <Textarea
-                value={head}
-                placeholder={i18next.t('请输入表头填充内容')}
-                onChange={this.handleChangeTable.bind(this, 'head')}
-              />
-            </div>
-            <div>
-              <Fonter
-                style={style || {}}
-                onChange={this.handleChangeTable.bind(this, 'style')}
-                type='table'
-              />
-              <Separator />
-              <TextAlign
-                style={style || {}}
-                onChange={this.handleChangeTable.bind(this, 'style')}
-              />
-              <Gap />
-
-              <Textarea
-                value={text}
-                placeholder={i18next.t('请输入内容填充内容')}
-                onChange={this.handleChangeTable.bind(this, 'text')}
-              />
-            </div>
-            {(_.includes(text, i18next.t('时间')) ||
-              _.includes(text, i18next.t('日期')) ||
-              _.includes(text, 'Time') ||
-              _.includes(text, 'Date')) && (
               <div>
-                <TipInfo
-                  text={i18next.t('注：可通过修改“{{}}”中的内容更改时间格式。')}
+                <Fonter
+                  style={headStyle || {}}
+                  onChange={this.handleChangeTable.bind(this, 'headStyle')}
+                  type='table'
                 />
-                {_.map(DiyTimeType, (v, k) => (
-                  <TipInfo text={`${k + 1}。${v.text}`} />
-                ))}
-                <TipInfo
-                  text={`${DiyTimeType.length +
-                    +1}、指定日期后7天，输入“单据日期：{{addDay(单据日期, 7)}}”；`}
+                <Separator />
+                <TextAlign
+                  style={headStyle || {}}
+                  onChange={this.handleChangeTable.bind(this, 'headStyle')}
+                />
+                <Gap />
+
+                <Textarea
+                  value={head}
+                  placeholder={i18next.t('请输入表头填充内容')}
+                  onChange={this.handleChangeTable.bind(this, 'head')}
                 />
               </div>
-            )}
-          </div>
-        </Flex>
+              <div>
+                <Fonter
+                  style={style || {}}
+                  onChange={this.handleChangeTable.bind(this, 'style')}
+                  type='table'
+                />
+                <Separator />
+                <TextAlign
+                  style={style || {}}
+                  onChange={this.handleChangeTable.bind(this, 'style')}
+                />
+                <Gap />
+
+                <Textarea
+                  value={text}
+                  placeholder={i18next.t('请输入内容填充内容')}
+                  onChange={this.handleChangeTable.bind(this, 'text')}
+                />
+              </div>
+              {(_.includes(text, i18next.t('时间')) ||
+                _.includes(text, i18next.t('日期')) ||
+                _.includes(text, 'Time') ||
+                _.includes(text, 'Date')) && (
+                <div>
+                  <TipInfo
+                    text={i18next.t(
+                      '注：可通过修改“{{}}”中的内容更改时间格式。'
+                    )}
+                  />
+                  {_.map(DiyTimeType, (v, k) => (
+                    <TipInfo text={`${k + 1}。${v.text}`} />
+                  ))}
+                  <TipInfo
+                    text={`${DiyTimeType.length +
+                      +1}、指定日期后7天，输入“单据日期：{{addDay(单据日期, 7)}}”；`}
+                  />
+                </div>
+              )}
+            </div>
+          </Flex>
+        )}
       </div>
     )
   }
@@ -615,7 +624,13 @@ class EditorField extends React.Component {
     let content = null
     if (editStore.computedIsSelectBlock) {
       content = this.renderBlocks()
-    } else if (editStore.computedIsSelectTable) {
+    } else if (
+      editStore.computedIsSelectTable ||
+      editStore.computedRegionIsTable
+    ) {
+      // 点击表格区域（selectedRegion）即可展示表格级设置（表体类型/整单合计/
+      // 行高/表格样式等），无需先精确选中某一列（selected）；
+      // 列级控件（设置列宽/字段设置）内部仍以 computedIsSelectTable 区分
       content = this.renderTable()
     }
     return content

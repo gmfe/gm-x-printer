@@ -8,3 +8,5 @@ logs
 build/font/
 build/demo.js
 lib/
+.tmp-autofill-build
+.tmp-regression-build
