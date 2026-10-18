@@ -28,9 +28,17 @@ const buildPreviewConfig = config => {
   // weightDivisor 未配置（undefined）= 不换算，与打印侧 modifyTemplate 口径一致
   const hasDivisor = content.weightDivisor !== undefined
   const excluded = ['班级名称', '配送内容', '备注']
-  const summableKeys = (content.columns || [])
+  const allKeys = (content.columns || [])
     .map(c => (c.text || '').match(/^\{\{列\.(.+)}}$/) && regExp(c.text))
     .filter(key => key && !excluded.includes(key))
+  // 可汇总字段勾选（1158798739001058039）：summaryFields 未存（存量模板）默认全汇总；
+  // 与打印侧 modifyTemplate 口径一致
+  const fields = content.orderSummary.summaryFields
+  const wantWeight = fields === undefined || fields.includes('商品总重量')
+  const wantMealCount = fields === undefined || fields.includes('配餐人数')
+  const summableKeys = allKeys.filter(name =>
+    name === '配餐人数' ? wantMealCount : wantWeight
+  )
   return {
     ...config,
     contents: config.contents.map(v =>
