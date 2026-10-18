@@ -88,9 +88,12 @@ const buildPreviewConfig = config => {
 class ContextMenu extends React.Component {
   componentDidMount() {
     // editor_store.init 会把 isAutoFilling 重置为 false，模板重新打开时需从
-    // config.autoFillConfig 恢复开关状态（照 editor/context_menu 先例），
-    // 否则 UI 显示关闭而 config.autoFillConfig.checked 仍为 true，
-    // 预览/打印仍会填充空白行（TAPD 1158798739001093058 / 1158798739001093059）
+    // config.autoFillConfig 恢复开关状态，否则 UI 显示关闭而 checked 仍为 true，
+    // 预览/打印仍会填充空白行（TAPD 1158798739001093058 / 1158798739001093059）。
+    // 只恢复运行时开关：不走 handleChangeTableData——它会以当前 selectedRegion
+    // （挂载时为 undefined）覆盖 config.autoFillConfig，用户保存后 region 永久丢失，
+    // 打印侧 computedTableCustomerRowHeight 回退默认行高、填充行数不准。
+    // mock 填充行由 Printer 挂载流程负责（printer.js componentDidMount → changeTableData）
     const {
       editStore,
       editStore: {
@@ -99,7 +102,7 @@ class ContextMenu extends React.Component {
     } = this.props
 
     if (autoFillConfig?.checked) {
-      editStore.handleChangeTableData(autoFillConfig?.checked)
+      editStore.setAutoFillingConfig(autoFillConfig.checked)
     }
   }
 
