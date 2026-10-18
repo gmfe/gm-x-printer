@@ -556,6 +556,7 @@ class Printer extends React.Component {
       onReady,
       selectedRegion,
       printerStore,
+      isAutoFilling,
       ...rest
     } = this.props
     const {

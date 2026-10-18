@@ -328,10 +328,12 @@ class EditorStore {
       getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     if (isAutoFillingBool) {
       // mock 数据可能不含该 dataKey（如学生餐打印选项关闭对应明细），
-      // 无表可填充时仅同步开关状态即可，避免 table.push 抛错
-      if (table) {
-        table.push(...this.getFilledTableData(table))
+      // 无表可填充时仅同步开关状态：不 push 也不写回——
+      // 写回 undefined 会污染共享 mockData，clearAllTableEmptyData 遍历 filter 时崩溃
+      if (!table) {
+        return
       }
+      table.push(...this.getFilledTableData(table))
     } else {
       this.clearExtraTableData(dataKey)
       return
@@ -582,7 +584,10 @@ class EditorStore {
   clearAllTableEmptyData() {
     const tableData = this.mockData._table
     for (const [key, table] of Object.entries(tableData)) {
-      tableData[key] = table.filter(x => !x._isEmptyData)
+      // 与 printer/store.js clearAllExtraTableData 同防御：非数组/无填充行条目原样保留
+      if (Array.isArray(table) && table.some(row => row?._isEmptyData)) {
+        tableData[key] = table.filter(x => !x._isEmptyData)
+      }
     }
     // this.setAutoFillingConfig(false)
     set(this.mockData, {

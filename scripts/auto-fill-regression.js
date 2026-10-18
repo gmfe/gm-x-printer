@@ -179,10 +179,10 @@ function run() {
     store.init({ ...baseConfig }, data)
     store.setAutofillConfig(true)
     store.changeTableData()
-    assert.deepStrictEqual(
-      data._table[undefined] || [],
-      [],
-      '缺失 dataKey 不应抛错'
+    // 不抛错且不得写入 undefined 键（|| [] 兜底断言对 falsy 恒真，锁不住回归）
+    assert.ok(
+      !Object.prototype.hasOwnProperty.call(data._table, undefined),
+      '缺失 dataKey 不应写入 _table[undefined]'
     )
   }
 
