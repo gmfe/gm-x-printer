@@ -1,6 +1,6 @@
 import i18next from '../../locales'
 import React from 'react'
-import { Flex, Option, Select, Radio } from '../components'
+import { Flex, Option, Select, Radio, Checkbox } from '../components'
 import { observer, inject } from 'mobx-react'
 import { DYNAMIC_DEMO_FLAG } from './table_body_type'
 import {
@@ -114,6 +114,28 @@ class EditorField extends React.Component {
       return
     }
     editStore.setHorizontalSummaryConfig(patch)
+  }
+
+  // 可汇总字段勾选值（1158798739001058039）：未存 summaryFields（存量模板）默认全选
+  getSummaryFields(orderSummary) {
+    return orderSummary.summaryFields || ['商品总重量', '配餐人数']
+  }
+
+  // 可汇总字段勾选切换：需求要求启用整单合计必须至少选一个，取消到空时忽略
+  handleToggleSummaryField = (field, checked) => {
+    const selectedTableContent = this.getSelectedTableContent()
+    if (!selectedTableContent) {
+      return
+    }
+    const orderSummary = selectedTableContent.orderSummary || {}
+    const current = this.getSummaryFields(orderSummary)
+    const next = checked
+      ? _.uniq([...current, field])
+      : current.filter(f => f !== field)
+    if (!next.length) {
+      return
+    }
+    this.handleSetHorizontalSummary({ summaryFields: next })
   }
 
   handleSetWeightDivisor = val => {
@@ -332,34 +354,77 @@ class EditorField extends React.Component {
                     <Option value='on'>{i18next.t('开启')}</Option>
                   </Select>
                 </Flex>
-                <Flex alignCenter className='gm-padding-top-5'>
-                  <Flex alignCenter>{i18next.t('重量换算')}：</Flex>
-                  <Select
-                    className='gm-printer-edit-select'
-                    value={weightOperator || 'divide'}
-                    onChange={v => this.handleSetWeightOperator(v)}
-                  >
-                    <Option value='divide'>{i18next.t('÷ 除以')}</Option>
-                    <Option value='multiply'>{i18next.t('× 乘以')}</Option>
-                  </Select>
-                </Flex>
-                <Flex alignCenter className='gm-padding-top-5'>
-                  <Flex alignCenter>{i18next.t('换算数值')}：</Flex>
-                  <input
-                    value={
-                      weightDivisor === undefined ? '' : String(weightDivisor)
-                    }
-                    onChange={e => this.handleSetWeightDivisor(e.target.value)}
-                    type='number'
-                    className='gm-printer-edit-input-custom'
-                    style={{ width: '120px' }}
-                  />
-                </Flex>
-                <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
-                  {(weightOperator || 'divide') === 'divide'
-                    ? i18next.t('合计除以该数（例 500 = 克转斤）；留空保存为 0')
-                    : i18next.t('合计乘以该数；留空保存为 0')}
-                </Flex>
+                {orderSummary.show && (
+                  <>
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>{i18next.t('可汇总字段')}：</Flex>
+                      <Flex row>
+                        {[
+                          {
+                            field: '商品总重量',
+                            label: i18next.t('商品总重量')
+                          },
+                          { field: '配餐人数', label: i18next.t('配餐人数') }
+                        ].map(({ field, label }) => (
+                          <Checkbox
+                            key={field}
+                            checked={this.getSummaryFields(
+                              orderSummary
+                            ).includes(field)}
+                            onChange={checked =>
+                              this.handleToggleSummaryField(field, checked)
+                            }
+                          >
+                            <span className='gm-padding-left-5'>{label}</span>
+                          </Checkbox>
+                        ))}
+                      </Flex>
+                    </Flex>
+                    <Flex className='gm-padding-top-5 gm-text-desc'>
+                      {i18next.t(
+                        '启用整单合计必须要选择至少一个汇总字段才能显示'
+                      )}
+                    </Flex>
+                  </>
+                )}
+                {orderSummary.show && (
+                  <>
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>{i18next.t('重量换算')}：</Flex>
+                      <Select
+                        className='gm-printer-edit-select'
+                        value={weightOperator || 'divide'}
+                        onChange={v => this.handleSetWeightOperator(v)}
+                      >
+                        <Option value='divide'>{i18next.t('÷ 除以')}</Option>
+                        <Option value='multiply'>{i18next.t('× 乘以')}</Option>
+                      </Select>
+                    </Flex>
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>{i18next.t('换算数值')}：</Flex>
+                      <input
+                        value={
+                          weightDivisor === undefined
+                            ? ''
+                            : String(weightDivisor)
+                        }
+                        onChange={e =>
+                          this.handleSetWeightDivisor(e.target.value)
+                        }
+                        type='number'
+                        className='gm-printer-edit-input-custom'
+                        style={{ width: '120px' }}
+                      />
+                    </Flex>
+                    <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                      {(weightOperator || 'divide') === 'divide'
+                        ? i18next.t(
+                            '合计除以该数（例 500 = 克转斤）；留空保存为 0'
+                          )
+                        : i18next.t('合计乘以该数；留空保存为 0')}
+                    </Flex>
+                  </>
+                )}
               </>
             )}
             <Gap height='5px' />

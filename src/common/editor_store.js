@@ -265,9 +265,10 @@ class EditorStore {
               vv.subtotal.show +
               vv.summaryConfig?.pageSummaryShow +
               vv.customerRowHeight +
-              // 横向表配置变化需重挂载 Printer 预览（表体类型/整单合计/换算——同 summaryConfig.pageSummaryShow 先例）
+              // 横向表配置变化需重挂载 Printer 预览（表体类型/整单合计/换算/可汇总字段勾选——同 summaryConfig.pageSummaryShow 先例）
               vv.tableType +
               vv.orderSummary?.show +
+              vv.orderSummary?.summaryFields +
               vv.weightDivisor +
               vv.weightOperator
             )
