@@ -25,10 +25,9 @@ const sumCol = (key, dataList, isAllProduct) => {
   try {
     result = dataList.reduce((acc, item) => {
       arr.push(item[key])
-      if (isAllProduct) {
-        if (item['子商品']) {
-          return acc
-        }
+      // 子商品配比数量只在子行有值，父行为空串；跳过子行会让合计恒为 0
+      if (isAllProduct && item['子商品'] && key !== '子商品配比数量') {
+        return acc
       }
       acc = acc.plus(parseFloat(item[key]) || 0)
       return acc
@@ -51,10 +50,9 @@ const sumColWithMulti = (key, dataList, isAllProduct) => {
     result = dataList.reduce((acc, item) => {
       arr.push(item[key])
       arr.push(item[`${key}_MULTI_SUFFIX`])
-      if (isAllProduct) {
-        if (item['子商品']) {
-          return acc
-        }
+      // 子商品配比数量只在子行有值，父行为空串；跳过子行会让合计恒为 0
+      if (isAllProduct && item['子商品'] && key !== '子商品配比数量') {
+        return acc
       }
       acc = acc.plus(parseFloat(item[key]) || 0)
       acc = acc.plus(parseFloat(item[`${key}_MULTI_SUFFIX`]) || 0)
@@ -154,4 +152,5 @@ const PageSummary = props => {
   }
 }
 
+export { sumCol }
 export default observer(PageSummary)

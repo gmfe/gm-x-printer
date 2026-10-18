@@ -16,6 +16,7 @@ import {
 import _ from 'lodash'
 import batchPrinterStore from './batch_printer_store'
 import Big from 'big.js'
+import { isGroupedDeliveryTable } from './grouped_delivery'
 
 export const TR_BASE_HEIGHT = 23
 const price = (n, f = 2) => {
@@ -69,6 +70,8 @@ class PrinterStore {
 
   @observable ready = false
 
+  @observable paginationError = ''
+
   /**
    * 需要等待table渲染完毕才能计算
    */
@@ -116,6 +119,7 @@ class PrinterStore {
 
   @observable
   isInPrint = false
+
   /** 打印时是否显示印章（本期 false 仅定位盖章，将来 true 显示 assets 印章图） */
   @observable
   showSealInPrint = false
@@ -123,6 +127,7 @@ class PrinterStore {
   @action
   init(config, data) {
     this.ready = false
+    this.paginationError = ''
     this.config = config
     this.height = {}
     this.contents = []
@@ -365,13 +370,27 @@ class PrinterStore {
   computedPages() {
     // 每次先初始化置空
     this.pages = []
+    this.paginationError = ''
     const isAutoFillingAuto =
       getAutoFillingConfig(this.isAutoFilling) !== 'manual'
+    const hasGroupedDeliveryData = this.config.contents.some(
+      content =>
+        content.type === 'table' &&
+        isGroupedDeliveryTable(content.dataKey) &&
+        this.data._table?.[
+          getDataKey(content.dataKey, content.arrange, this.tableVerticalStyle)
+        ]?.length > 0
+    )
     // 每页必有 页眉header, 页脚footer , 签名
     const allPagesHaveThisHeight = this.height.header + this.height.footer
 
     // 退出计算! 因为页眉 + 页脚 > currentPageHeight,页面装不下其他东西
     if (allPagesHaveThisHeight > this.pageHeight) {
+      if (hasGroupedDeliveryData) {
+        this.paginationError = i18next.t(
+          '页眉和页脚超过纸张可打印高度，请减小页眉、页脚高度或增大纸张后重试。'
+        )
+      }
       return
     }
 
@@ -469,6 +488,19 @@ class PrinterStore {
               getDataKey(dataKey, arrange, this.tableVerticalStyle)
             )
           ]
+        }
+        // First-left-then-right pairs change at every page boundary. Using this
+        // table's largest unmerged measured row reserves both column lanes,
+        // even when a long parent value resumes alone on the next page.
+        if (
+          isGroupedDeliveryTable(dataKey) &&
+          isMultiPage &&
+          arrange === 'vertical' &&
+          this.isFirstLeftThenRight &&
+          heights.length
+        ) {
+          const maxRowHeight = Math.max(...heights)
+          heights = heights.map(() => maxRowHeight)
         }
         let heightsLength = heights.length
         let isShowOrderSummary = false
@@ -645,6 +677,25 @@ class PrinterStore {
               tableCellCount++
 
               if (currentTableHeight > pageAccomodateTableHeight) {
+                if (isGroupedDeliveryTable(dataKey) && pageSize === 0) {
+                  // Retry on an empty page before considering an error. A row
+                  // that cannot fit even there must not loop or print clipped.
+                  const emptyPageHeight =
+                    this.pageHeight - allPagesHaveThisHeight
+                  if (allTableHaveThisHeight + trHeight > emptyPageHeight) {
+                    this.paginationError = i18next.t(
+                      '组合商品单行内容超过页面可打印高度，请增大纸张、加宽列宽或缩短商品名称后重试。'
+                    )
+                    this.pages = []
+                    return
+                  }
+                  if (page.length) this.pages.push(page)
+                  page = []
+                  pageIndex++
+                  tableCellCount--
+                  tablePageComplete()
+                  continue
+                }
                 const overHeight = dataHeights[end] || 24
                 // 双栏合计
                 if (isMultiPage && !isVertical && subtotal.show) {
@@ -971,6 +1022,13 @@ class PrinterStore {
         currentPageHeight += panelHeight
         // 当 panel + allPagesHaveThisHeight > 页高度, 停止. 避免死循环
         if (panelHeight + allPagesHaveThisHeight > this.pageHeight) {
+          if (hasGroupedDeliveryData) {
+            this.paginationError = i18next.t(
+              '内容区域超过纸张可打印高度，请减小区域高度或增大纸张后重试。'
+            )
+            this.pages = []
+            return
+          }
           break
         }
         // 如果是最后一页，必须要加上sign的高度，否则会重叠， 从外面移了进来

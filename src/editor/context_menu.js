@@ -82,7 +82,9 @@ class ContextMenu extends React.Component {
     const isCategoryActive = keyArr.includes('category')
 
     const isCombine =
-      keyArr.includes('combination') || keyArr.includes('allprod')
+      keyArr.includes('combination') ||
+      keyArr.includes('allprod') ||
+      keyArr.includes('allprodGrouped')
 
     const isfakeOutstockPrice = keyArr.includes('fake')
 

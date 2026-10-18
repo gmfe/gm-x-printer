@@ -22,7 +22,6 @@ import classNames from 'classnames'
 // ‼️‼️🚸🚸 注意: value的命名不要用下划线! 原因是 computedTableDataKeyOfSelectedRegion 会split('_')下划线做一些事情‼️
 // 📚hasSubtotalBtn 这种表格是否支持  双栏,分类,合计  功能
 const tableDataKeyList = [
-
   {
     value: 'orders',
     text: i18next.t('非组合/子商品'),
@@ -45,7 +44,16 @@ const tableDataKeyList = [
     hasSubtotalBtn: false
   },
 
-  { value: 'allprod', text: i18next.t('全部商品'), hasSubtotalBtn: false }
+  {
+    value: 'allprod',
+    text: i18next.t('全部商品（独立分行）'),
+    hasSubtotalBtn: false
+  },
+  {
+    value: 'allprodGrouped',
+    text: i18next.t('全部商品（按组合商品分组）'),
+    hasSubtotalBtn: false
+  }
 ]
 
 export const noSubtotalBtnTableDataKeySet = new Set(

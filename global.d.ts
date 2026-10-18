@@ -17,11 +17,13 @@ declare module 'gm-x-printer' {
     selected?: string
     selectedRegion?: string
     onReady?: () => void
+    onError?: (error: Error) => void
   }
 
   interface BatchPrinterProps {
     list: any[]
     onReady?: () => void
+    onError?: (error: Error) => void
   }
 
   interface EditorStatementProps extends EditorProps {
@@ -145,6 +147,8 @@ declare module 'gm-x-printer' {
       showSealInPrint?: boolean
       /** 渲染完成回调 */
       onReady?: () => void
+      /** 分页无法容纳单行内容时回调，不会同时调用 onReady */
+      onError?: (error: Error) => void
     }
   ): void
 

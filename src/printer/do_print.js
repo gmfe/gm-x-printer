@@ -76,7 +76,7 @@ function toDoPrint({
   isElectronPrint,
   showSealInPrint
 }) {
-  return new window.Promise(resolve => {
+  return new window.Promise((resolve, reject) => {
     let $app
     if (isElectronPrint) {
       $app = document.getElementById('appContainer')
@@ -90,6 +90,7 @@ function toDoPrint({
         data={data}
         isInPrint
         showSealInPrint={showSealInPrint}
+        onError={reject}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
             if (isPrint) {
@@ -106,7 +107,7 @@ function toDoPrint({
 }
 
 function toDoPrintBatch(list, isPrint = true, onReady, isElectronPrint) {
-  return new window.Promise(resolve => {
+  return new window.Promise((resolve, reject) => {
     let $app
     if (isElectronPrint) {
       $app = document.getElementById('appContainer')
@@ -118,6 +119,7 @@ function toDoPrintBatch(list, isPrint = true, onReady, isElectronPrint) {
     ReactDOM.render(
       <BatchPrinter
         list={list}
+        onError={reject}
         onReady={() => {
           afterImgAndSvgLoaded(() => {
             if (isPrint) {
@@ -178,6 +180,7 @@ function doBatchPrint(
 }
 
 function renderBatchPrintToDom(list, container, extraConfig) {
+  const handleError = extraConfig?.onError
   // 重复渲染同一 container 前必须先 unmount：否则 React 复用旧树只更新 props，
   // 内部 Printer 不重挂载 → onReady（仅 componentDidMount 触发）不再回调 →
   // 电子签场景切换打印模板后 ready 永远为 false，无法发起签署（P0）
@@ -190,6 +193,7 @@ function renderBatchPrintToDom(list, container, extraConfig) {
       list={list}
       showSealInPrint={extraConfig?.showSealInPrint}
       onReady={extraConfig?.onReady}
+      onError={handleError}
     />,
     container
   )
