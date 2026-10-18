@@ -226,6 +226,12 @@ class Printer extends React.Component {
       showSealInPrint
     } = this.props
     printerStore.init(config, data)
+    // 挂载构造阶段（首次 render 前）剔除历史填充的空白行：编辑器 mockData 跨
+    // Printer 重挂载共享，残留空行若进入首次渲染，表格高度测量会被污染，
+    // 后续 computedPages 拿过期高度分页导致页数不准（多出空白页）；
+    // 未开启填充的模板也因此渲染出别的模板残留的填充行。
+    // 仅挂载时清理（组件 init 不被 props 更新触发），不会清掉本次会话的填充
+    printerStore.clearAllExtraTableData()
     printerStore.setSelected(selected)
     printerStore.setSelectedRegion(selectedRegion)
     printerStore.setIsInPrint(isInPrint)

@@ -1515,13 +1515,27 @@ class PrinterStore {
     return Array(tr_count).fill(filledData)
   }
 
+  /** 剔除全部表体中填充追加的空白行（_isEmptyData），挂载时清理跨模板残留 */
+  @action.bound
+  clearAllExtraTableData() {
+    if (!this.data?._table) return
+    _.forEach(this.data._table, (rows, key) => {
+      if (Array.isArray(rows) && rows.some(row => row?._isEmptyData)) {
+        this.data._table[key] = rows.filter(row => !row?._isEmptyData)
+      }
+    })
+  }
+
   @action.bound
   changeTableData() {
     const { autoFillConfig } = this.config
     const isAutoFilling = getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     if (!isAutoFilling) return
     const dataKey = autoFillConfig?.dataKey
-    const table = this.data._table[dataKey]
+    // data 是编辑器 mockData 的引用，跨 Printer 重挂载（切换表体类型/重新打开
+    // 模板）持久共享；先剔除历史填充的空白行再追加，保证幂等，否则叠加追加
+    // 导致页数膨胀（TAPD 1158798739001093058）
+    const table = (this.data._table[dataKey] || []).filter(x => !x._isEmptyData)
 
     if (!this.isDeliverType) {
       table.push(...this.getFilledTableData(table))
