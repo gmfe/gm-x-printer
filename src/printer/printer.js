@@ -109,6 +109,13 @@ class Printer extends React.Component {
         nextProps.linesPerPage || ''
       )
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
+      // 关闭填充时剔除渲染数据中已追加的空白行：编辑器侧清理的是 editStore.mockData，
+      // 与 printerStore.data 引用可能不同步（editStore 单例跨会话），残留空行会使
+      // 重算分页时 heights 被 slice(0, -filledTableLen) 截空，表格主体消失
+      // （TAPD 1158798739001093073）
+      if (getAutoFillingConfig(nextProps.isAutoFilling) === 'manual') {
+        this.props.printerStore.clearAllExtraTableData()
+      }
       await this.props.printerStore.setData(nextProps.data)
       await this.props.printerStore.setReady(true)
       await this.props.printerStore.computedPages()
