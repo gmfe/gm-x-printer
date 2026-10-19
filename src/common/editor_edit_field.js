@@ -420,9 +420,9 @@ class EditorField extends React.Component {
                     <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
                       {(weightOperator || 'divide') === 'divide'
                         ? i18next.t(
-                            '合计除以该数（例 500 = 克转斤）；留空保存为 0'
+                            '每个菜品数值除以该数（例 500 = 克转斤）；留空保存为 0'
                           )
-                        : i18next.t('合计乘以该数；留空保存为 0')}
+                        : i18next.t('每个菜品数值乘以该数；留空保存为 0')}
                     </Flex>
                   </>
                 )}
