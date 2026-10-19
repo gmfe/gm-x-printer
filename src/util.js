@@ -387,8 +387,10 @@ function getOverallOrderTrHeight(overallOrder) {
  * @returns 列名
  */
 function regExp(text) {
-  // {{列.x}} 提取列 key x（捕获至结尾，菜名含「.」如「土豆1.5kg」不再被 split 截断）
-  const match = /^{{列\.(.+)}}$/.exec(text)
+  // 取首个 {{列.x}} 提取列 key x（贪婪捕获至该占位符结尾，菜名含「.」如「土豆1.5kg」不被截断）。
+  // 不加 ^$ 锚点：存量模板列文本常带前后缀（如「件数：{{列.件数}}」「{{列.数量}}({{列.单位}})」），
+  // 全串匹配会让提取结果变为空串，每页/整单合计静默渲染空白
+  const match = /{{列\.([^{}]+)}}/.exec(text)
   return match ? match[1] : ''
 }
 

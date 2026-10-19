@@ -139,6 +139,40 @@ class EditorField extends React.Component {
     this.handleSetHorizontalSummary({ summaryFields: next })
   }
 
+  // 换算数值失焦提交：weightDivisor 进了 computedPrinterKey 重挂载 key，
+  // 逐键 onChange 提交会让预览 Printer 每敲一个字符整体重挂载一次（清行 +
+  // 延迟 reaction + 重新分页）。本地草稿编辑，onBlur 时一次性提交。
+  // null 表示未在编辑，镜像 store 值展示。
+  state = { weightDivisorDraft: null }
+
+  componentDidUpdate(prevProps) {
+    // 切换选中表体时丢弃未提交草稿，避免草稿串到别的表体输入框
+    if (
+      prevProps.editStore.selectedRegion !== this.props.editStore.selectedRegion
+    ) {
+      if (this.state.weightDivisorDraft !== null) {
+        this.setState({ weightDivisorDraft: null })
+      }
+    }
+  }
+
+  getWeightDivisorInputValue = weightDivisor => {
+    const { weightDivisorDraft } = this.state
+    if (weightDivisorDraft !== null) {
+      return weightDivisorDraft
+    }
+    return weightDivisor === undefined ? '' : String(weightDivisor)
+  }
+
+  commitWeightDivisorDraft = () => {
+    const { weightDivisorDraft } = this.state
+    if (weightDivisorDraft === null) {
+      return
+    }
+    this.setState({ weightDivisorDraft: null })
+    this.handleSetWeightDivisor(weightDivisorDraft)
+  }
+
   handleSetWeightDivisor = val => {
     const { editStore } = this.props
     if (!editStore.computedRegionIsTable) {
@@ -404,14 +438,11 @@ class EditorField extends React.Component {
                     <Flex alignCenter className='gm-padding-top-5'>
                       <Flex alignCenter>{i18next.t('换算数值')}：</Flex>
                       <input
-                        value={
-                          weightDivisor === undefined
-                            ? ''
-                            : String(weightDivisor)
-                        }
+                        value={this.getWeightDivisorInputValue(weightDivisor)}
                         onChange={e =>
-                          this.handleSetWeightDivisor(e.target.value)
+                          this.setState({ weightDivisorDraft: e.target.value })
                         }
+                        onBlur={() => this.commitWeightDivisorDraft()}
                         type='number'
                         className='gm-printer-edit-input-custom'
                         style={{ width: '120px' }}

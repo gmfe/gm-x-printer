@@ -344,10 +344,11 @@ class EditorStore {
 
   @action
   clearExtraTableData(dataKey) {
-    const newTable = this.mockData._table?.[dataKey]?.filter(
-      x => !x._isEmptyData
-    )
-    this.mockData._table[dataKey] = newTable
+    const table = this.mockData._table?.[dataKey]
+    // 同 handleChangeTableData 守卫：表体不存在时直接返回，
+    // 写回 undefined 会污染共享 mockData，后续解构/持久化路径拿到 undefined 表体
+    if (!Array.isArray(table)) return
+    this.mockData._table[dataKey] = table.filter(x => !x._isEmptyData)
   }
 
   @action

@@ -1535,7 +1535,11 @@ class PrinterStore {
     // data 是编辑器 mockData 的引用，跨 Printer 重挂载（切换表体类型/重新打开
     // 模板）持久共享；先剔除历史填充的空白行再追加，保证幂等，否则叠加追加
     // 导致页数膨胀（TAPD 1158798739001093058）
-    const table = (this.data._table[dataKey] || []).filter(x => !x._isEmptyData)
+    // 缺失 dataKey 时直接返回：fallback 成 [] 再写回会在共享 mockData 上
+    // 写入 _table[undefined] 伪造空表体（同 editor_store.js handleChangeTableData 守卫）
+    const rawTable = this.data._table[dataKey]
+    if (!Array.isArray(rawTable)) return
+    const table = rawTable.filter(x => !x._isEmptyData)
 
     if (!this.isDeliverType) {
       table.push(...this.getFilledTableData(table))
