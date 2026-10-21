@@ -11,6 +11,7 @@ import {
   regExp,
   getAutoFillingConfig
 } from '../util'
+import { ensureDishAnchor, filterHorizontalColumns } from './table_body_type'
 
 class EditorStore {
   @observable
@@ -264,7 +265,13 @@ class EditorStore {
               vv.dataKey +
               vv.subtotal.show +
               vv.summaryConfig?.pageSummaryShow +
-              vv.customerRowHeight
+              vv.customerRowHeight +
+              // 横向表配置变化需重挂载 Printer 预览（表体类型/整单合计/换算/可汇总字段勾选——同 summaryConfig.pageSummaryShow 先例）
+              vv.tableType +
+              vv.orderSummary?.show +
+              vv.orderSummary?.summaryFields +
+              vv.weightDivisor +
+              vv.weightOperator
             )
           } else {
             return vv.style ? vv.style.height : ''
@@ -321,6 +328,12 @@ class EditorStore {
     const isAutoFillingBool =
       getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     if (isAutoFillingBool) {
+      // mock 数据可能不含该 dataKey（如学生餐打印选项关闭对应明细），
+      // 无表可填充时仅同步开关状态：不 push 也不写回——
+      // 写回 undefined 会污染共享 mockData，clearAllTableEmptyData 遍历 filter 时崩溃
+      if (!table) {
+        return
+      }
       table.push(...this.getFilledTableData(table))
     } else {
       this.clearExtraTableData(dataKey)
@@ -331,10 +344,11 @@ class EditorStore {
 
   @action
   clearExtraTableData(dataKey) {
-    const newTable = this.mockData._table?.[dataKey]?.filter(
-      x => !x._isEmptyData
-    )
-    this.mockData._table[dataKey] = newTable
+    const table = this.mockData._table?.[dataKey]
+    // 同 handleChangeTableData 守卫：表体不存在时直接返回，
+    // 写回 undefined 会污染共享 mockData，后续解构/持久化路径拿到 undefined 表体
+    if (!Array.isArray(table)) return
+    this.mockData._table[dataKey] = table.filter(x => !x._isEmptyData)
   }
 
   @action
@@ -572,7 +586,10 @@ class EditorStore {
   clearAllTableEmptyData() {
     const tableData = this.mockData._table
     for (const [key, table] of Object.entries(tableData)) {
-      tableData[key] = table.filter(x => !x._isEmptyData)
+      // 与 printer/store.js clearAllExtraTableData 同防御：非数组/无填充行条目原样保留
+      if (Array.isArray(table) && table.some(row => row?._isEmptyData)) {
+        tableData[key] = table.filter(x => !x._isEmptyData)
+      }
     }
     // this.setAutoFillingConfig(false)
     set(this.mockData, {
@@ -1172,6 +1189,100 @@ class EditorStore {
         this.config.contents[arr[2]] = {
           ...this.config.contents[arr[2]],
           arrange: val
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 获得表体类型（学生餐配送单：纵向表 / 商品横向表），缺省 vertical
+  @computed
+  get computedTableBodyType() {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        return this.config.contents[arr[2]].tableType || 'vertical'
+      }
+    }
+  }
+
+  @action.bound
+  setTableBodyType(val, keepTexts) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        const next = { ...content, tableType: val }
+        // 切换到横向表时剔除非白名单列（空文本自定义列保留）
+        if (val === 'horizontal_product' && keepTexts && keepTexts.length) {
+          next.columns = ensureDishAnchor(
+            filterHorizontalColumns(content.columns, keepTexts)
+          )
+          // 选中列按索引寻址（computedSelectedInfo = columns[N]），剔除后索引悬空/错位
+          // 会导致 Fonter/ColumnWidth 读 undefined 崩溃——照 removeField 先例清理选中态
+          if (
+            this.selected &&
+            this.selected.startsWith(`contents.table.${arr[2]}.column.`)
+          ) {
+            this.selected = null
+          }
+        }
+        this.config.contents[arr[2]] = next
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 商品横向表整单合计配置（show: 整单合计开关；perPage: 每页显示合计），均默认 false
+  @action.bound
+  setHorizontalSummaryConfig(patch) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        this.config.contents[arr[2]] = {
+          ...content,
+          orderSummary: {
+            show: false,
+            perPage: false,
+            ...content.orderSummary,
+            ...patch
+          }
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 商品横向表重量换算（除数），非法/非正数按 1（不换算）处理
+  @action.bound
+  setWeightDivisor(val) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        // 2026-10-14 需求：输入可删空（存原样字符串），保存时 erp 归一为 0
+        const trimmed = String(val).trim()
+        const n = Number(trimmed)
+        this.config.contents[arr[2]] = {
+          ...content,
+          weightDivisor: trimmed === '' ? '' : Number.isFinite(n) ? n : ''
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
+  // 重量换算运算符：divide（÷，默认）| multiply（×）——2026-10-14 需求增补
+  @action.bound
+  setWeightOperator(val) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        this.config.contents[arr[2]] = {
+          ...content,
+          weightOperator: val === 'multiply' ? 'multiply' : 'divide'
         }
         this.changeUpdateData()
       }

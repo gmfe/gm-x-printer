@@ -109,6 +109,13 @@ class Printer extends React.Component {
         nextProps.linesPerPage || ''
       )
       await this.props.printerStore.setAutofillConfig(nextProps.isAutoFilling)
+      // 关闭填充时剔除渲染数据中已追加的空白行：编辑器侧清理的是 editStore.mockData，
+      // 与 printerStore.data 引用可能不同步（editStore 单例跨会话），残留空行会使
+      // 重算分页时 heights 被 slice(0, -filledTableLen) 截空，表格主体消失
+      // （TAPD 1158798739001093073）
+      if (getAutoFillingConfig(nextProps.isAutoFilling) === 'manual') {
+        this.props.printerStore.clearAllExtraTableData()
+      }
       await this.props.printerStore.setData(nextProps.data)
       await this.props.printerStore.setReady(true)
       await this.props.printerStore.computedPages()
@@ -226,6 +233,12 @@ class Printer extends React.Component {
       showSealInPrint
     } = this.props
     printerStore.init(config, data)
+    // 挂载构造阶段（首次 render 前）剔除历史填充的空白行：编辑器 mockData 跨
+    // Printer 重挂载共享，残留空行若进入首次渲染，表格高度测量会被污染，
+    // 后续 computedPages 拿过期高度分页导致页数不准（多出空白页）；
+    // 未开启填充的模板也因此渲染出别的模板残留的填充行。
+    // 仅挂载时清理（组件 init 不被 props 更新触发），不会清掉本次会话的填充
+    printerStore.clearAllExtraTableData()
     printerStore.setSelected(selected)
     printerStore.setSelectedRegion(selectedRegion)
     printerStore.setIsInPrint(isInPrint)
@@ -558,6 +571,7 @@ class Printer extends React.Component {
       onError,
       selectedRegion,
       printerStore,
+      isAutoFilling,
       ...rest
     } = this.props
     const {

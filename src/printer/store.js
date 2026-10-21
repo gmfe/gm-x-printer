@@ -511,7 +511,7 @@ class PrinterStore {
           allOrderSummaryConfig?.isShowOrderSummaryPer
         ) {
           /** 这里不用减，好像有点奇怪 */
-          if (summaryConfig.showPageType === 'bottom') {
+          if (summaryConfig?.showPageType === 'bottom') {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
@@ -528,7 +528,7 @@ class PrinterStore {
           /** 整单合计，不是是每页显示整单合计且在每页底部显示 且开启每页显示在每页底部显示 */
           if (
             !allOrderSummaryConfig?.isShowOrderSummaryPer &&
-            summaryConfig.showPageType === 'bottom'
+            summaryConfig?.showPageType === 'bottom'
           ) {
             // 如果开了整单合计，但没开每页整单合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
@@ -538,7 +538,7 @@ class PrinterStore {
           }
         } else if (summaryConfig?.pageSummaryShow) {
           /** 每页合计， 在每页底部显示 */
-          if (summaryConfig.showPageType === 'bottom') {
+          if (summaryConfig?.showPageType === 'bottom') {
             // 如果开了每页合计，并且显示每页合计，那么height = 1
             if (pageSummaryTrHeight && heightsLength >= 2) {
               heightsLength = heightsLength - 1
@@ -1373,6 +1373,17 @@ class PrinterStore {
     // 做好保护，出错就返回 text
     try {
       const list = this.data._table[dataKey] || this.data._table.orders
+      // 仅当单元格是「单一 {{列.x}} 占位符」时走正则直查——属性名含特殊字符（如动态菜名）
+      // 时 _.template 编译会失败。混排文本（如「{{列.商品单价}}元/{{列.定价单位}}」、页码、
+      // 函数表达式）仍走 _.template 旧逻辑，保留 '元/' 特判与表达式能力（存量模板零变化）。
+      const singleCol = /^\{\{列\.([^{}]+)\}\}$/.exec(text)
+      if (singleCol) {
+        const v = list[index] && list[index][singleCol[1]]
+        if (v !== undefined) {
+          // 与 _.template 插值对齐：null 渲染为空串
+          return v === null ? '' : String(v)
+        }
+      }
       const result = _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
@@ -1409,6 +1420,16 @@ class PrinterStore {
   templateRowSpanTable(text, item) {
     // 做好保护，出错就返回 text
     try {
+      // 仅当单元格是「单一 {{列.x}} 占位符」时走正则直查（原因同 templateTable：
+      // 特殊字符菜名致 _.template 编译失败）；null 与 _.template 插值对齐渲染空串。
+      // 混排文本走 _.template 旧逻辑，保留表达式/函数能力（存量模板零变化）。
+      const singleCol = /^\{\{列\.([^{}]+)\}\}$/.exec(text)
+      if (singleCol) {
+        const v = item && item[singleCol[1]]
+        if (v !== undefined) {
+          return v === null ? '' : String(v)
+        }
+      }
       return _.template(text, {
         interpolate: /{{([\s\S]+?)}}/g
       })({
@@ -1494,13 +1515,31 @@ class PrinterStore {
     return Array(tr_count).fill(filledData)
   }
 
+  /** 剔除全部表体中填充追加的空白行（_isEmptyData），挂载时清理跨模板残留 */
+  @action.bound
+  clearAllExtraTableData() {
+    if (!this.data?._table) return
+    _.forEach(this.data._table, (rows, key) => {
+      if (Array.isArray(rows) && rows.some(row => row?._isEmptyData)) {
+        this.data._table[key] = rows.filter(row => !row?._isEmptyData)
+      }
+    })
+  }
+
   @action.bound
   changeTableData() {
     const { autoFillConfig } = this.config
     const isAutoFilling = getAutoFillingConfig(this.isAutoFilling) !== 'manual'
     if (!isAutoFilling) return
     const dataKey = autoFillConfig?.dataKey
-    const table = this.data._table[dataKey]
+    // data 是编辑器 mockData 的引用，跨 Printer 重挂载（切换表体类型/重新打开
+    // 模板）持久共享；先剔除历史填充的空白行再追加，保证幂等，否则叠加追加
+    // 导致页数膨胀（TAPD 1158798739001093058）
+    // 缺失 dataKey 时直接返回：fallback 成 [] 再写回会在共享 mockData 上
+    // 写入 _table[undefined] 伪造空表体（同 editor_store.js handleChangeTableData 守卫）
+    const rawTable = this.data._table[dataKey]
+    if (!Array.isArray(rawTable)) return
+    const table = rawTable.filter(x => !x._isEmptyData)
 
     if (!this.isDeliverType) {
       table.push(...this.getFilledTableData(table))

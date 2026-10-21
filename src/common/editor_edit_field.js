@@ -1,7 +1,8 @@
 import i18next from '../../locales'
 import React from 'react'
-import { Flex, Option, Select, Radio } from '../components'
+import { Flex, Option, Select, Radio, Checkbox } from '../components'
 import { observer, inject } from 'mobx-react'
+import { DYNAMIC_DEMO_FLAG } from './table_body_type'
 import {
   Fonter,
   Gap,
@@ -58,6 +59,158 @@ class EditorField extends React.Component {
     editStore.setConfigTable('style', _style)
     // 设置thead > tr > td
     editStore.setConfigTable('headStyle', headStyle)
+  }
+
+  handleSetTableBodyType = val => {
+    const { editStore, tableBodyTypeFields } = this.props
+    // 点击表格区域即可设置（无需精确选中列）
+    if (!editStore.computedRegionIsTable) {
+      return
+    }
+    // selected 与 selectedRegion 是两个独立 action：selected 可能仍指向 table 而
+    // selectedRegion 已被「选择区域」切走，解引用前必须校验 region 含 table
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    if (val === editStore.computedTableBodyType) {
+      return
+    }
+    let keepTexts
+    if (val === 'horizontal_product') {
+      keepTexts = _.map(
+        _.flatten(_.values(tableBodyTypeFields)),
+        o => o.value
+      ).filter(v => v)
+      const content = editStore.config.contents[arr[2]]
+      const removed = (content.columns || []).filter(
+        c => c.text && !c[DYNAMIC_DEMO_FLAG] && !keepTexts.includes(c.text)
+      )
+      if (
+        removed.length &&
+        !window.confirm(
+          i18next.t(
+            '切换为商品横向表将移除不受支持的字段列（如 生产日期/保质期），确认切换？'
+          )
+        )
+      ) {
+        return
+      }
+    }
+    editStore.setTableBodyType(val, keepTexts)
+  }
+
+  handleSetHorizontalSummary = patch => {
+    const { editStore } = this.props
+    if (!editStore.computedRegionIsTable) {
+      return
+    }
+    // 同 handleSetTableBodyType：selectedRegion 可能已被「选择区域」切走，写值前校验含 table
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setHorizontalSummaryConfig(patch)
+  }
+
+  // 可汇总字段勾选值（1158798739001058039）：未存 summaryFields（存量模板）默认全选
+  getSummaryFields(orderSummary) {
+    return orderSummary.summaryFields || ['商品总重量', '配餐人数']
+  }
+
+  // 可汇总字段勾选切换：需求要求启用整单合计必须至少选一个，取消到空时忽略
+  handleToggleSummaryField = (field, checked) => {
+    const selectedTableContent = this.getSelectedTableContent()
+    if (!selectedTableContent) {
+      return
+    }
+    const orderSummary = selectedTableContent.orderSummary || {}
+    const current = this.getSummaryFields(orderSummary)
+    const next = checked
+      ? _.uniq([...current, field])
+      : current.filter(f => f !== field)
+    if (!next.length) {
+      return
+    }
+    this.handleSetHorizontalSummary({ summaryFields: next })
+  }
+
+  // 换算数值失焦提交：weightDivisor 进了 computedPrinterKey 重挂载 key，
+  // 逐键 onChange 提交会让预览 Printer 每敲一个字符整体重挂载一次（清行 +
+  // 延迟 reaction + 重新分页）。本地草稿编辑，onBlur 时一次性提交。
+  // null 表示未在编辑，镜像 store 值展示。
+  state = { weightDivisorDraft: null }
+
+  componentDidUpdate(prevProps) {
+    // 切换选中表体时丢弃未提交草稿，避免草稿串到别的表体输入框
+    if (
+      prevProps.editStore.selectedRegion !== this.props.editStore.selectedRegion
+    ) {
+      if (this.state.weightDivisorDraft !== null) {
+        this.setState({ weightDivisorDraft: null })
+      }
+    }
+  }
+
+  getWeightDivisorInputValue = weightDivisor => {
+    const { weightDivisorDraft } = this.state
+    if (weightDivisorDraft !== null) {
+      return weightDivisorDraft
+    }
+    return weightDivisor === undefined ? '' : String(weightDivisor)
+  }
+
+  commitWeightDivisorDraft = () => {
+    const { weightDivisorDraft } = this.state
+    if (weightDivisorDraft === null) {
+      return
+    }
+    this.setState({ weightDivisorDraft: null })
+    this.handleSetWeightDivisor(weightDivisorDraft)
+  }
+
+  handleSetWeightDivisor = val => {
+    const { editStore } = this.props
+    if (!editStore.computedRegionIsTable) {
+      return
+    }
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setWeightDivisor(val)
+  }
+
+  handleSetWeightOperator = val => {
+    const { editStore } = this.props
+    if (!editStore.computedRegionIsTable) {
+      return
+    }
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setWeightOperator(val)
+  }
+
+  // 读取当前选中表体 content（selectedRegion 含 table 才有效），供横向表配置控件取值
+  getSelectedTableContent() {
+    const { editStore } = this.props
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (arr.includes('table')) {
+      return editStore.config.contents[arr[2]]
+    }
+    return null
   }
 
   handleSetTableDataKey = dataKey => {
@@ -164,10 +317,19 @@ class EditorField extends React.Component {
       isDeliverType,
       showMergeOption,
       showProductPermutation = true,
-      renderExtra
+      renderExtra,
+      tableBodyTypeFields
     } = this.props
     const { head, headStyle, text, style } =
       editStore.computedSelectedInfo || {}
+    const selectedTableContent = this.getSelectedTableContent()
+    const orderSummary =
+      (selectedTableContent && selectedTableContent.orderSummary) || {}
+    // 2026-10-14 需求：输入框可删空（undefined 显示空，保存时归一为 0）
+    const weightDivisor =
+      selectedTableContent && selectedTableContent.weightDivisor
+    const weightOperator =
+      selectedTableContent && selectedTableContent.weightOperator
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -193,13 +355,124 @@ class EditorField extends React.Component {
           </>
         )}
 
-        <Flex alignCenter>
-          <Flex alignCenter>{i18next.t('设置列宽')}：</Flex>
-          <ColumnWidth
-            style={headStyle}
-            onChange={this.handleChangeTableColumn}
-          />
-        </Flex>
+        {/* 打印侧仅处理 dataKey '1'（学生餐常规表体），2/3/4（桶餐/净菜/调味品）不展示横向配置 */}
+        {tableBodyTypeFields && editStore.selectedTableDataKey === '1' && (
+          <>
+            <Flex alignCenter>
+              <Flex alignCenter>{i18next.t('表体类型')}：</Flex>
+              <Select
+                className='gm-printer-edit-select'
+                value={editStore.computedTableBodyType}
+                onChange={this.handleSetTableBodyType}
+              >
+                <Option value='vertical'>{i18next.t('纵向明细表')}</Option>
+                <Option value='horizontal_product'>
+                  {i18next.t('商品横向表')}
+                </Option>
+              </Select>
+            </Flex>
+            <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+              {i18next.t('商品横向表仅支持按班级汇总打印')}
+            </Flex>
+            {editStore.computedTableBodyType === 'horizontal_product' && (
+              <>
+                <Flex alignCenter className='gm-padding-top-5'>
+                  <Flex alignCenter>{i18next.t('整单合计')}：</Flex>
+                  <Select
+                    className='gm-printer-edit-select'
+                    value={orderSummary.show ? 'on' : 'off'}
+                    onChange={v =>
+                      this.handleSetHorizontalSummary({ show: v === 'on' })
+                    }
+                  >
+                    <Option value='off'>{i18next.t('关闭')}</Option>
+                    <Option value='on'>{i18next.t('开启')}</Option>
+                  </Select>
+                </Flex>
+                {orderSummary.show && (
+                  <>
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>{i18next.t('可汇总字段')}：</Flex>
+                      <Flex row>
+                        {[
+                          {
+                            field: '商品总重量',
+                            label: i18next.t('商品总重量')
+                          },
+                          { field: '配餐人数', label: i18next.t('配餐人数') }
+                        ].map(({ field, label }) => (
+                          <Checkbox
+                            key={field}
+                            checked={this.getSummaryFields(
+                              orderSummary
+                            ).includes(field)}
+                            onChange={checked =>
+                              this.handleToggleSummaryField(field, checked)
+                            }
+                          >
+                            <span className='gm-padding-left-5'>{label}</span>
+                          </Checkbox>
+                        ))}
+                      </Flex>
+                    </Flex>
+                    <Flex className='gm-padding-top-5 gm-text-desc'>
+                      {i18next.t(
+                        '启用整单合计必须要选择至少一个汇总字段才能显示'
+                      )}
+                    </Flex>
+                  </>
+                )}
+                {orderSummary.show && (
+                  <>
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>{i18next.t('重量换算')}：</Flex>
+                      <Select
+                        className='gm-printer-edit-select'
+                        value={weightOperator || 'divide'}
+                        onChange={v => this.handleSetWeightOperator(v)}
+                      >
+                        <Option value='divide'>{i18next.t('÷ 除以')}</Option>
+                        <Option value='multiply'>{i18next.t('× 乘以')}</Option>
+                      </Select>
+                    </Flex>
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>{i18next.t('换算数值')}：</Flex>
+                      <input
+                        value={this.getWeightDivisorInputValue(weightDivisor)}
+                        onChange={e =>
+                          this.setState({ weightDivisorDraft: e.target.value })
+                        }
+                        onBlur={() => this.commitWeightDivisorDraft()}
+                        type='number'
+                        className='gm-printer-edit-input-custom'
+                        style={{ width: '120px' }}
+                      />
+                    </Flex>
+                    <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                      {(weightOperator || 'divide') === 'divide'
+                        ? i18next.t(
+                            '每个菜品数值除以该数（例 500 = 克转斤）；留空保存为 0'
+                          )
+                        : i18next.t('每个菜品数值乘以该数；留空保存为 0')}
+                    </Flex>
+                  </>
+                )}
+              </>
+            )}
+            <Gap height='5px' />
+          </>
+        )}
+
+        {/* 列级控件：需精确选中某一列（点击表头/列）才展示 */}
+        {editStore.computedIsSelectTable && (
+          <Flex alignCenter>
+            <Flex alignCenter>{i18next.t('设置列宽')}：</Flex>
+            <ColumnWidth
+              style={headStyle || {}}
+              onChange={this.handleChangeTableColumn}
+            />
+          </Flex>
+        )}
 
         <Gap height='5px' />
 
@@ -307,66 +580,71 @@ class EditorField extends React.Component {
 
         <Gap height='5px' />
 
-        <Flex>
-          <Flex>{i18next.t('字段设置')}：</Flex>
-          <div>
+        {/* 列级控件：需精确选中某一列（点击表头/列）才展示 */}
+        {editStore.computedIsSelectTable && (
+          <Flex>
+            <Flex>{i18next.t('字段设置')}：</Flex>
             <div>
-              <Fonter
-                style={headStyle}
-                onChange={this.handleChangeTable.bind(this, 'headStyle')}
-                type='table'
-              />
-              <Separator />
-              <TextAlign
-                style={headStyle}
-                onChange={this.handleChangeTable.bind(this, 'headStyle')}
-              />
-              <Gap />
-
-              <Textarea
-                value={head}
-                placeholder={i18next.t('请输入表头填充内容')}
-                onChange={this.handleChangeTable.bind(this, 'head')}
-              />
-            </div>
-            <div>
-              <Fonter
-                style={style}
-                onChange={this.handleChangeTable.bind(this, 'style')}
-                type='table'
-              />
-              <Separator />
-              <TextAlign
-                style={style}
-                onChange={this.handleChangeTable.bind(this, 'style')}
-              />
-              <Gap />
-
-              <Textarea
-                value={text}
-                placeholder={i18next.t('请输入内容填充内容')}
-                onChange={this.handleChangeTable.bind(this, 'text')}
-              />
-            </div>
-            {(_.includes(text, i18next.t('时间')) ||
-              _.includes(text, i18next.t('日期')) ||
-              _.includes(text, 'Time') ||
-              _.includes(text, 'Date')) && (
               <div>
-                <TipInfo
-                  text={i18next.t('注：可通过修改“{{}}”中的内容更改时间格式。')}
+                <Fonter
+                  style={headStyle || {}}
+                  onChange={this.handleChangeTable.bind(this, 'headStyle')}
+                  type='table'
                 />
-                {_.map(DiyTimeType, (v, k) => (
-                  <TipInfo text={`${k + 1}。${v.text}`} />
-                ))}
-                <TipInfo
-                  text={`${DiyTimeType.length +
-                    +1}、指定日期后7天，输入“单据日期：{{addDay(单据日期, 7)}}”；`}
+                <Separator />
+                <TextAlign
+                  style={headStyle || {}}
+                  onChange={this.handleChangeTable.bind(this, 'headStyle')}
+                />
+                <Gap />
+
+                <Textarea
+                  value={head}
+                  placeholder={i18next.t('请输入表头填充内容')}
+                  onChange={this.handleChangeTable.bind(this, 'head')}
                 />
               </div>
-            )}
-          </div>
-        </Flex>
+              <div>
+                <Fonter
+                  style={style || {}}
+                  onChange={this.handleChangeTable.bind(this, 'style')}
+                  type='table'
+                />
+                <Separator />
+                <TextAlign
+                  style={style || {}}
+                  onChange={this.handleChangeTable.bind(this, 'style')}
+                />
+                <Gap />
+
+                <Textarea
+                  value={text}
+                  placeholder={i18next.t('请输入内容填充内容')}
+                  onChange={this.handleChangeTable.bind(this, 'text')}
+                />
+              </div>
+              {(_.includes(text, i18next.t('时间')) ||
+                _.includes(text, i18next.t('日期')) ||
+                _.includes(text, 'Time') ||
+                _.includes(text, 'Date')) && (
+                <div>
+                  <TipInfo
+                    text={i18next.t(
+                      '注：可通过修改“{{}}”中的内容更改时间格式。'
+                    )}
+                  />
+                  {_.map(DiyTimeType, (v, k) => (
+                    <TipInfo text={`${k + 1}。${v.text}`} />
+                  ))}
+                  <TipInfo
+                    text={`${DiyTimeType.length +
+                      +1}、指定日期后7天，输入“单据日期：{{addDay(单据日期, 7)}}”；`}
+                  />
+                </div>
+              )}
+            </div>
+          </Flex>
+        )}
       </div>
     )
   }
@@ -377,7 +655,13 @@ class EditorField extends React.Component {
     let content = null
     if (editStore.computedIsSelectBlock) {
       content = this.renderBlocks()
-    } else if (editStore.computedIsSelectTable) {
+    } else if (
+      editStore.computedIsSelectTable ||
+      editStore.computedRegionIsTable
+    ) {
+      // 点击表格区域（selectedRegion）即可展示表格级设置（表体类型/整单合计/
+      // 行高/表格样式等），无需先精确选中某一列（selected）；
+      // 列级控件（设置列宽/字段设置）内部仍以 computedIsSelectTable 区分
       content = this.renderTable()
     }
     return content
@@ -392,6 +676,8 @@ EditorField.propTypes = {
   /** 是否显示商品排列 */
   showProductPermutation: PropTypes.bool,
   renderExtra: PropTypes.func,
+  /** 商品横向表白名单字段集合（传入才显示表体类型下拉） */
+  tableBodyTypeFields: PropTypes.object,
   isDeliverType: PropTypes.bool
 }
 

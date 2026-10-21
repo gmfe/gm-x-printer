@@ -40,7 +40,8 @@ const sumCol = (key, dataList, isAllProduct) => {
   } catch (e) {
     result = ''
   }
-  const isInt = !arr?.find(item => item?.includes('.'))
+  // 单元格可能是数字（如学生餐横向表），String 化后判定小数位，避免 number.includes 崩溃
+  const isInt = !arr?.find(item => String(item ?? '').includes('.'))
   if (result) {
     return isInt ? result : result.toFixed(2)
   }
@@ -57,14 +58,19 @@ const PageSummary = props => {
     isLastPage
   } = props
   const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-  const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig')
+  // 未配置整单合计的表体容错，避免裸解构崩溃
+  const allOrderSummaryConfig = get(config, 'allOrderSummaryConfig') || {}
 
   const {
     orderSummaryShow,
     showOrderType,
     style,
     orderSummaryText,
-    summaryOrderColumns
+    summaryOrderColumns,
+    // 2026-10-14 口径：仅整单合计行做重量换算（单元格原值展示）。per-key 映射
+    // { value, operator: 'divide'|'multiply' }：重量列配系数，配餐人数等非重量列不换算；
+    // ÷0 或 ×0 结果为 0（空保存归一 0 的配套口径）
+    sumConvertByField
   } = allOrderSummaryConfig
   const tableData = printerStore.data._table[_dataKey] || []
 
@@ -79,22 +85,51 @@ const PageSummary = props => {
     (config?.allOrderSummaryConfig?.isShowOrderSummaryPer || isLastPage) &&
     showOrderType === SHOW_WAY_ENUM.bottom
   ) {
+    // 可汇总列集合（模板串提取 key）；文案列自适应：汇总列显示合计值，
+    // 「整单合计」文案落在第一个非汇总列（如横向表的班级列）；
+    // 无任何非汇总列时退回首列文案（兼容纯菜品列表体）
+    const summableKeys = summaryOrderColumns.map(text => regExp(text))
+    const firstNonSummableIndex = columns.findIndex(col => {
+      const key = regExp(col.text)
+      return !key || !summableKeys.includes(key)
+    })
+    const labelIndex = firstNonSummableIndex >= 0 ? firstNonSummableIndex : 0
     return (
       <tr>
         {_.map(columns, (col, index) => {
           let html
-          // 第一列
-          if (index === 0) {
+          const key = regExp(col.text)
+          const isSummable = key && summableKeys.includes(key)
+          if (
+            index === labelIndex &&
+            (!isSummable || firstNonSummableIndex < 0)
+          ) {
             html = orderSummaryText
+          } else if (isSummable) {
+            if (!printerStore.ready) {
+              html = ' '
+            } else {
+              // 仅合计行换算（sumConvertByField[key]，未配置则原样）
+              const summed = sumCol(key, currentOrderTableData, isAllProduct)
+              const convert = sumConvertByField?.[key]
+              if (summed !== '' && convert && Number.isFinite(convert.value)) {
+                const bigSum =
+                  convert.operator === 'multiply'
+                    ? new Big(summed).times(convert.value)
+                    : convert.value > 0
+                    ? new Big(summed).div(convert.value)
+                    : new Big(0)
+                const rounded = bigSum.round(2)
+                // 与 sumCol 展示风格一致：整数原样，小数保留两位
+                html = rounded.mod(1).eq(0)
+                  ? rounded.toString()
+                  : rounded.toFixed(2)
+              } else {
+                html = summed
+              }
+            }
           } else {
-            const key = regExp(col.text)
-
-            html =
-              printerStore.ready &&
-              summaryOrderColumns.map(text => regExp(text)).includes(key) &&
-              key
-                ? sumCol(key, currentOrderTableData, isAllProduct)
-                : ' '
+            html = ' '
           }
           return (
             <td

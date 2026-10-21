@@ -35,7 +35,7 @@ const sumCol = (key, dataList, isAllProduct) => {
   } catch (e) {
     result = ''
   }
-  const isInt = !arr?.find(item => item?.includes('.'))
+  const isInt = !arr?.find(item => String(item ?? '').includes('.'))
   // 累加各个项时，如果存在小数那么保留两位小数
   if (result) {
     return isInt ? result : result.toFixed(2)
@@ -61,7 +61,7 @@ const sumColWithMulti = (key, dataList, isAllProduct) => {
   } catch (e) {
     result = ''
   }
-  const isInt = !arr?.find(item => item?.includes('.'))
+  const isInt = !arr?.find(item => String(item ?? '').includes('.'))
   // 累加各个项时，如果存在小数那么保留两位小数
   if (result) {
     return isInt ? result : result.toFixed(2)
@@ -78,7 +78,8 @@ const PageSummary = props => {
     printerStore
   } = props
   const _dataKey = getDataKey(dataKey, arrange, printerStore.tableVerticalStyle)
-  const summaryConfig = get(config, 'summaryConfig')
+  // 无每页合计配置的模板（如学生餐横向表）容错，避免裸解构崩溃
+  const summaryConfig = get(config, 'summaryConfig') || {}
 
   const {
     pageSummaryShow,
