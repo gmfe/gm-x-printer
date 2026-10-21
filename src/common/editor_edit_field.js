@@ -201,6 +201,21 @@ class EditorField extends React.Component {
     editStore.setWeightOperator(val)
   }
 
+  // 仅计量单位菜品换算开关（1158798739001058039 增补）：on/off 翻译为布尔存模板
+  handleSetWeightConversionOnlyMeasure = val => {
+    const { editStore } = this.props
+    if (!editStore.computedRegionIsTable) {
+      return
+    }
+    const arr = editStore.selectedRegion
+      ? editStore.selectedRegion.split('.')
+      : []
+    if (!arr.includes('table')) {
+      return
+    }
+    editStore.setWeightConversionOnlyMeasure(val === 'on')
+  }
+
   // 读取当前选中表体 content（selectedRegion 含 table 才有效），供横向表配置控件取值
   getSelectedTableContent() {
     const { editStore } = this.props
@@ -330,6 +345,9 @@ class EditorField extends React.Component {
       selectedTableContent && selectedTableContent.weightDivisor
     const weightOperator =
       selectedTableContent && selectedTableContent.weightOperator
+    // 1158798739001058039 增补：仅计量单位菜品换算开关（undefined=存量模板=关闭）
+    const weightConversionOnlyMeasure =
+      selectedTableContent && selectedTableContent.weightConversionOnlyMeasure
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -454,6 +472,28 @@ class EditorField extends React.Component {
                             '每个菜品数值除以该数（例 500 = 克转斤）；留空保存为 0'
                           )
                         : i18next.t('每个菜品数值乘以该数；留空保存为 0')}
+                    </Flex>
+                    {/* 1158798739001058039 增补：仅计量单位菜品参与换算，
+                        计数单位（份/个）原值打印；编辑器预览不区分单位（mock 无单位类型） */}
+                    <Flex alignCenter className='gm-padding-top-5'>
+                      <Flex alignCenter>
+                        {i18next.t('仅计量单位菜品换算')}：
+                      </Flex>
+                      <Select
+                        className='gm-printer-edit-select'
+                        value={weightConversionOnlyMeasure ? 'on' : 'off'}
+                        onChange={v =>
+                          this.handleSetWeightConversionOnlyMeasure(v)
+                        }
+                      >
+                        <Option value='off'>{i18next.t('关闭')}</Option>
+                        <Option value='on'>{i18next.t('开启')}</Option>
+                      </Select>
+                    </Flex>
+                    <Flex alignCenter className='gm-padding-top-5 gm-text-desc'>
+                      {i18next.t(
+                        '开启后打印时按菜品单位判断：克/千克等计量单位执行换算，份/个等计数单位不换算'
+                      )}
                     </Flex>
                   </>
                 )}

@@ -1289,6 +1289,24 @@ class EditorStore {
     }
   }
 
+  // 仅计量单位菜品换算开关（1158798739001058039 增补）：开启后打印页按菜品单位
+  // 类型过滤换算列（计量单位 ÷/×，计数单位原值）；erp 侧 applyHorizontalCellConversion 消费，
+  // undefined（存量模板）与 false 同为关闭
+  @action.bound
+  setWeightConversionOnlyMeasure(val) {
+    if (this.selectedRegion) {
+      const arr = this.selectedRegion.split('.')
+      if (arr.includes('table')) {
+        const content = this.config.contents[arr[2]]
+        this.config.contents[arr[2]] = {
+          ...content,
+          weightConversionOnlyMeasure: val === true
+        }
+        this.changeUpdateData()
+      }
+    }
+  }
+
   @action
   removeContent(name) {
     const arr = name.split('.')
