@@ -1,12 +1,20 @@
 declare module 'gm-x-printer' {
   import { CSSProperties } from 'react'
 
+  /** Minimal selected-column context for custom sorting template controls. */
+  interface EditorRenderExtraContext {
+    isTableColumnSelected: boolean
+    selectedColumn?: { text?: string }
+    setSelectedColumnValue: (key: string, value: unknown) => void
+  }
+
   interface EditorProps {
     config: any
     mockData: any
     onSave: (config: any, isSaveAs?: boolean) => void
     showEditor: boolean
     addFields: any
+    renderExtra?: (context: EditorRenderExtraContext) => React.ReactNode
   }
 
   interface PrinterProps {
@@ -173,6 +181,7 @@ declare module 'gm-x-printer' {
     EditorMaterialRequisition,
     EditorAfterSales,
     EditorSorting,
+    EditorRenderExtraContext,
     MULTI_SUFFIX,
     insertCSS,
     getCSS,

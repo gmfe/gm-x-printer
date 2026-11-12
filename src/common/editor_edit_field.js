@@ -576,7 +576,14 @@ class EditorField extends React.Component {
             )}
           </>
         )}
-        {renderExtra && renderExtra()}
+        {renderExtra &&
+          renderExtra({
+            isTableColumnSelected: !!editStore.computedIsSelectTable,
+            selectedColumn: editStore.computedIsSelectTable
+              ? { text: editStore.computedSelectedInfo.text }
+              : undefined,
+            setSelectedColumnValue: this.handleChangeTable
+          })}
         <Gap height='5px' />
         {type === 'OUT_STOCK' && showMergeOption && (
           <Flex>

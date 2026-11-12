@@ -15,7 +15,6 @@ import EditorSpecialTable from './editor_special_table'
 import ContextMenu from './context_menu'
 import i18next from '../../locales'
 import withStore from '../common/hoc_with_store'
-import EditorPageSummary from '../common/editor_page_summary'
 
 @withStore(editStore)
 @inject('editStore')
@@ -29,6 +28,7 @@ class Editor extends React.Component {
       isPurchase,
       uploadQiniuImage,
       batchPrintSettingKey,
+      renderExtra,
       config: { templateType }
     } = this.props
 
@@ -59,7 +59,7 @@ class Editor extends React.Component {
               batchPrintSettingKey={batchPrintSettingKey}
             />
             <Gap height='5px' />
-            <EditorField />
+            <EditorField renderExtra={renderExtra} />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
             <Gap height='5px' />
@@ -87,7 +87,8 @@ Editor.propTypes = {
   mockData: PropTypes.object.isRequired,
   addFields: PropTypes.object.isRequired,
   isPurchase: PropTypes.bool,
-  batchPrintSettingKey: PropTypes.string
+  batchPrintSettingKey: PropTypes.string,
+  renderExtra: PropTypes.func
 }
 
 Editor.deaultProps = {
