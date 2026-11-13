@@ -333,6 +333,7 @@ class EditorField extends React.Component {
       showMergeOption,
       showProductPermutation = true,
       renderExtra,
+      renderExtraAtEnd,
       tableBodyTypeFields
     } = this.props
     const { head, headStyle, text, style } =
@@ -348,6 +349,15 @@ class EditorField extends React.Component {
     // 1158798739001058039 增补：仅计量单位菜品换算开关（undefined=存量模板=关闭）
     const weightConversionOnlyMeasure =
       selectedTableContent && selectedTableContent.weightConversionOnlyMeasure
+    const extra =
+      renderExtra &&
+      renderExtra({
+        isTableColumnSelected: !!editStore.computedIsSelectTable,
+        selectedColumn: editStore.computedIsSelectTable
+          ? { text: editStore.computedSelectedInfo.text }
+          : undefined,
+        setSelectedColumnValue: this.handleChangeTable
+      })
     return (
       <div>
         <Title title={i18next.t('编辑字段')} />
@@ -576,14 +586,7 @@ class EditorField extends React.Component {
             )}
           </>
         )}
-        {renderExtra &&
-          renderExtra({
-            isTableColumnSelected: !!editStore.computedIsSelectTable,
-            selectedColumn: editStore.computedIsSelectTable
-              ? { text: editStore.computedSelectedInfo.text }
-              : undefined,
-            setSelectedColumnValue: this.handleChangeTable
-          })}
+        {!renderExtraAtEnd && extra}
         <Gap height='5px' />
         {type === 'OUT_STOCK' && showMergeOption && (
           <Flex>
@@ -692,6 +695,7 @@ class EditorField extends React.Component {
             </div>
           </Flex>
         )}
+        {renderExtraAtEnd && extra}
       </div>
     )
   }
@@ -723,6 +727,7 @@ EditorField.propTypes = {
   /** 是否显示商品排列 */
   showProductPermutation: PropTypes.bool,
   renderExtra: PropTypes.func,
+  renderExtraAtEnd: PropTypes.bool,
   /** 商品横向表白名单字段集合（传入才显示表体类型下拉） */
   tableBodyTypeFields: PropTypes.object,
   isDeliverType: PropTypes.bool

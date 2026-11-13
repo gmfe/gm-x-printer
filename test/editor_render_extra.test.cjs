@@ -191,8 +191,12 @@ test('the sorting editor forwards the callback to the real selected-column edito
   })
   editor.store.setSelectedRegion('contents.table.0')
   editor.store.setSelected('contents.table.0.column.0')
-  assert.match(
-    renderToStaticMarkup(editor.render()),
-    /sorting column extension/
+  const markup = renderToStaticMarkup(editor.render())
+  assert.match(markup, /sorting column extension/)
+  assert.ok(
+    markup.indexOf('字段设置') < markup.indexOf('sorting column extension')
+  )
+  assert.ok(
+    markup.indexOf('sorting column extension') < markup.indexOf('添加字段')
   )
 })

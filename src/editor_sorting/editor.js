@@ -59,7 +59,7 @@ class Editor extends React.Component {
               batchPrintSettingKey={batchPrintSettingKey}
             />
             <Gap height='5px' />
-            <EditorField renderExtra={renderExtra} />
+            <EditorField renderExtra={renderExtra} renderExtraAtEnd />
             <Gap height='5px' />
             <EditorAddField addFields={addFields} />
             <Gap height='5px' />
